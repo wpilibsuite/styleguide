@@ -6,8 +6,6 @@ import os
 import queue
 import subprocess
 import sys
-from threading import Lock
-from threading import Thread
 
 from clangformat import ClangFormat
 from licenseupdate import LicenseUpdate
@@ -21,21 +19,18 @@ def inGitRepo(directory):
     ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
     return ret.returncode == 0
 
-def threadFunc(workQueue, isVerbose, printLock):
+def procFunc(work, isVerbose, printLock):
     # Lint is run last since previous tasks can affect its output
     tasks = [ClangFormat(), LicenseUpdate(), Newline(), Whitespace(), Lint()]
 
     try:
-        while True:
-            name = workQueue.get_nowait()
-
+        for name in work:
             if isVerbose:
-                printLock.acquire()
-                print("Processing", name,)
-                for task in tasks:
-                    if task.fileMatchesExtension(name):
-                        print("  with " + type(task).__name__)
-                printLock.release()
+                with printLock:
+                    print("Processing", name,)
+                    for task in tasks:
+                        if task.fileMatchesExtension(name):
+                            print("  with " + type(task).__name__)
 
             for task in tasks:
                 if task.fileMatchesExtension(name):
@@ -100,25 +95,24 @@ def main():
     jobs = args.jobs
     isVerbose = args.verbose
 
-    # Add files to work queue
-    workQueue = queue.Queue()
-    for file in files:
-        workQueue.put(file)
+    processes = []
+    printLock = multiprocessing.Lock()
 
-    threads = []
-    printLock = Lock()
+    # Make list of evenly-sized work chunks
+    chunkSize = round(len(files) / jobs)
+    work = [files[i:i + chunkSize] for i in range(0, len(files), chunkSize)]
 
-    # Start worker threads
+    # Start worker processes
     for i in range(0, jobs):
-        thread = Thread(target = threadFunc,
-                        args = (workQueue, isVerbose, printLock))
-        thread.daemon = True
-        thread.start()
-        threads.append(thread)
+        proc = multiprocessing.Process(target = procFunc,
+                                       args = (work[i], isVerbose, printLock))
+        proc.daemon = True
+        proc.start()
+        processes.append(proc)
 
-    # Wait for worker threads to finish
+    # Wait for worker processes to finish
     for i in range(0, jobs):
-        threads[i].join()
+        processes[i].join()
 
 if __name__ == "__main__":
     main()
