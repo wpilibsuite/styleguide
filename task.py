@@ -3,11 +3,12 @@
 from abc import *
 import os
 import re
+import sys
 
-sep = os.sep
+regexSep = os.sep
 # If directory separator is backslash, escape it for regexes
-if sep == "\\":
-    sep += "\\"
+if regexSep == "\\":
+    regexSep += "\\"
 
 # There are two groups of regexes which prevent tasks from running on matching
 # files:
@@ -18,49 +19,102 @@ if sep == "\\":
 # modifications to generated files because some of the regexes from each group
 # overlap.
 
+"""Read values from config file
+
+Checks current directory for config file. If one doesn't exist, try all parent
+directories as well.
+
+A config file takes the form:
+
+```
+genFolderExclude {
+  folder1
+  folder2/subdir1/subdir2
+}
+
+genFileExclude {
+  header1\.h$
+  header2\.h$
+}
+
+modifiableFolderExclude {
+  \.git
+  __pycache__
+  folder/subdir
+}
+
+modifiableFileExclude {
+  \.jar$
+  \.patch$
+}
+```
+
+Directory separators must be "/", not "\". During processing, they will be
+replaced internally with an os.sep that is automatically escaped for regexes.
+
+Returns dictionary of groups (group name -> list of values).
+"""
+def readConfigFile(configName):
+    configFound = False
+    directory = os.getcwd()
+    while not configFound and len(directory) > 0:
+        try:
+            with open(directory + os.sep + configName, "r") as configFile:
+                configFound = True
+
+                inGroup = False
+                configGroups = {}
+                groupName = ""
+                groupElements = []
+
+                for line in configFile:
+                    # Skip empty lines
+                    if line.strip() == "":
+                        continue
+
+                    if "{" in line:
+                        inGroup = True
+
+                        # Group name is on same line as "{"
+                        groupName = line[:line.find("{")].strip()
+                    elif "}" in line:
+                        inGroup = False
+
+                        # After group closes, save element list and clear it
+                        configGroups[groupName] = groupElements
+                        groupElements = []
+                    elif inGroup:
+                        value = line.strip()
+
+                        # On Windows, replace "/" with escaped "\" for regexes
+                        if os.sep == "\\":
+                            value = value.replace("/", regexSep)
+
+                        groupElements.extend([value])
+                return configGroups
+        except OSError:
+            directory = directory[:directory.rfind(os.sep)]
+
+configDict = readConfigFile(".styleguide")
+if not configDict:
+    print("Error: config file \".styleguide\" not found")
+    sys.exit(1)
+
 # List of regexes for folders which contain generated files
-genFolderExclude = \
-    [name + sep for name in [
-     "FRC_FPGA_ChipObject",
-     "NetworkCommunication",
-     "ctre",
-     "frccansae",
-     "gtest",
-     "i2clib",
-     "msgs",
-     "ni-libraries",
-     "ni" + sep + "vision",
-     "spilib",
-     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "nivision",
-     "visa"]]
+genFolderExclude = [name + regexSep for name in configDict["genFolderExclude"]]
 
 # List of regexes for generated files
-genFileExclude = [name + "$" for name in [
-                  "CanTalonSRX\.h",
-                  "NIIMAQdx\.h",
-                  "can_proto\.h",
-                  "nivision\.h"]]
+genFileExclude = configDict["genFileExclude"]
 
 # Regex for generated file exclusions
 genRegexExclude = re.compile("|".join(genFolderExclude + genFileExclude))
 
 # Regex for folders which contain modifiable files
 modifiableFolderExclude = \
-    [name + sep for name in [
-     "\.git",
-     "\.gradle",
-     "__pycache__",
-     "build",
-     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "include",
-     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "lib"]]
+    [name + regexSep for name in configDict["modifiableFolderExclude"]]
 
 # List of regexes for modifiable files
-modifiableFileExclude = [name + "$" for name in [
-                         "\.jar",
-                         "\.patch",
-                         "\.png",
-                         "\.py",
-                         "\.so"]]
+modifiableFileExclude = configDict["modifiableFileExclude"]
 
 # Regex for modifiable file exclusions
 modifiableRegexExclude = \
