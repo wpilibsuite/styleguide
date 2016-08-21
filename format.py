@@ -3,7 +3,6 @@
 import argparse
 import multiprocessing
 import os
-import queue
 import subprocess
 import sys
 
@@ -23,20 +22,17 @@ def procFunc(work, isVerbose, printLock):
     # Lint is run last since previous tasks can affect its output
     tasks = [ClangFormat(), LicenseUpdate(), Newline(), Whitespace(), Lint()]
 
-    try:
-        for name in work:
-            if isVerbose:
-                with printLock:
-                    print("Processing", name,)
-                    for task in tasks:
-                        if task.fileMatchesExtension(name):
-                            print("  with " + type(task).__name__)
+    for name in work:
+        if isVerbose:
+            with printLock:
+                print("Processing", name,)
+                for task in tasks:
+                    if task.fileMatchesExtension(name):
+                        print("  with " + type(task).__name__)
 
-            for task in tasks:
-                if task.fileMatchesExtension(name):
-                    task.run(name)
-    except queue.Empty:
-        pass
+        for task in tasks:
+            if task.fileMatchesExtension(name):
+                task.run(name)
 
 def main():
     if not inGitRepo("."):
@@ -83,6 +79,10 @@ def main():
 
     # Don't format generated files
     files = [name for name in files if not Task.isGeneratedFile(name)]
+
+    # If there are no files left, do nothing
+    if len(files) == 0:
+        sys.exit(0)
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description = "Runs all formatting tasks on the code base. This should be invoked from either the styleguide directory or the root directory of the project.")
