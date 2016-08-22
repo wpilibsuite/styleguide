@@ -171,6 +171,31 @@ int bar [[deprecated("This is a deprecated variable.")]];
 <p>See <a href=http://josephmansfield.uk/articles/marking-deprecated-c++14.html>
 here</a> for more information on deprecation.</p>
 
+<h3 id="Implementation_Tradeoffs">Implementation Tradeoffs</h3>
+<p>The C++ version of WPILib is intended to be fast, so implementation tradeoffs
+should be biased toward that.</p>
+
+<h3 id="Built-in_Types">Built-in Types</h3>
+<p>The HAL uses stdint.h typedefs for integral types since maintaining
+consistent sizes on different platforms is important. wpilibc uses stdint.h
+typedefs for all integral types except for <code>int</code> in user-facing
+interfaces. All integer types are signed in external interfaces with unsigned
+types only used for bitwise arithmetic.
+</p>
+<p>doubles are used everywhere instead of floats. When compiling with
+optimizations enabled, there is negligible performance impact for the extra
+precision on ARMv7.
+</p>
+
+<h3 id="Generated_Files">Generated Files</h3>
+<p>Since changes would be overwritten upon regeneration, generated files should
+not be modified under any circumstances, including for formatting changes. The
+generator for those files should be modified instead. The current list of
+generated files is represented by regular expressions in the
+<code>.styleguide</code> file in the root directory of the generated file's
+repository.
+</p>
+
 <h2 id="Header_Files">Header Files</h2>
 
 <p>In general, every <code>.cc</code> file should have an
