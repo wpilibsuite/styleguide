@@ -107,7 +107,12 @@ genFolderExclude = [name + regexSep for name in configDict["genFolderExclude"]]
 genFileExclude = configDict["genFileExclude"]
 
 # Regex for generated file exclusions
-genRegexExclude = re.compile("|".join(genFolderExclude + genFileExclude))
+genExclude = genFolderExclude + genFileExclude
+if len(genExclude) == 0:
+    # If there are no file exclusions, make regex match nothing
+    genRegexExclude = re.compile("a^")
+else:
+    genRegexExclude = re.compile("|".join(genExclude))
 
 # Regex for folders which contain modifiable files
 modifiableFolderExclude = \
@@ -117,8 +122,12 @@ modifiableFolderExclude = \
 modifiableFileExclude = configDict["modifiableFileExclude"]
 
 # Regex for modifiable file exclusions
-modifiableRegexExclude = \
-    re.compile("|".join(modifiableFolderExclude + modifiableFileExclude))
+modifiableExclude = modifiableFolderExclude + modifiableFileExclude
+if len(modifiableExclude) == 0:
+    # If there are no file exclusions, make regex match nothing
+    modifiableRegexExclude = re.compile("a^")
+else:
+    modifiableRegexExclude = re.compile("|".join(modifiableExclude))
 
 class Task(object):
     __metaclass__ = ABCMeta
