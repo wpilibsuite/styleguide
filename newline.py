@@ -17,7 +17,8 @@ class Newline(Task):
             size = file.tell()
 
             # Seek to last character in file
-            file.seek(size - 1)
+            if size > 0:
+                file.seek(size - 1)
 
             # While last character is a newline
             while file.read(1) == "\n":
