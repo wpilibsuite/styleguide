@@ -1,4 +1,8 @@
-"""This task runs clang-format on all C++ source files."""
+"""This task runs clang-format on all C++ source files.
+
+Dependencies:
+    clang-format (included in Clang installation)
+"""
 
 import subprocess
 import sys
