@@ -27,6 +27,20 @@ directories as well.
 A config file takes the form:
 
 ```
+cExtensions {
+  c
+}
+
+cppExtensions {
+  cpp
+  h
+  inc
+}
+
+otherExtensions {
+  java
+}
+
 genFolderExclude {
   folder1
   folder2/subdir1/subdir2
@@ -144,6 +158,11 @@ class Task(object):
     @abstractmethod
     def run(self, name):
         return
+
+    # Returns value from config dictionary given key string
+    @staticmethod
+    def getConfig(keyName):
+        return configDict[keyName]
 
     # Returns True if file is modifiable but should not have tasks run on it
     @staticmethod
