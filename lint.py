@@ -18,7 +18,7 @@ from task import Task
 
 class Lint(Task):
     def getIncludeExtensions(self):
-        return ["cpp", "h", "inc"]
+        return Task.getConfig("cppExtensions")
 
     def run(self, name):
         # Handle running in either the root or styleguide directories
@@ -36,7 +36,8 @@ class Lint(Task):
                     "-readability/todo,"
                     "-runtime/references,"
                     "-runtime/string",
-                    "--extensions=cpp,h,inc", name]
+                    "--extensions=" + ",".join(self.getIncludeExtensions()),
+                    name]
 
         # Run cpplint.py
         try:

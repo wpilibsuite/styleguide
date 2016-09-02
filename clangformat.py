@@ -10,7 +10,7 @@ from task import Task
 
 class ClangFormat(Task):
     def getIncludeExtensions(self):
-        return ["cpp", "h", "inc"]
+        return Task.getConfig("cExtensions") + Task.getConfig("cppExtensions")
 
     def run(self, name):
         # Run clang-format

@@ -15,7 +15,8 @@ currentYear = str(date.today().year)
 
 class LicenseUpdate(Task):
     def getIncludeExtensions(self):
-        return ["cpp", "h", "inc", "java"]
+        return Task.getConfig("cExtensions") + \
+            Task.getConfig("cppExtensions") + Task.getConfig("otherExtensions")
 
     def run(self, name):
         with open(name, "r") as file:
