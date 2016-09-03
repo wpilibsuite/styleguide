@@ -38,6 +38,7 @@ class Lint(Task):
                     "-runtime/references,"
                     "-runtime/string",
                     "--extensions=" + ",".join(self.get_file_extensions()),
+                    "--quiet",
                     name]
 
         # Run cpplint.py
