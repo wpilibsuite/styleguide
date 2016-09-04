@@ -11,7 +11,9 @@ from task import Task
 
 class ClangFormat(Task):
     def get_file_extensions(self):
-        return Task.get_config("cExtensions") + Task.get_config("cppExtensions")
+        return Task.get_config("cExtensions") + \
+            Task.get_config("cppHeaderExtensions") + \
+            Task.get_config("cppSrcExtensions")
 
     def run(self, name):
         # Run clang-format

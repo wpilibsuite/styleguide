@@ -17,7 +17,8 @@ current_year = str(date.today().year)
 class LicenseUpdate(Task):
     def get_file_extensions(self):
         return Task.get_config("cExtensions") + \
-            Task.get_config("cppExtensions") + \
+            Task.get_config("cppHeaderExtensions") + \
+            Task.get_config("cppSrcExtensions") + \
             Task.get_config("otherExtensions")
 
     def run(self, name):

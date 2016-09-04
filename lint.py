@@ -5,9 +5,7 @@ use by lint.py.
 
 cpplint.py was originally spawned as a subprocess whose output was filtered.
 When it was moved into a separate repository, the difference in directories
-required it to be used as a module. Redirecting stderr is not thread-safe and
-overloading print() did not work, so the print statements causing that output
-where removed from cpplint.py.
+required it to be used as a module.
 """
 
 import os
@@ -19,7 +17,8 @@ from task import Task
 
 class Lint(Task):
     def get_file_extensions(self):
-        return Task.get_config("cppExtensions")
+        return Task.get_config("cppHeaderExtensions") + \
+            Task.get_config("cppSrcExtensions")
 
     def run(self, name):
         # Handle running in either the root or styleguide directories
@@ -31,13 +30,17 @@ class Lint(Task):
         saved_argv = sys.argv
         sys.argv = ["cpplint.py", "--filter="
                     "-build/c++11,"
-                    "-build/header_guard,"
                     "-build/include,"
+                    "-build/include_subdir,"
                     "-build/namespaces,"
                     "-readability/todo,"
                     "-runtime/references,"
                     "-runtime/string",
-                    "--extensions=" + ",".join(self.get_file_extensions()),
+                    "--extensions=" + \
+                        ",".join(self.get_config("cppHeaderExtensions") + \
+                                 self.get_config("cppSrcExtensions")),
+                    "--headers=" + \
+                        ",".join(Task.get_config("cppHeaderExtensions")),
                     "--quiet",
                     name]
 

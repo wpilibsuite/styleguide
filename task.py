@@ -31,10 +31,13 @@ cExtensions {
   c
 }
 
-cppExtensions {
-  cpp
+cppHeaderExtensions {
   h
   inc
+}
+
+cppSrcExtensions {
+  cpp
 }
 
 otherExtensions {

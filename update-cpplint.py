@@ -7,7 +7,6 @@ Dependencies:
 """
 
 import urllib.request
-import subprocess
 import sys
 
 import patch
