@@ -9,18 +9,20 @@ from datetime import date
 from functools import partial
 import hashlib
 import os
+
 from task import Task
 
-currentYear = str(date.today().year)
+current_year = str(date.today().year)
 
 class LicenseUpdate(Task):
-    def getIncludeExtensions(self):
-        return Task.getConfig("cExtensions") + \
-            Task.getConfig("cppExtensions") + Task.getConfig("otherExtensions")
+    def get_file_extensions(self):
+        return Task.get_config("cExtensions") + \
+            Task.get_config("cppExtensions") + \
+            Task.get_config("otherExtensions")
 
     def run(self, name):
         with open(name, "r") as file:
-            modifyCopyright = False
+            modify_copyright = False
             year = ""
 
             # Get first line of file
@@ -28,7 +30,7 @@ class LicenseUpdate(Task):
 
             # If first line is non-documentation comment
             if line[0:3] == "/*\n" or line[0:3] == "/*-":
-                modifyCopyright = True
+                modify_copyright = True
 
                 # Get next line
                 line = file.readline()
@@ -40,22 +42,22 @@ class LicenseUpdate(Task):
                 if pos != -1:
                     year = line[pos:pos + 4]
                 else:
-                    modifyCopyright = False
+                    modify_copyright = False
 
                 # Retrieve lines until one past end of comment block
-                inComment = True
-                inBlock = True
-                while inBlock:
-                    if not inComment:
+                in_comment = True
+                in_block = True
+                while in_block:
+                    if not in_comment:
                         pos = line.find("/*", pos)
                         if pos != -1:
-                            inComment = True
+                            in_comment = True
                         else:
-                            inBlock = False
+                            in_block = False
                     else:
                         pos = line.find("*/", pos)
                         if pos != -1:
-                            inComment = False
+                            in_comment = False
 
                         # This assumes no comments are started on the same line
                         # after another ends
@@ -71,14 +73,14 @@ class LicenseUpdate(Task):
 
                 # Write second line of comment
                 temp.write("/* Copyright (c) FIRST ")
-                if modifyCopyright and year != currentYear:
+                if modify_copyright and year != current_year:
                     temp.write(year)
                     temp.write("-")
-                temp.write(currentYear)
+                temp.write(current_year)
                 temp.write(". All Rights Reserved.")
                 for i in range(0, 24):
                     temp.write(" ")
-                if not modifyCopyright or year == currentYear:
+                if not modify_copyright or year == current_year:
                     for i in range(0, 5):
                         temp.write(" ")
                 temp.write("*/\n")

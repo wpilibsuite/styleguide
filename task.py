@@ -5,10 +5,10 @@ import os
 import re
 import sys
 
-regexSep = os.sep
+regex_sep = os.sep
 # If directory separator is backslash, escape it for regexes
-if regexSep == "\\":
-    regexSep += "\\"
+if regex_sep == "\\":
+    regex_sep += "\\"
 
 # There are two groups of regexes which prevent tasks from running on matching
 # files:
@@ -68,91 +68,94 @@ replaced internally with an os.sep that is automatically escaped for regexes.
 
 Returns dictionary of groups (group name -> list of values).
 """
-def readConfigFile(configName):
-    configFound = False
+def read_config_file(config_name):
+    config_found = False
     directory = os.getcwd()
-    while not configFound and len(directory) > 0:
+    while not config_found and len(directory) > 0:
         try:
-            with open(directory + os.sep + configName, "r") as configFile:
-                configFound = True
+            with open(directory + os.sep + config_name, "r") as config_file:
+                config_found = True
 
-                inGroup = False
-                configGroups = {}
-                groupName = ""
-                groupElements = []
+                in_group = False
+                config_groups = {}
+                group_name = ""
+                group_elements = []
 
-                for line in configFile:
+                for line in config_file:
                     # Skip empty lines
                     if line.strip() == "":
                         continue
 
                     if "{" in line:
-                        inGroup = True
+                        in_group = True
 
                         # Group name is on same line as "{"
-                        groupName = line[:line.find("{")].strip()
+                        group_name = line[:line.find("{")].strip()
                     elif "}" in line:
-                        inGroup = False
+                        in_group = False
 
                         # After group closes, save element list and clear it
-                        configGroups[groupName] = groupElements
-                        groupElements = []
-                    elif inGroup:
+                        config_groups[group_name] = group_elements
+                        group_elements = []
+                    elif in_group:
                         value = line.strip()
 
                         # On Windows, replace "/" with escaped "\" for regexes
                         if os.sep == "\\":
-                            value = value.replace("/", regexSep)
+                            value = value.replace("/", regex_sep)
 
-                        groupElements.extend([value])
-                return configGroups
+                        group_elements.extend([value])
+                return config_groups
         except OSError:
             directory = directory[:directory.rfind(os.sep)]
 
-configDict = readConfigFile(".styleguide")
-if not configDict:
+config_dict = read_config_file(".styleguide")
+if not config_dict:
     print("Error: config file \".styleguide\" not found")
     sys.exit(1)
 
 # List of regexes for folders which contain generated files
-genFolderExclude = [name + regexSep for name in configDict["genFolderExclude"]]
+gen_folder_exclude = \
+    [name + regex_sep for name in config_dict["genFolderExclude"]]
 
 # List of regexes for generated files
-genFileExclude = configDict["genFileExclude"]
+gen_file_exclude = config_dict["genFileExclude"]
 
 # Regex for generated file exclusions
-genExclude = genFolderExclude + genFileExclude
-if len(genExclude) == 0:
+gen_exclude = gen_folder_exclude + gen_file_exclude
+if len(gen_exclude) == 0:
     # If there are no file exclusions, make regex match nothing
-    genRegexExclude = re.compile("a^")
+    gen_regex_exclude = re.compile("a^")
 else:
-    genRegexExclude = re.compile("|".join(genExclude))
+    gen_regex_exclude = re.compile("|".join(gen_exclude))
 
 # Regex for folders which contain modifiable files
-modifiableFolderExclude = \
-    [name + regexSep for name in configDict["modifiableFolderExclude"]]
+modifiable_folder_exclude = \
+    [name + regex_sep for name in config_dict["modifiableFolderExclude"]]
 
 # List of regexes for modifiable files
-modifiableFileExclude = configDict["modifiableFileExclude"]
+modifiable_file_exclude = config_dict["modifiableFileExclude"]
 
 # Regex for modifiable file exclusions
-modifiableExclude = modifiableFolderExclude + modifiableFileExclude
-if len(modifiableExclude) == 0:
+modifiable_exclude = modifiable_folder_exclude + modifiable_file_exclude
+if len(modifiable_exclude) == 0:
     # If there are no file exclusions, make regex match nothing
-    modifiableRegexExclude = re.compile("a^")
+    modifiable_regex_exclude = re.compile("a^")
 else:
-    modifiableRegexExclude = re.compile("|".join(modifiableExclude))
+    modifiable_regex_exclude = re.compile("|".join(modifiable_exclude))
 
 class Task(object):
     __metaclass__ = ABCMeta
 
     def __init__(self):
-        self.regexInclude = re.compile("|".join(["\." + ext + "$" for ext in
-                                                 self.getIncludeExtensions()]))
+        self.regex_include = \
+            re.compile("|".join(["\." + ext + "$" for ext in
+                                 self.get_file_extensions()]))
 
     # Extensions of files which should be included in processing
-    def getIncludeExtensions(self):
-        return []
+    def get_file_extensions(self):
+        # Match anything by default
+        return [".*"]
 
     # Perform task on file with given name
     @abstractmethod
@@ -161,22 +164,22 @@ class Task(object):
 
     # Returns value from config dictionary given key string
     @staticmethod
-    def getConfig(keyName):
-        return configDict[keyName]
+    def get_config(key_name):
+        return config_dict[key_name]
 
     # Returns True if file is modifiable but should not have tasks run on it
     @staticmethod
-    def isModifiableFile(name):
-        return modifiableRegexExclude.search(name)
+    def is_modifiable_file(name):
+        return modifiable_regex_exclude.search(name)
 
     # Returns True if file isn't generated (generated files are skipped)
     @staticmethod
-    def isGeneratedFile(name):
-        return genRegexExclude.search(name)
+    def is_generated_file(name):
+        return gen_regex_exclude.search(name)
 
     # Returns True if file has an extension this task can process
-    def fileMatchesExtension(self, name):
-        if self.getIncludeExtensions() != []:
-            return self.regexInclude.search(name)
+    def file_matches_extension(self, name):
+        if self.get_file_extensions() != []:
+            return self.regex_include.search(name)
         else:
             return True

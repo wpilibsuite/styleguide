@@ -14,11 +14,12 @@ import os
 import sys
 
 import cpplint
+
 from task import Task
 
 class Lint(Task):
-    def getIncludeExtensions(self):
-        return Task.getConfig("cppExtensions")
+    def get_file_extensions(self):
+        return Task.get_config("cppExtensions")
 
     def run(self, name):
         # Handle running in either the root or styleguide directories
@@ -27,7 +28,7 @@ class Lint(Task):
             cpplintPrefix = "styleguide/"
 
         # Prepare arguments to cpplint.py
-        savedArgv = sys.argv
+        saved_argv = sys.argv
         sys.argv = ["cpplint.py", "--filter="
                     "-build/c++11,"
                     "-build/header_guard,"
@@ -36,7 +37,7 @@ class Lint(Task):
                     "-readability/todo,"
                     "-runtime/references,"
                     "-runtime/string",
-                    "--extensions=" + ",".join(self.getIncludeExtensions()),
+                    "--extensions=" + ",".join(self.get_file_extensions()),
                     name]
 
         # Run cpplint.py
@@ -46,4 +47,4 @@ class Lint(Task):
             pass
 
         # Restore original arguments
-        sys.argv = savedArgv
+        sys.argv = saved_argv

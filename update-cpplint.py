@@ -7,7 +7,6 @@ Dependencies:
 """
 
 import urllib.request
-import shutil
 import subprocess
 import sys
 
@@ -35,8 +34,8 @@ def main():
 
     print("Applying custom patches...", end = "")
     sys.stdout.flush()
-    patchSet = patch.fromfile("cpplint.patch")
-    patchSet.apply()
+    patch_set = patch.fromfile("cpplint.patch")
+    patch_set.apply()
     print(" done")
 
 if __name__ == "__main__":

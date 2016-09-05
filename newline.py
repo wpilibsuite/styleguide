@@ -1,6 +1,7 @@
 """This task ensures that all source files have exactly one EOF newline."""
 
 import os
+
 from task import Task
 
 class Newline(Task):

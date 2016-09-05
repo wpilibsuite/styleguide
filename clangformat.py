@@ -6,11 +6,12 @@ Dependencies:
 
 import subprocess
 import sys
+
 from task import Task
 
 class ClangFormat(Task):
-    def getIncludeExtensions(self):
-        return Task.getConfig("cExtensions") + Task.getConfig("cppExtensions")
+    def get_file_extensions(self):
+        return Task.get_config("cExtensions") + Task.get_config("cppExtensions")
 
     def run(self, name):
         # Run clang-format
