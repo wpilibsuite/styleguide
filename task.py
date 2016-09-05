@@ -71,12 +71,12 @@ replaced internally with an os.sep that is automatically escaped for regexes.
 
 Returns dictionary of groups (group name -> list of values).
 """
-def read_config_file(config_name):
+def read_config_file(file_name):
     config_found = False
     directory = os.getcwd()
     while not config_found and len(directory) > 0:
         try:
-            with open(directory + os.sep + config_name, "r") as config_file:
+            with open(directory + os.sep + file_name, "r") as config_file:
                 config_found = True
 
                 in_group = False
@@ -114,7 +114,7 @@ def read_config_file(config_name):
 
 config_dict = read_config_file(".styleguide")
 if not config_dict:
-    print("Error: config file \".styleguide\" not found")
+    print("Error: config file '.styleguide' not found")
     sys.exit(1)
 
 # List of regexes for folders which contain generated files

@@ -1,18 +1,30 @@
-"""This task updates the license comment block at the top of all source files.
+"""This task updates the license header at the top of the file.
 
-If there is already a comment block, a year range through the current year is
-created using the first year in the comment. If there is no comment block, a new
-one is added containing just the current year.
+The license header is always at the beginning of the file and ends after two
+newlines. If there isn't one, or it doesn't contain the required copyright
+contents, a new one is inserted containing the current year.
+
+A license template should be provided somewhere in the project in a file called
+".styleguide-license". It should contain `Copyright (c)` followed by the
+company name and the string `{year}`.
+
+`{year}` is replaced with a year range from the earliest copyright year in the
+file to the current year. If the earliest year is the current year, only that
+year will be written.
+
+`{padding}` is optional and represents an expanding space which pads the line to
+80 columns. Multiple instances of `{padding}` on the same line share the padding
+equally.
 """
 
 from datetime import date
 from functools import partial
 import hashlib
 import os
+import re
+import sys
 
 from task import Task
-
-current_year = str(date.today().year)
 
 class LicenseUpdate(Task):
     def get_file_extensions(self):
@@ -22,88 +34,63 @@ class LicenseUpdate(Task):
             Task.get_config("otherExtensions")
 
     def run(self, name):
+        license_template = \
+            self.read_license_template(".styleguide-license", name)
+        if not license_template:
+              print("Error: license template file '.styleguide-license' not " \
+                    "found")
+              sys.exit(1)
+
+        lines = []
         with open(name, "r") as file:
-            modify_copyright = False
-            year = ""
+            lines = file.read()
 
-            # Get first line of file
-            line = file.readline()
+        # License should be at beginning of file and followed by two newlines.
+        # If a comment exists at the top of the file, treat it as the license
+        # header
+        if lines.startswith("//") or lines.startswith("/*"):
+            file_parts = lines.split("\n\n", 1)
+        else:
+            file_parts = ["", lines.lstrip()]
 
-            # If first line is non-documentation comment
-            if line[0:3] == "/*\n" or line[0:3] == "/*-":
+        year_regex = re.compile("Copyright \(c\) [\w\s]+\s+(20..)")
+        year = ""
+        modify_copyright = False
+        for line in file_parts[0].split("\n"):
+            match = year_regex.search(line)
+            # If license contains copyright pattern, extract the first year
+            if match:
+                year = match.group(1)
                 modify_copyright = True
+                break
 
-                # Get next line
-                line = file.readline()
+        with open(name + ".tmp", "w") as temp:
+            # Determine copyright range and trailing padding
+            current_year = str(date.today().year)
+            if modify_copyright and year != current_year:
+                current_year = year + "-" + current_year
 
-                # Search for start of copyright year
-                pos = line.find("20")
+            for line in license_template:
+                # Insert copyright year range
+                line = line.replace("{year}", current_year)
 
-                # Extract it if found. If not, rewrite whole comment
-                if pos != -1:
-                    year = line[pos:pos + 4]
-                else:
-                    modify_copyright = False
+                # Insert padding which expands to the 80th column. If there is
+                # more than one padding token, the line may contain fewer than
+                # 80 characters due to rounding during the padding width
+                # calculation.
+                PADDING_TOKEN = "{padding}"
+                padding_count = line.count(PADDING_TOKEN)
+                if padding_count:
+                    padding = 80 - len(line) + len(PADDING_TOKEN) * \
+                        padding_count
+                    padding_width = int(padding / padding_count)
+                    line = line.replace(PADDING_TOKEN, " " * padding_width)
 
-                # Retrieve lines until one past end of comment block
-                in_comment = True
-                in_block = True
-                while in_block:
-                    if not in_comment:
-                        pos = line.find("/*", pos)
-                        if pos != -1:
-                            in_comment = True
-                        else:
-                            in_block = False
-                    else:
-                        pos = line.find("*/", pos)
-                        if pos != -1:
-                            in_comment = False
+                temp.write(line + "\n")
 
-                        # This assumes no comments are started on the same line
-                        # after another ends
-                        line = file.readline()
-                        pos = 0
-
-            with open(name + ".tmp", "w") as temp:
-                # Write first line of comment
-                temp.write("/*")
-                for i in range(0, 76):
-                    temp.write("-")
-                temp.write("*/\n")
-
-                # Write second line of comment
-                temp.write("/* Copyright (c) FIRST ")
-                if modify_copyright and year != current_year:
-                    temp.write(year)
-                    temp.write("-")
-                temp.write(current_year)
-                temp.write(". All Rights Reserved.")
-                for i in range(0, 24):
-                    temp.write(" ")
-                if not modify_copyright or year == current_year:
-                    for i in range(0, 5):
-                        temp.write(" ")
-                temp.write("*/\n")
-
-                # Write rest of lines of comment
-                temp.write("""\
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*""")
-                for i in range(0, 76):
-                    temp.write("-")
-                temp.write("*/\n")
-
-                # If line after comment block isn't empty
-                if len(line) > 1 and line[0] != " ":
-                    temp.write("\n")
-                temp.write(line)
-
-                # Copy rest of original file into new one
-                for line in file:
-                    temp.write(line)
+            # Copy rest of original file into new one
+            temp.write("\n")
+            temp.write(file_parts[1])
 
         # Replace old file if it was changed
         if self.md5sum(name) != self.md5sum(name + ".tmp"):
@@ -111,6 +98,30 @@ class LicenseUpdate(Task):
             os.rename(name + ".tmp", name)
         else:
             os.remove(name + ".tmp")
+
+    """Read license template from file
+
+    Checks current directory for config file. If one doesn't exist, try all
+    parent directories as well.
+
+    template_name -- name of license template file
+    file_name -- name of file currently being processed
+
+    Returns list containing license template or None if file was not found.
+    """
+    @staticmethod
+    def read_license_template(template_name, file_name):
+        config_found = False
+        directory = os.path.dirname(file_name)
+        while not config_found and len(directory) > 0:
+            try:
+                template_location = directory + os.sep + template_name
+                with open(template_location, "r") as template_file:
+                    config_found = True
+                    return template_file.read().splitlines()
+            except OSError:
+                directory = directory[:directory.rfind(os.sep)]
+        return None
 
     # Compute MD5 sum of file
     @staticmethod
