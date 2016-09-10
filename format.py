@@ -25,7 +25,7 @@ def proc_func(work, is_verbose, print_lock):
     for name in work:
         if is_verbose:
             with print_lock:
-                print("Processing", name,)
+                print("Processing", name)
                 for task in tasks:
                     if task.file_matches_extension(name):
                         print("  with " + type(task).__name__)
