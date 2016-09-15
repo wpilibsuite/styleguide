@@ -1,4 +1,4 @@
-"""Provides a task base class for use by format.py"""
+"""Provides a task base class for use by format.py."""
 
 from abc import *
 import os

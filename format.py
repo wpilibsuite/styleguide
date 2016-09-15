@@ -10,6 +10,7 @@ from clangformat import ClangFormat
 from licenseupdate import LicenseUpdate
 from lint import Lint
 from newline import Newline
+from stdlib import Stdlib
 from task import Task
 from whitespace import Whitespace
 
@@ -19,8 +20,11 @@ def in_git_repo(directory):
     return ret.returncode == 0
 
 def proc_func(work, is_verbose, print_lock):
-    # Lint is run last since previous tasks can affect its output
-    tasks = [ClangFormat(), LicenseUpdate(), Newline(), Whitespace(), Lint()]
+    # Stdlib is run before ClangFormat so ClangFormat can reorder includes after
+    # it. Lint is run last since previous tasks can affect its output. The rest
+    # are sorted alphabetically.
+    tasks = [Stdlib(), ClangFormat(), LicenseUpdate(), Newline(), Whitespace(),
+             Lint()]
 
     for name in work:
         if is_verbose:
