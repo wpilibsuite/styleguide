@@ -1,0 +1,37 @@
+cExtensions {
+  c
+}
+
+cppHeaderExtensions {
+  h
+  inc
+}
+
+cppSrcExtensions {
+  cpp
+}
+
+otherExtensions {
+  java
+}
+
+genFolderExclude {
+  folder1
+  folder2/subdir1/subdir2
+}
+
+genFileExclude {
+  header1\.h$
+  header2\.h$
+}
+
+modifiableFolderExclude {
+  \.git
+  __pycache__
+  folder/subdir
+}
+
+modifiableFileExclude {
+  \.jar$
+  \.patch$
+}

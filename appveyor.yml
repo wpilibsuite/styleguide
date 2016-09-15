@@ -1,0 +1,24 @@
+version: "{branch} {build}"
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: 3.5
+      PYTHON_ARCH: 64
+
+init:
+  - echo %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
+
+install:
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - python --version
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+
+build: false
+
+test_script:
+  - python unittest.py
+
+
+matrix:
+  fast_finish: true

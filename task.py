@@ -160,10 +160,17 @@ class Task(object):
         # Match anything by default
         return [".*"]
 
-    # Perform task on file with given name
+    """Performs task on file with given lines.
+
+    Keyword arguments:
+    name -- file name string
+    lines -- file contents
+
+    Returns tuple containing processed lines and whether lines were changed.
+    """
     @abstractmethod
-    def run(self, name):
-        return
+    def run(self, name, lines):
+        return ("", False)
 
     # Returns value from config dictionary given key string
     @staticmethod

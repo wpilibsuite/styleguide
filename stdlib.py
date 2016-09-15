@@ -2,7 +2,6 @@
 and assert.h are exceptions.
 """
 
-import os
 import re
 
 from task import Task
@@ -39,14 +38,20 @@ class Header(object):
             # and start with a letter. Function names are followed by an open
             # parenthesis.
             self.func_regex = re.compile("(?: |,|\()" + regex_prefix +
-                                         "([a-z][a-z0-9]*)(?:\()")
+                                         "([a-z][a-z0-9]*)" +
+                                         "(?:\()")
         else:
             self.func_regex = None
 
         if type_regexes != []:
-            self.type_regex = re.compile(regex_prefix + "(" +
-                                         "|".join(type_regexes) +
-                                         ")(?=\)|,|;| )")
+            # Type uses are preceded by a left angle bracket (template), a
+            # space, a comma, or an open parenthesis. Type names are followed by
+            # a close parenthesis, a comma, a semicolon, a space, or pointer
+            # asterisks.
+            # FIXME: Types at the beginning of the line are not matched.
+            self.type_regex = re.compile("(?<=\<| |,|\()" + regex_prefix +
+                                         "(" + "|".join(type_regexes) + ")" +
+                                         "(?=\)|,|;| |\*+)")
         else:
             self.type_regex = None
 
@@ -55,7 +60,7 @@ class Stdlib(Task):
         return Task.get_config("cppHeaderExtensions") + \
             Task.get_config("cppSrcExtensions")
 
-    def run(self, name):
+    def run(self, name, lines):
         headers = []
 
         # assert is a macro, so it's ommitted to avoid prefixing with std::
@@ -67,8 +72,8 @@ class Stdlib(Task):
                                "ispunct", "isspace", "isupper", "isxdigit",
                                "tolower", "toupper"}))
         headers.append(Header("errno"))
-        headers.append(Header("float", add_prefix = False))
-        headers.append(Header("limits", add_prefix = False))
+        headers.append(Header("float"))
+        headers.append(Header("limits"))
         headers.append(Header("math",
                               {"cos", "acos", "cosh", "acosh", "sin", "asin",
                                "asinh", "tan", "atan", "atan2", "atanh", "exp",
@@ -96,7 +101,7 @@ class Stdlib(Task):
         # removing the std:: prefix
         headers.append(
             Header("stdint",
-                   type_regexes = ["(u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t"],
+                   type_regexes = ["((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"],
                    add_prefix = False))
 
         headers.append(Header("stdio",
@@ -135,10 +140,6 @@ class Stdlib(Task):
                                "time"},
                               ["(clock|time)_t"]))
 
-        lines = ""
-        with open(name, "r") as file:
-            lines = file.read()
-
         file_changed = False
         for header in headers:
             # Prepare include names
@@ -157,28 +158,17 @@ class Stdlib(Task):
                 lines = lines.replace("#include <" + before + ">",
                                       "#include <" + after + ">")
 
-            # If header include was found in file, check for its functions and
-            # types
-            if "#include <" + after + ">" in lines:
-                if header.func_regex:
-                    (lines, changed) = self.func_substitute(header, lines)
-                    file_changed |= changed
+            if header.func_regex:
+                (lines, changed) = self.func_substitute(header, lines)
+                file_changed |= changed
 
-                if header.type_regex:
-                    old_length = len(lines)
-                    lines = header.type_regex.sub(header.type_sub, lines)
-                    if not file_changed and old_length != len(lines):
-                        file_changed = True
+            if header.type_regex:
+                old_length = len(lines)
+                lines = header.type_regex.sub(header.type_sub, lines)
+                if not file_changed and old_length != len(lines):
+                    file_changed = True
 
-        with open(name + ".tmp", "w") as temp:
-            temp.write(lines)
-
-        # Replace old file if it was changed
-        if file_changed:
-            os.remove(name)
-            os.rename(name + ".tmp", name)
-        else:
-            os.remove(name + ".tmp")
+        return (lines, file_changed)
 
     """Returns modified lines and whether string changed."""
     def func_substitute(self, header, lines):
