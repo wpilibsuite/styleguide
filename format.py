@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 from clangformat import ClangFormat
+from includeorder import IncludeOrder
 from licenseupdate import LicenseUpdate
 from lint import Lint
 from newline import Newline
@@ -21,11 +22,13 @@ def in_git_repo(directory):
     return ret.returncode == 0
 
 def proc_func(work, is_verbose, print_lock):
-    task_pipeline = [LicenseUpdate(), Newline(), Stdlib(), Whitespace(),
-                     ClangFormat()]
+    # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
+    # vice versa are sorted properly. ClangFormat is run after the other tasks
+    # so it can clean up their formatting.
+    task_pipeline = [LicenseUpdate(), Newline(), Stdlib(), IncludeOrder(),
+                     Whitespace(), ClangFormat()]
 
-    # These tasks are performed on files directly. ClangFormat is run after the
-    # other tasks so it can clean up their formatting. Lint is run last since
+    # These tasks are performed on files directly. Lint is run last since
     # previous tasks can affect its output.
     final_tasks = [Lint()]
 

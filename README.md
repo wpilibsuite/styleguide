@@ -20,7 +20,7 @@ After cloning this repository, set the `WPI_FORMAT` environment variable to its 
 
 ### .styleguide
 
-`format.py` checks the current directory for the `.styleguide` file. If one doesn't exist, all parent directories are tried as well. [.styleguide](.styleguide) is an example.
+`format.py` checks the current directory for the `.styleguide` file. If one doesn't exist, all parent directories are tried as well. [.styleguide](.styleguide) is an example with all possible groups.
 
 This file contains groups of file name regular expressions. There are two groups of regexes which prevent tasks (i.e., formatters and linters) from running on matching files:
 
@@ -29,9 +29,9 @@ This file contains groups of file name regular expressions. There are two groups
 
 Generated files should not be modified; if they are, `format.py` will emit warnings.
 
-Config groups may be empty, but may not be omitted. Directory separators must be "/",
-not "\". During processing, they will be replaced internally with an os.sep that
-is automatically escaped for regexes.
+Config groups may be empty, but may not be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
+
+The groups `includeRelated`, `includeCSys`, `includeCppSys`, `includeOtherLibs`, and `includeProject` correspond to the header groups in the style guide. If a header name matches a regex in one of the groups, it overrides the default ordering and is placed in the corresponding group. The groups of regexes are checked in order of include group precedence.
 
 ### .styleguide-license
 
