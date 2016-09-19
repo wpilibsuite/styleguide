@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import math
 import multiprocessing
 import os
 import subprocess
@@ -103,8 +104,10 @@ def main():
     print_lock = multiprocessing.Lock()
 
     # Make list of evenly-sized work chunks
-    chunk_size = round(len(files) / jobs)
+    chunk_size = math.ceil(len(files) / jobs)
     work = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
+
+    assert len(work) == jobs
 
     # Start worker processes
     for i in range(0, jobs):
