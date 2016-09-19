@@ -1,4 +1,4 @@
-"""This task runs cpplint.py on all C++ source files.
+"""This task runs cpplint.py on a C++ source file.
 
 The `update-cpplint.py` script downloads the latest cpplint.py and edits it for
 use by lint.py.

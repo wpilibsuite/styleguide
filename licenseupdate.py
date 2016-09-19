@@ -1,21 +1,4 @@
-"""This task updates the license header at the top of the file.
-
-The license header is always at the beginning of the file and ends after two
-newlines. If there isn't one, or it doesn't contain the required copyright
-contents, a new one is inserted containing the current year.
-
-A license template should be provided somewhere in the project in a file called
-".styleguide-license". It should contain `Copyright (c)` followed by the
-company name and the string `{year}`.
-
-`{year}` is replaced with a year range from the earliest copyright year in the
-file to the current year. If the earliest year is the current year, only that
-year will be written.
-
-`{padding}` is optional and represents an expanding space which pads the line to
-80 columns. Multiple instances of `{padding}` on the same line share the padding
-equally.
-"""
+"""This task updates the license header at the top of the file."""
 
 from datetime import date
 from functools import partial

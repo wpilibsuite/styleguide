@@ -10,11 +10,6 @@ regex_sep = os.sep
 if regex_sep == "\\":
     regex_sep += "\\"
 
-# There are two groups of regexes which prevent tasks from running on matching
-# files:
-#   1) generated files (shouldn't be modified)
-#   2) modifiable files
-#
 # format.py excludes matches for the "modifiable" regex before checking for
 # modifications to generated files because some of the regexes from each group
 # overlap.
@@ -23,51 +18,6 @@ if regex_sep == "\\":
 
 Checks current directory for config file. If one doesn't exist, try all parent
 directories as well.
-
-A config file takes the form:
-
-```
-cExtensions {
-  c
-}
-
-cppHeaderExtensions {
-  h
-  inc
-}
-
-cppSrcExtensions {
-  cpp
-}
-
-otherExtensions {
-  java
-}
-
-genFolderExclude {
-  folder1
-  folder2/subdir1/subdir2
-}
-
-genFileExclude {
-  header1\.h$
-  header2\.h$
-}
-
-modifiableFolderExclude {
-  \.git
-  __pycache__
-  folder/subdir
-}
-
-modifiableFileExclude {
-  \.jar$
-  \.patch$
-}
-```
-
-Directory separators must be "/", not "\". During processing, they will be
-replaced internally with an os.sep that is automatically escaped for regexes.
 
 Returns dictionary of groups (group name -> list of values).
 """

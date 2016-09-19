@@ -1,4 +1,4 @@
-"""This task ensures that all source files have exactly one EOF newline."""
+"""This task ensures that the file has exactly one EOF newline."""
 
 import os
 
