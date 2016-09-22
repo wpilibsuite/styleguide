@@ -61,9 +61,19 @@ def test_licenseupdate():
     file_appendix)
 
     # pragma once at top of file preceded by newline
-    temp = (inputs[0][0], os.linesep + inputs[0][1])
+    temp = (inputs[len(inputs) - 1][0], os.linesep + inputs[len(inputs) - 1][1])
     inputs.append(temp)
-    outputs.append(outputs[0])
+    outputs.append(outputs[len(outputs) - 1])
+
+    # File containing up-to-date license preceded by newline
+    inputs.append(("./Test.h",
+    "" + os.linesep +
+    "/*                                Company Name                                */" + os.linesep +
+    "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".format(year) +
+    os.linesep +
+    os.linesep +
+    file_appendix))
+    outputs.append(inputs[len(inputs) - 1][1].lstrip())
 
     # File containing up-to-date range license
     inputs.append(("./Test.h",
@@ -86,7 +96,7 @@ def test_licenseupdate():
     os.linesep +
     os.linesep +
     file_appendix))
-    outputs.append(inputs[3][1])
+    outputs.append(inputs[len(inputs) - 1][1])
 
     return test(task, inputs, outputs)
 
