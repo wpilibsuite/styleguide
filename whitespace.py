@@ -1,4 +1,4 @@
-"""This task removes trailing whitespace from all source files."""
+"""This task removes trailing whitespace from the file."""
 
 import os
 
