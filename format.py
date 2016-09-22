@@ -21,23 +21,42 @@ def in_git_repo(directory):
     return ret.returncode == 0
 
 def proc_func(work, is_verbose, print_lock):
-    # Stdlib is run before ClangFormat so ClangFormat can reorder includes after
-    # it. Lint is run last since previous tasks can affect its output. The rest
-    # are sorted alphabetically.
-    tasks = [Stdlib(), ClangFormat(), LicenseUpdate(), Newline(), Whitespace(),
-             Lint()]
+    task_pipeline = [LicenseUpdate(), Newline(), Stdlib(), Whitespace(),
+                     ClangFormat()]
+
+    # These tasks are performed on files directly. ClangFormat is run after the
+    # other tasks so it can clean up their formatting. Lint is run last since
+    # previous tasks can affect its output.
+    final_tasks = [Lint()]
 
     for name in work:
         if is_verbose:
             with print_lock:
                 print("Processing", name)
-                for task in tasks:
+                for task in task_pipeline:
+                    if task.file_matches_extension(name):
+                        print("  with " + type(task).__name__)
+                for task in final_tasks:
                     if task.file_matches_extension(name):
                         print("  with " + type(task).__name__)
 
-        for task in tasks:
+        lines = ""
+        with open(name, "r") as file:
+            lines = file.read()
+        file_changed = False
+
+        for task in task_pipeline:
             if task.file_matches_extension(name):
-                task.run(name)
+                lines, changed = task.run(name, lines)
+                file_changed |= changed
+
+        if file_changed:
+            with open(name, "wb") as file:
+                file.write(lines.encode())
+
+        for task in final_tasks:
+            if task.file_matches_extension(name):
+                task.run(name, "")
 
 def main():
     if not in_git_repo("."):
@@ -72,7 +91,7 @@ def main():
     # Create list of all changed files
     changed_file_list = []
     proc = subprocess.Popen(["git", "diff", "--name-only", "master"],
-                            bufsize = 1, stdout = subprocess.PIPE)
+                            stdout = subprocess.PIPE)
     for line in proc.stdout:
         changed_file_list.append(config_path + os.sep +
                                line.strip().decode("ascii"))

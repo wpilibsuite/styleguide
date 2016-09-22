@@ -20,7 +20,7 @@ class Lint(Task):
         return Task.get_config("cppHeaderExtensions") + \
             Task.get_config("cppSrcExtensions")
 
-    def run(self, name):
+    def run(self, name, lines):
         # Handle running in either the root or styleguide directories
         cpplintPrefix = ""
         if os.getcwd().rpartition(os.sep)[2] != "styleguide":
