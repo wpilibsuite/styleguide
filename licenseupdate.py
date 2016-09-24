@@ -23,13 +23,13 @@ class LicenseUpdate(Task):
               sys.exit(1)
 
         # Strip newlines at top of file
-        lines = lines.lstrip()
+        stripped_lines = lines.lstrip()
 
         # License should be at beginning of file and followed by two newlines.
         # If a comment exists at the top of the file, treat it as the license
         # header
-        if lines.startswith("//") or lines.startswith("/*"):
-            file_parts = lines.split(os.linesep + os.linesep, 1)
+        if stripped_lines.startswith("//") or stripped_lines.startswith("/*"):
+            file_parts = stripped_lines.split(os.linesep + os.linesep, 1)
         else:
             file_parts = ["", lines.lstrip()]
 
@@ -67,17 +67,11 @@ class LicenseUpdate(Task):
 
             output += line + os.linesep
 
-        # Check whether file contents changed
-        if file_parts[0] != output[0:len(output) - 1]:
-            # Copy rest of original file into new one
-            if len(file_parts) > 1:
-                output += os.linesep + file_parts[1]
-            else:
-                output += os.linesep
+        # Copy rest of original file into new one
+        if len(file_parts) > 1:
+            output += os.linesep + file_parts[1]
 
-            return (output, True)
-        else:
-            return (lines, False)
+        return (output, lines != output)
 
     """Read license template from file
 
