@@ -22,6 +22,9 @@ class LicenseUpdate(Task):
                     "found")
               sys.exit(1)
 
+        # Strip newlines at top of file
+        lines = lines.lstrip()
+
         # License should be at beginning of file and followed by two newlines.
         # If a comment exists at the top of the file, treat it as the license
         # header
