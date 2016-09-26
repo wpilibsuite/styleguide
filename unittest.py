@@ -2,6 +2,7 @@
 
 from datetime import date
 import os
+import sys
 
 from includeorder import IncludeOrder
 from licenseupdate import LicenseUpdate
@@ -188,9 +189,9 @@ def test_includeorder():
 
     # Verify relevant headers are found and sorted correctly
     inputs.append(("./PDP.cpp",
-        "#include \"HAL/PDP.h\"" + os.linesep + \
-        os.linesep + \
         "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "#include \"HAL/PDP.h\"" + os.linesep + \
         os.linesep + \
         "#include \"ctre/PDP.h\"" + os.linesep + \
         os.linesep + \
@@ -424,9 +425,9 @@ def main():
     success &= test_whitespace()
 
     if success:
-        return 0
+        sys.exit(0)
     else:
-        return 1
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
