@@ -73,6 +73,11 @@ class IncludeOrder(Task):
                 override_regexes.append(re.compile("a^"))
             else:
                 regex_str = "(" + "|".join(Task.get_config(group)) + ")"
+
+                # On Windows, fix forward slash for include regexes
+                if os.sep == "\\":
+                    regex_str = regex_str.replace("\\\\", "/")
+
                 override_regexes.append(re.compile(regex_str))
 
         # Retrieve includes
