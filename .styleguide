@@ -35,3 +35,19 @@ modifiableFileExclude {
   \.jar$
   \.patch$
 }
+
+includeRelated {
+}
+
+includeCSys {
+}
+
+includeCppSys {
+}
+
+includeOtherLibs {
+}
+
+includeProject {
+  ^ctre/
+}

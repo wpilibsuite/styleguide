@@ -3,6 +3,7 @@
 from datetime import date
 import os
 
+from includeorder import IncludeOrder
 from licenseupdate import LicenseUpdate
 from newline import Newline
 from stdlib import Stdlib
@@ -35,6 +36,179 @@ def test(task, inputs, outputs):
         else:
             print(print_str.format(i + 1, len(inputs), "OK"))
     return success
+
+def test_includeorder():
+    task = IncludeOrder()
+
+    inputs = []
+    outputs = []
+
+    # cpp source including related header with wrong include braces and C++ sys
+    # before C sys headers
+    inputs.append(("./Utility.cpp",
+        "#include <Utility.h>" + os.linesep + \
+        os.linesep + \
+        "#include <sstream>" + os.linesep + \
+        os.linesep + \
+        "#include <cxxabi.h>" + os.linesep + \
+        "#include <execinfo.h>" + os.linesep + \
+        os.linesep + \
+        "#include \"HAL/HAL.h\"" + os.linesep + \
+        "#include \"Task.h\"" + os.linesep + \
+        "#include \"nivision.h\"" + os.linesep))
+    outputs.append((
+        "#include \"Utility.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <cxxabi.h>" + os.linesep + \
+        "#include <execinfo.h>" + os.linesep + \
+        os.linesep + \
+        "#include <sstream>" + os.linesep + \
+        os.linesep + \
+        "#include \"HAL/HAL.h\"" + os.linesep + \
+        "#include \"Task.h\"" + os.linesep + \
+        "#include \"nivision.h\"" + os.linesep, True))
+
+    # Ensure quotes around C and C++ std header includes are replaced with
+    # angle brackets and they are properly sorted into two groups
+    inputs.append(("./Test.h",
+        "#include \"stdio.h\"" + os.linesep + \
+        "#include \"iostream\"" + os.linesep + \
+        "#include \"memory\"" + os.linesep + \
+        "#include \"signal.h\"" + os.linesep))
+    outputs.append((
+        "#include <signal.h>" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "#include <memory>" + os.linesep, True))
+
+    # Ensure NOLINT headers are considered related headers
+    inputs.append(("./Test.h",
+        "#include <cstdio>" + os.linesep + \
+        "#include \"ImportantHeader.h\"  // NOLINT" + os.linesep))
+    outputs.append((
+        "#include \"ImportantHeader.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "#include <cstdio>" + os.linesep, True))
+
+    # Check sorting for at least one header from each group except related
+    # headeer. Test.inc isn't considered related in headers.
+    inputs.append(("./Test.h",
+        "#include \"MyHeader.h\"" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        "#include \"Test.inc\"" + os.linesep + \
+        "#include <sys/time.h>" + os.linesep + \
+        "#include <fstream>" + os.linesep + \
+        "#include <boost/algorithm/string/replace.hpp>" + os.linesep))
+    outputs.append((
+        "#include <stdio.h>" + os.linesep + \
+        "#include <sys/time.h>" + os.linesep + \
+        os.linesep + \
+        "#include <fstream>" + os.linesep + \
+        os.linesep + \
+        "#include <boost/algorithm/string/replace.hpp>" + os.linesep + \
+        os.linesep + \
+        "#include \"MyHeader.h\"" + os.linesep + \
+        "#include \"Test.inc\"" + os.linesep, True))
+
+    # Check newline is added between last header and code after it
+    inputs.append(("./Test.cpp",
+        "#include \"MyFile.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "namespace std {" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append((
+        "#include <iostream>" + os.linesep + \
+        os.linesep + \
+        "#include \"MyFile.h\"" + os.linesep + \
+        os.linesep + \
+        "namespace std {" + os.linesep + \
+        "}" + os.linesep, True))
+
+    # Check newlines are removed between last header and code after it
+    inputs.append(("./Test.cpp",
+        "#include \"MyFile.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        os.linesep + \
+        os.linesep + \
+        os.linesep + \
+        "namespace std {" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append((outputs[len(outputs) - 1][0], True))
+
+    # Ensure headers stay grouped together between license header and other code
+    inputs.append(("./Test.cpp",
+        "// Copyright (c) Company Name 2016." + os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "#include \"Test.h\"" + os.linesep + \
+        "namespace std {" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append((
+        "// Copyright (c) Company Name 2016." + os.linesep + \
+        "#include \"Test.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        os.linesep + \
+        "namespace std {" + os.linesep + \
+        "}" + os.linesep, True))
+
+    # Check "#ifdef _WIN32" is sorted after all other includes
+    inputs.append(("./Error.h",
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#include <stdint.h>" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "#include <Windows.h>" + os.linesep + \
+        "// This is a comment" + os.linesep + \
+        "#undef GetMessage" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep))
+    outputs.append((
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#include <stdint.h>" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep + \
+        os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "#include <Windows.h>" + os.linesep + \
+        "// This is a comment" + os.linesep + \
+        "#undef GetMessage" + os.linesep + \
+        "#endif" + os.linesep, True))
+
+    # Verify relevant headers are found and sorted correctly
+    inputs.append(("./PDP.cpp",
+        "#include \"HAL/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "#include \"ctre/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "using namespace hal;" + os.linesep))
+    outputs.append((
+        "#include \"HAL/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "#include \"ctre/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "using namespace hal;" + os.linesep, True))
+
+    # Check for idempotence
+    inputs.append(("./PDP.cpp", outputs[len(outputs) - 1][0]))
+    outputs.append((inputs[len(inputs) - 1][1], False))
+
+    return test(task, inputs, outputs)
 
 def test_licenseupdate():
     task = LicenseUpdate()
@@ -243,6 +417,7 @@ def test_whitespace():
 
 def main():
     success = True
+    success &= test_includeorder()
     success &= test_licenseupdate()
     success &= test_newline()
     success &= test_stdlib()
