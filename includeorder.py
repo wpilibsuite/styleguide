@@ -173,9 +173,9 @@ class IncludeOrder(Task):
 
         output = os.linesep.join(output_list).rstrip() + os.linesep
         if output != lines:
-            return (output, True)
+            return (output, True, True)
         else:
-            return (lines, False)
+            return (lines, False, True)
 
     def fixup_include(self, name_match, group_number):
         if group_number == 1 or group_number == 2 or group_number == 3:

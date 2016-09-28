@@ -19,4 +19,4 @@ class Whitespace(Task):
                 file_changed = True
             output += processed_line + eol
 
-        return (output, file_changed)
+        return (output, file_changed, True)

@@ -21,7 +21,7 @@ def in_git_repo(directory):
     ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
     return ret.returncode == 0
 
-def proc_func(work, is_verbose, print_lock):
+def proc_func(procnum, work, is_verbose, print_lock, ret_dict):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -31,6 +31,9 @@ def proc_func(work, is_verbose, print_lock):
     # These tasks are performed on files directly. Lint is run last since
     # previous tasks can affect its output.
     final_tasks = [Lint()]
+
+    # The success flag is aggregated across multiple file processing results
+    ret_dict[procnum] = True
 
     for name in work:
         if is_verbose:
@@ -50,8 +53,9 @@ def proc_func(work, is_verbose, print_lock):
 
         for task in task_pipeline:
             if task.file_matches_extension(name):
-                lines, changed = task.run(name, lines)
+                lines, changed, success = task.run(name, lines)
                 file_changed |= changed
+                ret_dict[procnum] &= success
 
         if file_changed:
             with open(name, "wb") as file:
@@ -59,7 +63,9 @@ def proc_func(work, is_verbose, print_lock):
 
         for task in final_tasks:
             if task.file_matches_extension(name):
-                task.run(name, "")
+                lines, changed, success = task.run(name, "")
+                file_changed |= changed
+                ret_dict[procnum] &= success
 
 def main():
     if not in_git_repo("."):
@@ -124,6 +130,7 @@ def main():
 
     processes = []
     print_lock = multiprocessing.Lock()
+    manager = multiprocessing.Manager()
 
     # Make list of evenly-sized work chunks
     chunk_size = math.ceil(len(files) / jobs)
@@ -132,9 +139,11 @@ def main():
     assert len(work) == jobs
 
     # Start worker processes
+    ret_dict = manager.dict()
     for i in range(0, jobs):
         proc = multiprocessing.Process(target = proc_func,
-                                       args = (work[i], is_verbose, print_lock))
+                                       args = (i, work[i], is_verbose,
+                                       print_lock, ret_dict))
         proc.daemon = True
         proc.start()
         processes.append(proc)
@@ -142,6 +151,15 @@ def main():
     # Wait for worker processes to finish
     for i in range(0, jobs):
         processes[i].join()
+
+    success = True
+    for i in range(0, jobs):
+        success &= ret_dict[i]
+
+    if success:
+        sys.exit(0)
+    else:
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

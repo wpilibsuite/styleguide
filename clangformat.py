@@ -29,9 +29,9 @@ class ClangFormat(Task):
             except FileNotFoundError:
                 print("Error: clang-format not found in PATH. Is it installed?",
                       file = sys.stderr)
-                return (lines, False)
+                return (lines, False, False)
 
         if lines == output:
-            return (lines, False)
+            return (lines, False, True)
         else:
-            return (output, True)
+            return (output, True, True)
