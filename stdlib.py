@@ -168,7 +168,7 @@ class Stdlib(Task):
                 if not file_changed and old_length != len(lines):
                     file_changed = True
 
-        return (lines, file_changed)
+        return (lines, file_changed, True)
 
     """Returns modified lines and whether string changed."""
     def func_substitute(self, header, lines):

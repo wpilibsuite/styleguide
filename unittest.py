@@ -18,25 +18,29 @@ def test(task, inputs, outputs):
     print(type(task).__name__)
 
     success = True
+    tests_passed = True
     print_str = "  test {}/{}: {}"
     for i in range(0, len(inputs)):
         print("  ".format(type(task).__name__), end = "")
-        output, file_changed = task.run(inputs[i][0], inputs[i][1])
-        if output != outputs[i][0] or file_changed != outputs[i][1]:
-            success = False
+        output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+        if output != outputs[i][0] or file_changed != outputs[i][1] or \
+                success != outputs[i][2]:
+            tests_passed = False
 
             print(print_str.format(i + 1, len(inputs), "FAIL"))
 
-            print("expected file_changed == {} and output ==".format(
-                outputs[i][1]))
+            output_str = "expected file_changed == {}, success == {}, and " + \
+                         "output =="
+            print(output_str.format(outputs[i][1], outputs[i][2]))
             print(outputs[i][0].encode())
 
-            print(os.linesep + "actual file_changed == {} and output ==".format(
-                file_changed))
+            output_str = "actual file_changed == {}, success == {}, and " + \
+                         "output =="
+            print(os.linesep + output_str.format(file_changed, success))
             print(output.encode())
         else:
             print(print_str.format(i + 1, len(inputs), "OK"))
-    return success
+    return tests_passed
 
 def test_includeorder():
     task = IncludeOrder()
@@ -67,7 +71,7 @@ def test_includeorder():
         os.linesep + \
         "#include \"HAL/HAL.h\"" + os.linesep + \
         "#include \"Task.h\"" + os.linesep + \
-        "#include \"nivision.h\"" + os.linesep, True))
+        "#include \"nivision.h\"" + os.linesep, True, True))
 
     # Ensure quotes around C and C++ std header includes are replaced with
     # angle brackets and they are properly sorted into two groups
@@ -81,7 +85,7 @@ def test_includeorder():
         "#include <stdio.h>" + os.linesep + \
         os.linesep + \
         "#include <iostream>" + os.linesep + \
-        "#include <memory>" + os.linesep, True))
+        "#include <memory>" + os.linesep, True, True))
 
     # Ensure NOLINT headers are considered related headers
     inputs.append(("./Test.h",
@@ -90,7 +94,7 @@ def test_includeorder():
     outputs.append((
         "#include \"ImportantHeader.h\"  // NOLINT" + os.linesep + \
         os.linesep + \
-        "#include <cstdio>" + os.linesep, True))
+        "#include <cstdio>" + os.linesep, True, True))
 
     # Check sorting for at least one header from each group except related
     # headeer. Test.inc isn't considered related in headers.
@@ -110,7 +114,7 @@ def test_includeorder():
         "#include <boost/algorithm/string/replace.hpp>" + os.linesep + \
         os.linesep + \
         "#include \"MyHeader.h\"" + os.linesep + \
-        "#include \"Test.inc\"" + os.linesep, True))
+        "#include \"Test.inc\"" + os.linesep, True, True))
 
     # Check newline is added between last header and code after it
     inputs.append(("./Test.cpp",
@@ -125,7 +129,7 @@ def test_includeorder():
         "#include \"MyFile.h\"" + os.linesep + \
         os.linesep + \
         "namespace std {" + os.linesep + \
-        "}" + os.linesep, True))
+        "}" + os.linesep, True, True))
 
     # Check newlines are removed between last header and code after it
     inputs.append(("./Test.cpp",
@@ -137,7 +141,7 @@ def test_includeorder():
         os.linesep + \
         "namespace std {" + os.linesep + \
         "}" + os.linesep))
-    outputs.append((outputs[len(outputs) - 1][0], True))
+    outputs.append((outputs[len(outputs) - 1][0], True, True))
 
     # Ensure headers stay grouped together between license header and other code
     inputs.append(("./Test.cpp",
@@ -153,7 +157,7 @@ def test_includeorder():
         "#include <iostream>" + os.linesep + \
         os.linesep + \
         "namespace std {" + os.linesep + \
-        "}" + os.linesep, True))
+        "}" + os.linesep, True, True))
 
     # Check "#ifdef _WIN32" is sorted after all other includes
     inputs.append(("./Error.h",
@@ -185,7 +189,7 @@ def test_includeorder():
         "#include <Windows.h>" + os.linesep + \
         "// This is a comment" + os.linesep + \
         "#undef GetMessage" + os.linesep + \
-        "#endif" + os.linesep, True))
+        "#endif" + os.linesep, True, True))
 
     # Verify relevant headers are found and sorted correctly
     inputs.append(("./PDP.cpp",
@@ -203,11 +207,11 @@ def test_includeorder():
         os.linesep + \
         "#include \"ctre/PDP.h\"" + os.linesep + \
         os.linesep + \
-        "using namespace hal;" + os.linesep, True))
+        "using namespace hal;" + os.linesep, True, True))
 
     # Check for idempotence
     inputs.append(("./PDP.cpp", outputs[len(outputs) - 1][0]))
-    outputs.append((inputs[len(inputs) - 1][1], False))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
 
     return test(task, inputs, outputs)
 
@@ -235,7 +239,7 @@ def test_licenseupdate():
     "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".format(year) +
     os.linesep +
     os.linesep +
-    file_appendix, True))
+    file_appendix, True, True))
 
     # pragma once at top of file preceded by newline
     temp = (inputs[len(inputs) - 1][0], os.linesep + inputs[len(inputs) - 1][1])
@@ -250,7 +254,7 @@ def test_licenseupdate():
     os.linesep +
     os.linesep +
     file_appendix))
-    outputs.append((inputs[len(inputs) - 1][1].lstrip(), True))
+    outputs.append((inputs[len(inputs) - 1][1].lstrip(), True, True))
 
     # File containing up-to-date range license
     inputs.append(("./Test.h",
@@ -264,7 +268,7 @@ def test_licenseupdate():
     "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".format(year) +
     os.linesep +
     os.linesep +
-    file_appendix, True))
+    file_appendix, True, True))
 
     # File containing up-to-date license with one year
     inputs.append(("./Test.h",
@@ -273,7 +277,7 @@ def test_licenseupdate():
     os.linesep +
     os.linesep +
     file_appendix))
-    outputs.append((inputs[len(inputs) - 1][1], False))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
 
     return test(task, inputs, outputs)
 
@@ -294,23 +298,23 @@ def test_newline():
 
     # Empty file
     inputs.append(("./Test.h", ""))
-    outputs.append((os.linesep, True))
+    outputs.append((os.linesep, True, True))
 
     # No newline
     inputs.append(("./Test.h", file_appendix))
-    outputs.append((file_appendix + os.linesep, True))
+    outputs.append((file_appendix + os.linesep, True, True))
 
     # One newline
     inputs.append((inputs[1][0], inputs[1][1] + os.linesep))
-    outputs.append((outputs[1][0], False))
+    outputs.append((outputs[1][0], False, True))
 
     # Two newlines
     inputs.append((inputs[1][0], inputs[1][1] + os.linesep + os.linesep))
-    outputs.append((outputs[1][0], True))
+    outputs.append((outputs[1][0], True, True))
 
     # .bat file with no "./" prefix
     inputs.append(("test.bat", inputs[1][1].replace(os.linesep, "\r\n")))
-    outputs.append((outputs[1][0].replace(os.linesep, "\r\n"), True))
+    outputs.append((outputs[1][0].replace(os.linesep, "\r\n"), True, True))
 
     return test(task, inputs, outputs)
 
@@ -347,11 +351,11 @@ def test_stdlib():
         "  uint_fast16_t** l = &k;" + os.linesep +
         "  uint_fast16_t ** m = l;" + os.linesep +
         "  std::free(mem);" + os.linesep +
-        "}" + os.linesep, True))
+        "}" + os.linesep, True, True))
 
     # FILE should be recognized as type here
     inputs.append(("./Class.cpp", "static FILE* Class::file = nullptr;"))
-    outputs.append(("static std::FILE* Class::file = nullptr;", True))
+    outputs.append(("static std::FILE* Class::file = nullptr;", True, True))
 
     # FILE should not be recognized as type here
     inputs.append(("./Class.cpp",
@@ -361,11 +365,11 @@ def test_stdlib():
     outputs.append((
         "static int Class::error1 = ERR_FILE;" + os.linesep +
         "#define FILE_LOG(level)" + os.linesep +
-        "if (level > FILELog::ReportingLevel())" + os.linesep, False))
+        "if (level > FILELog::ReportingLevel())" + os.linesep, False, True))
 
     # Types followed by semicolon should match
     inputs.append(("./Main.cpp", "typedef integer std::uint8_t;"))
-    outputs.append(("typedef integer uint8_t;", True))
+    outputs.append(("typedef integer uint8_t;", True, True))
 
     return test(task, inputs, outputs)
 
@@ -386,11 +390,11 @@ def test_whitespace():
 
     # Empty file
     inputs.append(("./Test.h", ""))
-    outputs.append(("", False))
+    outputs.append(("", False, True))
 
     # No trailing whitespace
     inputs.append(("./Test.h", file_appendix))
-    outputs.append((file_appendix, False))
+    outputs.append((file_appendix, False, True))
 
     # Two spaces trailing
     inputs.append(("./Test.h",
@@ -401,7 +405,7 @@ def test_whitespace():
         "int main() {  " + os.linesep +
         "  std::cout << \"Hello World!\";  " + os.linesep +
         "}" + os.linesep))
-    outputs.append((file_appendix, True))
+    outputs.append((file_appendix, True, True))
 
     # Two tabs trailing
     inputs.append(("./Test.h",
@@ -412,7 +416,7 @@ def test_whitespace():
         "int main() {\t\t" + os.linesep +
         "  std::cout << \"Hello World!\";\t\t" + os.linesep +
         "}" + os.linesep))
-    outputs.append((file_appendix, True))
+    outputs.append((file_appendix, True, True))
 
     return test(task, inputs, outputs)
 

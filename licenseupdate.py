@@ -71,7 +71,7 @@ class LicenseUpdate(Task):
         if len(file_parts) > 1:
             output += os.linesep + file_parts[1]
 
-        return (output, lines != output)
+        return (output, lines != output, True)
 
     """Read license template from file
 

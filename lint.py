@@ -47,8 +47,9 @@ class Lint(Task):
         # Run cpplint.py
         try:
             cpplint.main()
-        except SystemExit:
-            pass
+        except SystemExit as e:
+            # Restore original arguments
+            sys.argv = saved_argv
 
-        # Restore original arguments
-        sys.argv = saved_argv
+            # Report success if error code is 0 (False)
+            return (lines, False, e.code == False)

@@ -116,11 +116,12 @@ class Task(object):
     name -- file name string
     lines -- file contents
 
-    Returns tuple containing processed lines and whether lines were changed.
+    Returns tuple containing processed lines, whether lines were changed, and
+    whether task succeeded in formatting the file.
     """
     @abstractmethod
     def run(self, name, lines):
-        return ("", False)
+        return ("", False, True)
 
     # Returns value from config dictionary given key string
     @staticmethod

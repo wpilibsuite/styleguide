@@ -14,7 +14,7 @@ class Newline(Task):
 
         # Handle trivial case
         if len(lines) == 0:
-            return (eol, True)
+            return (eol, True, True)
 
         pos = len(lines) - 1
 
@@ -27,9 +27,9 @@ class Newline(Task):
 
         if newlines < 1:
             # Append newline to end of file
-            return (lines + eol, True)
+            return (lines + eol, True, True)
         elif newlines > 1:
             # Truncate all but one newline
-            return (lines[0:len(lines) - len(eol) * (newlines - 1)], True)
+            return (lines[0:len(lines) - len(eol) * (newlines - 1)], True, True)
         else:
-            return (lines, False)
+            return (lines, False, True)
