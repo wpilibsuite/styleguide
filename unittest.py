@@ -116,6 +116,15 @@ def test_includeorder():
         "#include \"MyHeader.h\"" + os.linesep + \
         "#include \"Test.inc\"" + os.linesep, True, True))
 
+    # Check "other header" isn't identified as C system include
+    inputs.append(("./Test.h",
+        "#include <OtherHeader.h>" + os.linesep + \
+        "#include <sys/time.h>" + os.linesep))
+    outputs.append((
+        "#include <sys/time.h>" + os.linesep + \
+        os.linesep + \
+        "#include <OtherHeader.h>" + os.linesep, True, True))
+
     # Check newline is added between last header and code after it
     inputs.append(("./Test.cpp",
         "#include \"MyFile.h\"" + os.linesep + \

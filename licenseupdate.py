@@ -33,7 +33,7 @@ class LicenseUpdate(Task):
         else:
             file_parts = ["", lines.lstrip()]
 
-        year_regex = re.compile("Copyright \(c\) [\w\s]+\s+(20..)")
+        year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s+(20..)")
         year = ""
         modify_copyright = False
         for line in file_parts[0].split(os.linesep):
