@@ -31,11 +31,13 @@ class Lint(Task):
         sys.argv = ["cpplint.py", "--filter="
                     "-build/c++11,"
                     "-build/include,"
+                    "-build/include_order,"  # includeorder.py handles ordering
                     "-build/include_subdir,"
                     "-build/namespaces,"
                     "-readability/todo,"
                     "-runtime/references,"
-                    "-runtime/string",
+                    "-runtime/string,"
+                    "-whitespace/indent",  # clangformat.py handles indentation
                     "--extensions=" + \
                         ",".join(self.get_config("cppHeaderExtensions") + \
                                  self.get_config("cppSrcExtensions")),

@@ -38,7 +38,7 @@ class IncludeOrder(Task):
                         "cstdbool"]
 
         # All other headers matching this pattern are C system headers
-        self.c_sys_regex = re.compile("<.*\.h>")
+        self.c_sys_regex = re.compile("<[a-z].*\.h>")
 
         self.header_regex = re.compile("(?P<header>"
                                          "(?P<open_bracket><|\")"
