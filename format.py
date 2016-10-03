@@ -18,8 +18,9 @@ from whitespace import Whitespace
 
 # Check that the current directory is part of a Git repository
 def in_git_repo(directory):
-    ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
-    return ret.returncode == 0
+    cmd = ["git", "rev-parse"]
+    returncode = subprocess.call(cmd, stderr = subprocess.DEVNULL)
+    return returncode == 0
 
 def proc_func(procnum, work, is_verbose, print_lock, ret_dict):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
