@@ -144,3 +144,17 @@ class Task(object):
             return self.regex_include.search(name)
         else:
             return True
+
+    # Returns autodetected line separator for file
+    @staticmethod
+    def get_linesep(lines):
+        # Find potential line separator
+        pos = lines.find("\n")
+
+        # If a newline character was found and the character preceding it is a
+        # carriage return, assume CRLF line endings. LF line endings are assumed
+        # for empty files.
+        if pos > 0 and lines[pos - 1] == "\r":
+            return "\r\n"
+        else:
+            return "\n"

@@ -307,7 +307,7 @@ def test_newline():
 
     # Empty file
     inputs.append(("./Test.h", ""))
-    outputs.append((os.linesep, True, True))
+    outputs.append(("\n", True, True))
 
     # No newline
     inputs.append(("./Test.h", file_appendix))
