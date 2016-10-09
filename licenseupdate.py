@@ -15,6 +15,8 @@ class LicenseUpdate(Task):
             Task.get_config("otherExtensions")
 
     def run(self, name, lines):
+        linesep = Task.get_linesep(lines)
+
         license_template = \
             self.read_license_template(".styleguide-license", name)
         if not license_template:
@@ -29,14 +31,14 @@ class LicenseUpdate(Task):
         # If a comment exists at the top of the file, treat it as the license
         # header
         if stripped_lines.startswith("//") or stripped_lines.startswith("/*"):
-            file_parts = stripped_lines.split(os.linesep + os.linesep, 1)
+            file_parts = stripped_lines.split(linesep + linesep, 1)
         else:
             file_parts = ["", lines.lstrip()]
 
         year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s+(20..)")
         year = ""
         modify_copyright = False
-        for line in file_parts[0].split(os.linesep):
+        for line in file_parts[0].split(linesep):
             match = year_regex.search(line)
             # If license contains copyright pattern, extract the first year
             if match:
@@ -65,11 +67,11 @@ class LicenseUpdate(Task):
                 padding_width = int(padding / padding_count)
                 line = line.replace(PADDING_TOKEN, " " * padding_width)
 
-            output += line + os.linesep
+            output += line + linesep
 
         # Copy rest of original file into new one
         if len(file_parts) > 1:
-            output += os.linesep + file_parts[1]
+            output += linesep + file_parts[1]
 
         return (output, lines != output, True)
 

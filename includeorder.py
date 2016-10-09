@@ -51,6 +51,8 @@ class IncludeOrder(Task):
             Task.get_config("cppSrcExtensions")
 
     def run(self, name, lines):
+        linesep = Task.get_linesep(lines)
+
         self.name = name
 
         includes = [[], [], [], [], []]
@@ -166,12 +168,12 @@ class IncludeOrder(Task):
             # ifdef blocks go after all other includes
             if ifdef_blocks != [[]]:
                 for block in ifdef_blocks:
-                    output_list.append(os.linesep.join(block))
+                    output_list.append(linesep.join(block))
                     output_list.append("")
 
             output_list.extend(lines_list[include_stop:])
 
-        output = os.linesep.join(output_list).rstrip() + os.linesep
+        output = linesep.join(output_list).rstrip() + linesep
         if output != lines:
             return (output, True, True)
         else:
