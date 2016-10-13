@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """Downloads the latest cpplint.py and edits it for use by lint.py.
 
 Dependencies:
@@ -11,8 +10,9 @@ import sys
 
 import patch
 
+
 def main():
-    print("Downloading cpplint.py...", end = "")
+    print("Downloading cpplint.py...", end="")
     sys.stdout.flush()
     url = "https://raw.githubusercontent.com/theandrewdavis/cpplint/master/cpplint.py"
     with urllib.request.urlopen(url) as response, \
@@ -21,11 +21,12 @@ def main():
         out.write(data)
     print(" done")
 
-    print("Applying custom patches...", end = "")
+    print("Applying custom patches...", end="")
     sys.stdout.flush()
     patch_set = patch.fromfile("cpplint.patch")
     patch_set.apply()
     print(" done")
+
 
 if __name__ == "__main__":
     main()

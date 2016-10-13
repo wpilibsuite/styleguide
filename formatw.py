@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """This script invokes format.py in the wpilibsuite/styleguide repository.
 
 Set the WPI_FORMAT environment variable to its location on disk before use. For
@@ -12,6 +11,7 @@ import os
 import subprocess
 import sys
 
+
 def main():
     path = os.environ.get("WPI_FORMAT")
     if path == None:
@@ -23,6 +23,7 @@ def main():
     args.extend(sys.argv[1:])
     proc = subprocess.Popen(args)
     sys.exit(proc.wait())
+
 
 if __name__ == "__main__":
     main()

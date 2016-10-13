@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """Downloads the latest cpplint.py and generates a diff between it and the local
 version.
 """
@@ -10,17 +9,19 @@ import os
 import re
 import sys
 
+
 # Check that the current directory is part of a Git repository
 def in_git_repo(directory):
-    ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
+    ret = subprocess.run(["git", "rev-parse"], stderr=subprocess.DEVNULL)
     return ret.returncode == 0
+
 
 def main():
     if not in_git_repo("."):
-        print("Error: not invoked within a Git repository", file = sys.stderr)
+        print("Error: not invoked within a Git repository", file=sys.stderr)
         sys.exit(1)
 
-    print("Downloading cpplint.py...", end = "")
+    print("Downloading cpplint.py...", end="")
     sys.stdout.flush()
     url = "https://raw.githubusercontent.com/theandrewdavis/cpplint/master/cpplint.py"
     with urllib.request.urlopen(url) as response, \
@@ -29,12 +30,13 @@ def main():
         out.write(data)
     print(" done")
 
-    print("Generating patch...", end = "")
+    print("Generating patch...", end="")
     sys.stdout.flush()
 
     # Generate diff
-    proc = subprocess.Popen(["git", "diff", "--no-index", "cpplint.py.master",
-                             "cpplint.py"], stdout = subprocess.PIPE)
+    proc = subprocess.Popen(
+        ["git", "diff", "--no-index", "cpplint.py.master", "cpplint.py"],
+        stdout=subprocess.PIPE)
     diff, err = proc.communicate()
 
     # Write diff to file
@@ -49,6 +51,7 @@ def main():
     # Remove "from" file
     os.remove("cpplint.py.master")
     print(" done")
+
 
 if __name__ == "__main__":
     main()

@@ -5,45 +5,46 @@ import re
 
 from task import Task
 
+
 class IncludeOrder(Task):
+
     def __init__(self):
         Task.__init__(self)
 
-        self.c_std = ["assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h",
-                      "float.h", "inttypes.h", "iso646.h", "limits.h",
-                      "locale.h", "math.h", "setjmp.h", "signal.h",
-                      "stdalign.h", "stdarg.h", "stdatomic.h", "stdbool.h",
-                      "stddef.h", "stdint.h", "stdio.h", "stdlib.h",
-                      "stdnoreturn.h", "string.h", "tgmath.h", "threads.h",
-                      "time.h", "uchar.h", "wchar.h", "wctype.h"]
+        self.c_std = [
+            "assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h", "float.h",
+            "inttypes.h", "iso646.h", "limits.h", "locale.h", "math.h",
+            "setjmp.h", "signal.h", "stdalign.h", "stdarg.h", "stdatomic.h",
+            "stdbool.h", "stddef.h", "stdint.h", "stdio.h", "stdlib.h",
+            "stdnoreturn.h", "string.h", "tgmath.h", "threads.h", "time.h",
+            "uchar.h", "wchar.h", "wctype.h"
+        ]
 
-        self.cpp_std = ["cstdlib", "csignal", "csetjmp", "cstdarg", "typeinfo",
-                        "typeindex", "type_traits", "bitset", "functional",
-                        "utility", "ctime", "chrono", "cstddef",
-                        "initializer_list", "tuple", "new", "memory",
-                        "scoped_allocator", "climits", "cfloat", "cstdint",
-                        "cinttypes", "limits", "exception", "stdexcept",
-                        "cassert", "system_error", "cerrno", "cctype",
-                        "cwctype", "cstring", "cwchar", "cuchar", "string",
-                        "array", "vector", "deque", "list", "forward_list",
-                        "set", "map", "unordered_set", "unordered_map",
-                        "stack", "queue", "algorithm", "iterator", "cmath",
-                        "complex", "valarray", "random", "numeric", "ratio",
-                        "cfenv", "iosfwd", "ios", "istream", "ostream",
-                        "iostream", "fstream", "sstream", "strstream",
-                        "iomanip", "streambuf", "cstdio", "locale", "clocale",
-                        "codecvt", "regex", "atomic", "thread", "mutex",
-                        "shared_mutex", "future", "condition_variable",
-                        "ciso646", "ccomplex", "ctgmath", "cstdalign",
-                        "cstdbool"]
+        self.cpp_std = [
+            "cstdlib", "csignal", "csetjmp", "cstdarg", "typeinfo", "typeindex",
+            "type_traits", "bitset", "functional", "utility", "ctime", "chrono",
+            "cstddef", "initializer_list", "tuple", "new", "memory",
+            "scoped_allocator", "climits", "cfloat", "cstdint", "cinttypes",
+            "limits", "exception", "stdexcept", "cassert", "system_error",
+            "cerrno", "cctype", "cwctype", "cstring", "cwchar", "cuchar",
+            "string", "array", "vector", "deque", "list", "forward_list", "set",
+            "map", "unordered_set", "unordered_map", "stack", "queue",
+            "algorithm", "iterator", "cmath", "complex", "valarray", "random",
+            "numeric", "ratio", "cfenv", "iosfwd", "ios", "istream", "ostream",
+            "iostream", "fstream", "sstream", "strstream", "iomanip",
+            "streambuf", "cstdio", "locale", "clocale", "codecvt", "regex",
+            "atomic", "thread", "mutex", "shared_mutex", "future",
+            "condition_variable", "ciso646", "ccomplex", "ctgmath", "cstdalign",
+            "cstdbool"
+        ]
 
         # All other headers matching this pattern are C system headers
         self.c_sys_regex = re.compile("<[a-z].*\.h>")
 
         self.header_regex = re.compile("(?P<header>"
-                                         "(?P<open_bracket><|\")"
-                                         "(?P<name>.*)"
-                                         "(?P<close_bracket>>|\"))"
+                                       "(?P<open_bracket><|\")"
+                                       "(?P<name>.*)"
+                                       "(?P<close_bracket>>|\"))"
                                        "(?P<postfix>.*)")
 
     def get_file_extensions(self):
@@ -69,8 +70,10 @@ class IncludeOrder(Task):
         override_regexes = []
 
         # Compile include sorting override regexes
-        for group in ["includeRelated", "includeCSys", "includeCppSys",
-                    "includeOtherLibs", "includeProject"]:
+        for group in [
+                "includeRelated", "includeCSys", "includeCppSys",
+                "includeOtherLibs", "includeProject"
+        ]:
             if not len(Task.get_config(group)):
                 override_regexes.append(re.compile("a^"))
             else:

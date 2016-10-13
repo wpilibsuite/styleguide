@@ -16,20 +16,24 @@ otherExtensions {
 }
 
 genFolderExclude {
+  folder1
+  folder2/subdir1/subdir2
 }
 
 genFileExclude {
-  /cpplint\.py$
+  header1\.h$
+  header2\.h$
 }
 
 modifiableFolderExclude {
   \.git
   __pycache__
+  folder/subdir
 }
 
 modifiableFileExclude {
+  \.jar$
   \.patch$
-  \.png$
 }
 
 includeRelated {
@@ -44,7 +48,6 @@ includeCppSys {
 includeOtherLibs {
 }
 
-# Used by unit tests
 includeProject {
   ^ctre/
 }

@@ -15,7 +15,9 @@ import cpplint
 
 from task import Task
 
+
 class Lint(Task):
+
     def get_file_extensions(self):
         return Task.get_config("cppHeaderExtensions") + \
             Task.get_config("cppSrcExtensions")

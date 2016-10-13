@@ -7,7 +7,9 @@ import sys
 
 from task import Task
 
+
 class LicenseUpdate(Task):
+
     def get_file_extensions(self):
         return Task.get_config("cExtensions") + \
             Task.get_config("cppHeaderExtensions") + \
@@ -20,9 +22,9 @@ class LicenseUpdate(Task):
         license_template = \
             self.read_license_template(".styleguide-license", name)
         if not license_template:
-              print("Error: license template file '.styleguide-license' not " \
-                    "found")
-              sys.exit(1)
+            print("Error: license template file '.styleguide-license' not " \
+                  "found")
+            sys.exit(1)
 
         # Strip newlines at top of file
         stripped_lines = lines.lstrip()
@@ -85,6 +87,7 @@ class LicenseUpdate(Task):
 
     Returns list containing license template or None if file was not found.
     """
+
     @staticmethod
     def read_license_template(template_name, file_name):
         config_found = False

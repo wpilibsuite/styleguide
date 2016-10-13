@@ -15,12 +15,13 @@ Anything submitted to a wpilibsuite project needs to follow the code style guide
 
 - [Python 3.5](https://www.python.org/downloads/)
 - clang-format 3.8 or newer (included with [LLVM](http://llvm.org/releases/download.html))
+- Python packages in [requirements.txt](requirements.txt)
 
 After cloning this repository, set the `WPI_FORMAT` environment variable to its location. If you would like to use these tools with a new project, copy [formatw.py](formatw.py), [.styleguide](#.styleguide), and [.styleguide-license](#.styleguide-license) into the project.
 
 ### .styleguide
 
-`format.py` checks the current directory for the `.styleguide` file. If one doesn't exist, all parent directories are tried as well. [.styleguide](.styleguide) is an example with all possible groups.
+`format.py` checks the current directory for the `.styleguide` file. If one doesn't exist, all parent directories are tried as well. [.styleguide](examples/.styleguide) is an example with all possible groups.
 
 This file contains groups of file name regular expressions. There are two groups of regexes which prevent tasks (i.e., formatters and linters) from running on matching files:
 
@@ -35,7 +36,7 @@ The groups `includeRelated`, `includeCSys`, `includeCppSys`, `includeOtherLibs`,
 
 ### .styleguide-license
 
-This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. [.styleguide-license](.styleguide-license) is an example.
+This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. [.styleguide-license](examples/.styleguide-license) is an example.
 
 `format.py` checks the currently processed file's directory for a `.styleguide` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
 
