@@ -73,12 +73,24 @@ def main():
         print("Error: not invoked within a Git repository", file = sys.stderr)
         sys.exit(1)
 
-    # Handle running in either the root or styleguide directories
+    # All file paths are relative to Git repo root directory, so find the root.
+    # We can assume the ".git" exists because we already checked we are in a Git
+    # repo. Checking "len(directory) > 0" isn't necessary.
     config_path = ""
-    if os.getcwd().rpartition(os.sep)[2] == "styleguide":
-        config_path = ".."
-    else:
-        config_path = "."
+    git_dir_found = False
+    directory = os.getcwd()
+    while not git_dir_found:
+        git_location = directory + os.sep + ".git"
+        if os.path.isdir(git_location):
+            git_dir_found = True
+            if config_path == "":
+                config_path = "."
+        else:
+            directory = directory[:directory.rfind(os.sep)]
+            if config_path == "":
+                config_path += ".."
+            else:
+                config_path += os.sep + ".."
 
     # Delete temporary files from previous incomplete run
     files = [os.path.join(dp, f) for dp, dn, fn in
@@ -119,7 +131,7 @@ def main():
         sys.exit(0)
 
     # Parse command-line arguments
-    parser = argparse.ArgumentParser(description = "Runs all formatting tasks on the code base. This should be invoked from either the styleguide directory or the root directory of the project.")
+    parser = argparse.ArgumentParser(description = "Runs all formatting tasks on the code base. This should be invoked from a directory within the project.")
     parser.add_argument("-v", dest = "verbose", action = "store_true",
                         help = "enable output verbosity")
     parser.add_argument("-j", dest = "jobs", type = int,
