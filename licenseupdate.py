@@ -99,5 +99,6 @@ class LicenseUpdate(Task):
                 with open(template_location, "r") as template_file:
                     config_found = True
                     return template_file.read().splitlines()
-            directory = directory[:directory.rfind(os.sep)]
+            else:
+                directory = directory[:directory.rfind(os.sep)]
         return None
