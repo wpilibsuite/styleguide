@@ -6,6 +6,7 @@ import re
 
 from task import Task
 
+
 class Header(object):
     """Manages function and type names in standard library header.
 
@@ -16,8 +17,9 @@ class Header(object):
     add_prefix -- determines whether std:: prefix is added or removed
                   (default True)
     """
-    def __init__(self, name, func_names = set(), type_regexes = [],
-                 add_prefix = True):
+
+    def __init__(self, name, func_names=set(), type_regexes=[],
+                 add_prefix=True):
         self.name = name
         self.func_names = func_names
         self.add_prefix = add_prefix
@@ -38,8 +40,7 @@ class Header(object):
             # and start with a letter. Function names are followed by an open
             # parenthesis.
             self.func_regex = re.compile("(?: |,|\()" + regex_prefix +
-                                         "([a-z][a-z0-9]*)" +
-                                         "(?:\()")
+                                         "([a-z][a-z0-9]*)" + "(?:\()")
         else:
             self.func_regex = None
 
@@ -49,13 +50,15 @@ class Header(object):
             # a close parenthesis, a comma, a semicolon, a space, or pointer
             # asterisks.
             # FIXME: Types at the beginning of the line are not matched.
-            self.type_regex = re.compile("(?<=\<| |,|\()" + regex_prefix +
-                                         "(" + "|".join(type_regexes) + ")" +
-                                         "(?=\)|,|;| |\*+)")
+            self.type_regex = re.compile(
+                "(?<=\<| |,|\()" + regex_prefix + "(" + "|".join(
+                    type_regexes) + ")" + "(?=\)|,|;| |\*+)")
         else:
             self.type_regex = None
 
+
 class Stdlib(Task):
+
     def get_file_extensions(self):
         return Task.get_config("cppHeaderExtensions") + \
             Task.get_config("cppSrcExtensions")
@@ -66,79 +69,79 @@ class Stdlib(Task):
         # assert is a macro, so it's ommitted to avoid prefixing with std::
         headers.append(Header("assert"))
 
-        headers.append(Header("ctype",
-                              {"isalum", "isalpha", "isblank", "iscntrl",
-                               "isdigit", "isgraph", "islower", "isprint",
-                               "ispunct", "isspace", "isupper", "isxdigit",
-                               "tolower", "toupper"}))
+        headers.append(
+            Header("ctype", {
+                "isalum", "isalpha", "isblank", "iscntrl", "isdigit", "isgraph",
+                "islower", "isprint", "ispunct", "isspace", "isupper",
+                "isxdigit", "tolower", "toupper"
+            }))
         headers.append(Header("errno"))
         headers.append(Header("float"))
         headers.append(Header("limits"))
-        headers.append(Header("math",
-                              {"cos", "acos", "cosh", "acosh", "sin", "asin",
-                               "asinh", "tan", "atan", "atan2", "atanh", "exp",
-                               "frexp", "ldexp", "log", "log10", "ilogb",
-                               "log1p", "log2", "logb", "modf", "exp2", "expm1",
-                               "scalbl", "scalbln", "pow", "sqrt", "cbrt",
-                               "hypot", "erf", "erfc", "tgamma", "lgamma",
-                               "ceil", "floor", "fmod", "trunc", "round",
-                               "lround", "llround", "rint", "lrint", "llrint",
-                               "nearbyint", "remainder", "remquo", "copysign",
-                               "nan", "nextafter", "nexttoward", "fdim", "fmax",
-                               "fmin", "fma", "fpclassify", "abs", "fabs",
-                               "signbit", "isfinite", "isinf", "isnan",
-                               "isnormal", "isgreater", "isgreaterequal",
-                               "isless", "islessequal", "islessgreater",
-                               "isunordered"}))
+        headers.append(
+            Header("math", {
+                "cos", "acos", "cosh", "acosh", "sin", "asin", "asinh", "tan",
+                "atan", "atan2", "atanh", "exp", "frexp", "ldexp", "log",
+                "log10", "ilogb", "log1p", "log2", "logb", "modf", "exp2",
+                "expm1", "scalbl", "scalbln", "pow", "sqrt", "cbrt", "hypot",
+                "erf", "erfc", "tgamma", "lgamma", "ceil", "floor", "fmod",
+                "trunc", "round", "lround", "llround", "rint", "lrint",
+                "llrint", "nearbyint", "remainder", "remquo", "copysign", "nan",
+                "nextafter", "nexttoward", "fdim", "fmax", "fmin", "fma",
+                "fpclassify", "abs", "fabs", "signbit", "isfinite", "isinf",
+                "isnan", "isnormal", "isgreater", "isgreaterequal", "isless",
+                "islessequal", "islessgreater", "isunordered"
+            }))
         headers.append(Header("setjmp", {"longjmp", "setjmp"}, ["jmp_buf"]))
-        headers.append(Header("signal", {"signal", "raise"}, ["sig_atomic_t"],
-                              False))
+        headers.append(
+            Header("signal", {"signal", "raise"}, ["sig_atomic_t"], False))
         headers.append(Header("stdarg", {"va_list"}))
-        headers.append(Header("stddef",
-                              type_regexes = ["(ptrdiff|max_align|nullptr)_t"]))
+        headers.append(
+            Header(
+                "stddef", type_regexes=["(ptrdiff|max_align|nullptr)_t"]))
 
         # size_t isn't actually defined in size_t, but it fits best here for
         # removing the std:: prefix
         headers.append(
-            Header("stdint",
-                   type_regexes = ["((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"],
-                   add_prefix = False))
+            Header(
+                "stdint",
+                type_regexes=[
+                    "((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"
+                ],
+                add_prefix=False))
 
-        headers.append(Header("stdio",
-                              {"remove", "rename", "rewind", "tmpfile",
-                               "tmpnam", "fclose", "fflush", "fopen", "freopen",
-                               "fgetc", "fgets", "fputc", "fputs", "fread",
-                               "fwrite", "fgetpos", "fseek", "fsetpos", "ftell",
-                               "feof", "ferror", "setbuf", "setvbuf", "fprintf",
-                               "snprintf", "sprintf", "vfprintf", "vprintf",
-                               "vsnprintf", "vsprintf", "printf", "fscanf",
-                               "sscanf", "vfscanf", "vscanf", "vsscanf",
-                               "scanf", "getchar", "gets", "putc", "putchar",
-                               "puts", "getc", "ungetc", "clearerr", "perror"},
-                              ["FILE", "fpos_t"]))
-        headers.append(Header("stdlib",
-                              {"atof", "atoi", "atol", "atoll", "strtof",
-                               "strtol", "strtod", "strtold", "strtoll",
-                               "strtoul", "strtoull", "rand", "srand", "free",
-                               "calloc", "malloc", "realloc", "abort",
-                               "at_quick_exit", "quick_exit", "atexit", "exit",
-                               "getenv", "system", "_Exit", "bsearch", "qsort",
-                               "llabs", "labs", "abs", "lldiv", "ldiv", "div",
-                               "mblen", "btowc", "wctomb", "wcstombs",
-                               "mbstowcs"},
-                              ["(l|ll)?div_t"]))
-        headers.append(Header("string",
-                              {"memcpy", "memcmp", "memchr", "memmove",
-                               "memset", "strcpy", "strncpy", "strcat",
-                               "strncat", "strcmp", "strncmp", "strcoll",
-                               "strchr", "strrchr", "strstr", "strxfrm",
-                               "strcspn", "strrspn", "strpbrk", "strtok",
-                               "strerror", "strlen"}))
-        headers.append(Header("time",
-                              {"clock", "asctime", "ctime", "difftime",
-                               "gmtime", "localtime", "mktime", "strftime",
-                               "time"},
-                              ["(clock|time)_t"]))
+        headers.append(
+            Header("stdio", {
+                "remove", "rename", "rewind", "tmpfile", "tmpnam", "fclose",
+                "fflush", "fopen", "freopen", "fgetc", "fgets", "fputc",
+                "fputs", "fread", "fwrite", "fgetpos", "fseek", "fsetpos",
+                "ftell", "feof", "ferror", "setbuf", "setvbuf", "fprintf",
+                "snprintf", "sprintf", "vfprintf", "vprintf", "vsnprintf",
+                "vsprintf", "printf", "fscanf", "sscanf", "vfscanf", "vscanf",
+                "vsscanf", "scanf", "getchar", "gets", "putc", "putchar",
+                "puts", "getc", "ungetc", "clearerr", "perror"
+            }, ["FILE", "fpos_t"]))
+        headers.append(
+            Header("stdlib", {
+                "atof", "atoi", "atol", "atoll", "strtof", "strtol", "strtod",
+                "strtold", "strtoll", "strtoul", "strtoull", "rand", "srand",
+                "free", "calloc", "malloc", "realloc", "abort", "at_quick_exit",
+                "quick_exit", "atexit", "exit", "getenv", "system", "_Exit",
+                "bsearch", "qsort", "llabs", "labs", "abs", "lldiv", "ldiv",
+                "div", "mblen", "btowc", "wctomb", "wcstombs", "mbstowcs"
+            }, ["(l|ll)?div_t"]))
+        headers.append(
+            Header("string", {
+                "memcpy", "memcmp", "memchr", "memmove", "memset", "strcpy",
+                "strncpy", "strcat", "strncat", "strcmp", "strncmp", "strcoll",
+                "strchr", "strrchr", "strstr", "strxfrm", "strcspn", "strrspn",
+                "strpbrk", "strtok", "strerror", "strlen"
+            }))
+        headers.append(
+            Header("time", {
+                "clock", "asctime", "ctime", "difftime", "gmtime", "localtime",
+                "mktime", "strftime", "time"
+            }, ["(clock|time)_t"]))
 
         file_changed = False
         for header in headers:
@@ -171,6 +174,7 @@ class Stdlib(Task):
         return (lines, file_changed, True)
 
     """Returns modified lines and whether string changed."""
+
     def func_substitute(self, header, lines):
         pos = 0
         lines_changed = False

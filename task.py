@@ -13,7 +13,6 @@ if regex_sep == "\\":
 # format.py excludes matches for the "modifiable" regex before checking for
 # modifications to generated files because some of the regexes from each group
 # overlap.
-
 """Read values from config file
 
 Checks current directory for config file. If one doesn't exist, try all parent
@@ -21,6 +20,8 @@ directories as well.
 
 Returns dictionary of groups (group name -> list of values).
 """
+
+
 def read_config_file(file_name):
     config_found = False
     directory = os.getcwd()
@@ -62,6 +63,7 @@ def read_config_file(file_name):
         except OSError:
             directory = directory[:directory.rfind(os.sep)]
 
+
 config_dict = read_config_file(".styleguide")
 if not config_dict:
     print("Error: config file '.styleguide' not found")
@@ -97,6 +99,7 @@ if len(modifiable_exclude) == 0:
 else:
     modifiable_regex_exclude = re.compile("|".join(modifiable_exclude))
 
+
 class Task(object):
     __metaclass__ = ABCMeta
 
@@ -119,6 +122,7 @@ class Task(object):
     Returns tuple containing processed lines, whether lines were changed, and
     whether task succeeded in formatting the file.
     """
+
     @abstractmethod
     def run(self, name, lines):
         return ("", False, True)

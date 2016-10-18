@@ -2,7 +2,9 @@
 
 from task import Task
 
+
 class Newline(Task):
+
     def run(self, name, lines):
         linesep = Task.get_linesep(lines)
 
