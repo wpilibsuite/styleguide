@@ -2,6 +2,9 @@ version: "{branch} {build}"
 
 environment:
   matrix:
+    - PYTHON: "C:\\Python34"
+      PYTHON_VERSION: 3.4
+      PYTHON_ARCH: 64
     - PYTHON: "C:\\Python35"
       PYTHON_VERSION: 3.5
       PYTHON_ARCH: 64
@@ -11,15 +14,16 @@ init:
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - pip install -r requirements.txt
+  - cd wpiformat
+  - py -3 setup.py build
+  - py -3 setup.py install --optimize=1 --skip-build
 
 build: false
 
 test_script:
-  - python unittest.py
-  - python format.py
+  - py -3 setup.py test
+  - cd .. && py -3 -m wpiformat -v
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-
 
 matrix:
   fast_finish: true

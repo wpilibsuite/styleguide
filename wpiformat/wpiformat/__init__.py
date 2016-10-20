@@ -7,16 +7,16 @@ import os
 import subprocess
 import sys
 
-from clangformat import ClangFormat
-from includeorder import IncludeOrder
-from licenseupdate import LicenseUpdate
-from lint import Lint
-from namespace import Namespace
-from newline import Newline
-from pyformat import PyFormat
-from stdlib import Stdlib
-import task
-from whitespace import Whitespace
+from wpiformat.clangformat import ClangFormat
+from wpiformat.includeorder import IncludeOrder
+from wpiformat.licenseupdate import LicenseUpdate
+from wpiformat.lint import Lint
+from wpiformat.namespace import Namespace
+from wpiformat.newline import Newline
+from wpiformat.pyformat import PyFormat
+from wpiformat.stdlib import Stdlib
+from wpiformat import task
+from wpiformat.whitespace import Whitespace
 
 
 # Check that the current directory is part of a Git repository

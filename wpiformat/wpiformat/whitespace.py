@@ -2,7 +2,7 @@
 
 import os
 
-import task
+from . import task
 
 
 class Whitespace(task.Task):

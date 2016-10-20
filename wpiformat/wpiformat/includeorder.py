@@ -3,7 +3,7 @@
 import os
 import re
 
-import task
+from . import task
 
 
 class IncludeOrder(task.Task):

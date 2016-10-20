@@ -11,9 +11,8 @@ required it to be used as a module.
 import os
 import sys
 
-import cpplint
-
-import task
+from . import cpplint
+from . import task
 
 
 class Lint(task.Task):

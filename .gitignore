@@ -138,7 +138,11 @@ local.properties
 
 ### Python ###
 *.pyc
+.cache
 __pycache__
+*.egg-info/
+*.egg
+version.py
 
 # External tool builders
 .externalToolBuilders/

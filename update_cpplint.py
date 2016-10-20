@@ -16,14 +16,15 @@ def main():
     sys.stdout.flush()
     url = "https://raw.githubusercontent.com/theandrewdavis/cpplint/master/cpplint.py"
     with urllib.request.urlopen(url) as response, \
-            open("cpplint.py", "wb") as out:
+            open("wpiformat" + os.sep + "src" + os.sep + "cpplint.py", "wb") as out:
         data = response.read()
         out.write(data)
     print(" done")
 
     print("Applying custom patches...", end="")
     sys.stdout.flush()
-    patch_set = patch.fromfile("cpplint.patch")
+    patch_set = patch.fromfile("wpiformat" + os.sep + "src" + os.sep +
+                               "cpplint.patch")
     patch_set.apply()
     print(" done")
 

@@ -2,7 +2,7 @@
 
 import re
 
-import task
+from . import task
 
 
 class Namespace(task.Task):

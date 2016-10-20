@@ -9,6 +9,9 @@ before_install:
   - sudo apt-get install clang-format-3.8 -y
 
 script:
-  - python3 unittest.py
-  - python3 format.py
+  - cd wpiformat
+  - python3 setup.py build
+  - python3 setup.py install --optimize=1 --skip-build
+  - python3 setup.py test
+  - cd .. && python3 -m wpiformat -v
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes

@@ -4,7 +4,7 @@ and assert.h are exceptions.
 
 import re
 
-import task
+from . import task
 
 
 class Header(object):

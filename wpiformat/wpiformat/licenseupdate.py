@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-import task
+from . import task
 
 
 class LicenseUpdate(task.Task):

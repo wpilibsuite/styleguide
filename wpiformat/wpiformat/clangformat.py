@@ -3,7 +3,7 @@
 import subprocess
 import sys
 
-import task
+from . import task
 
 
 class ClangFormat(task.Task):
