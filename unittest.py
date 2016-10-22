@@ -288,6 +288,24 @@ def test_licenseupdate():
         format(year) + os.linesep + os.linesep + file_appendix))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
+    # File with three newlines between license and include guard
+    inputs.append((
+        "./Test.h",
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        format(year) + os.linesep + os.linesep + os.linesep + file_appendix))
+    outputs.append((outputs[len(outputs) - 1][0], True, True))
+
+    # File with only one newline between license and include guard
+    inputs.append((
+        "./Test.h",
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        format(year) + os.linesep + file_appendix))
+    outputs.append((outputs[len(outputs) - 1][0], True, True))
+
     return test(task, inputs, outputs)
 
 
