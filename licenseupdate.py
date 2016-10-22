@@ -27,15 +27,22 @@ class LicenseUpdate(Task):
             sys.exit(1)
 
         # Strip newlines at top of file
-        stripped_lines = lines.lstrip()
+        stripped_lines = lines.lstrip().split(linesep)
 
         # License should be at beginning of file and followed by two newlines.
         # If a comment exists at the top of the file, treat it as the license
         # header
-        if stripped_lines.startswith("//") or stripped_lines.startswith("/*"):
-            file_parts = stripped_lines.split(linesep + linesep, 1)
+        license_end = 0
+        while stripped_lines[license_end].startswith("//") or \
+            stripped_lines[license_end].startswith("/*"):
+            license_end += 1
+
+        if license_end > 0:
+            file_parts = \
+                [linesep.join(stripped_lines[0:license_end]),
+                 linesep + linesep.join(stripped_lines[license_end:]).lstrip()]
         else:
-            file_parts = ["", lines.lstrip()]
+            file_parts = ["", linesep + lines.lstrip()]
 
         year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s+(20..)")
         year = ""
@@ -73,7 +80,7 @@ class LicenseUpdate(Task):
 
         # Copy rest of original file into new one
         if len(file_parts) > 1:
-            output += linesep + file_parts[1]
+            output += file_parts[1]
 
         return (output, lines != output, True)
 
