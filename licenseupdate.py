@@ -29,15 +29,39 @@ class LicenseUpdate(Task):
         # Strip newlines at top of file
         stripped_lines = lines.lstrip().split(linesep)
 
-        # License should be at beginning of file and followed by two newlines.
-        # If a comment exists at the top of the file, treat it as the license
-        # header
+        # If a comment at the beginning of the file is considered a license, it
+        # is replaced with an updated license. Otherwise, a license header is
+        # inserted before it.
+        first_comment_is_license = False
         license_end = 0
-        while stripped_lines[license_end].startswith("//") or \
-            stripped_lines[license_end].startswith("/*"):
-            license_end += 1
 
-        if license_end > 0:
+        # Regex for tokenizing on comment boundaries
+        regex_str = "(^/\*|\*/|^//)"
+
+        in_multiline_comment = False
+        for line in stripped_lines:
+            # If part of comment contains "Copyright (c)", comment is license.
+            if "Copyright (c)" in line:
+                first_comment_is_license = True
+
+            line_has_comment = False
+            for match in re.finditer(regex_str, line):
+                # If any comment token was matched, the line has a comment
+                line_has_comment = True
+
+                token = match.group(0)
+
+                if token == "/*":
+                    in_multiline_comment = True
+                elif token == "*/":
+                    in_multiline_comment = False
+            if not in_multiline_comment and not line_has_comment:
+                break
+            else:
+                license_end += 1
+
+        # If comment at beginning of file is non-empty license, update it
+        if first_comment_is_license and license_end > 0:
             file_parts = \
                 [linesep.join(stripped_lines[0:license_end]),
                  linesep + linesep.join(stripped_lines[license_end:]).lstrip()]
