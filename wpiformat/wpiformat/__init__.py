@@ -15,6 +15,7 @@ from wpiformat.eofnewline import EofNewline
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
+from wpiformat.javaformat import JavaFormat
 from wpiformat.jni import Jni
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
@@ -365,7 +366,7 @@ def main():
     run_pipeline(task_pipeline, args, files)
 
     # Lint is run last since previous tasks can affect its output.
-    task_pipeline = [PyFormat(), Lint()]
+    task_pipeline = [PyFormat(), JavaFormat(), Lint()]
     run_batch(task_pipeline, args, file_batches)
 
 
