@@ -16,20 +16,10 @@ class ClangFormat(Task):
     def run(self, name, lines):
         args = ["-assume-filename=" + name, "-style=file", "-"]
         try:
-            proc = subprocess.Popen(
-                ["clang-format-3.8"] + args,
-                stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE)
-            output = proc.communicate(lines.encode())[0]
-            output = output.decode()
+            output = self.run_clangformat("clang-format-3.8", args, lines)
         except FileNotFoundError:
             try:
-                proc = subprocess.Popen(
-                    ["clang-format"] + args,
-                    stdout=subprocess.PIPE,
-                    stdin=subprocess.PIPE)
-                output = proc.communicate(lines.encode())[0]
-                output = output.decode()
+                output = self.run_clangformat("clang-format", args, lines)
             except FileNotFoundError:
                 print(
                     "Error: clang-format not found in PATH. Is it installed?",
@@ -40,3 +30,10 @@ class ClangFormat(Task):
             return (lines, False, True)
         else:
             return (output, True, True)
+
+    @staticmethod
+    def run_clangformat(binary, args, lines):
+        proc = subprocess.Popen(
+            [binary] + args, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        output = proc.communicate(lines.encode())[0]
+        return output.decode()
