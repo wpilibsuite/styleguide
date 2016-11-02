@@ -11,6 +11,7 @@ from clangformat import ClangFormat
 from includeorder import IncludeOrder
 from licenseupdate import LicenseUpdate
 from lint import Lint
+from namespace import Namespace
 from newline import Newline
 from pyformat import PyFormat
 from stdlib import Stdlib
@@ -30,8 +31,8 @@ def proc_func(procnum, work, is_verbose, print_lock, ret_dict):
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
     task_pipeline = [
-        LicenseUpdate(), Newline(), Stdlib(), IncludeOrder(), Whitespace(),
-        ClangFormat()
+        LicenseUpdate(), Namespace(), Newline(), Stdlib(), IncludeOrder(),
+        Whitespace(), ClangFormat()
     ]
 
     # These tasks are performed on files directly. Lint is run last since

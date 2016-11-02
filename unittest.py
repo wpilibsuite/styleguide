@@ -1,29 +1,44 @@
 #!/usr/bin/env python3
 
 from datetime import date
+import io
 import os
 import sys
 
 from includeorder import IncludeOrder
 from licenseupdate import LicenseUpdate
+from namespace import Namespace
 from newline import Newline
 from stdlib import Stdlib
 from whitespace import Whitespace
 
 
-def test(task, inputs, outputs):
+def test(task, inputs, outputs, stdout_as_output=False):
     if len(inputs) != len(outputs):
         print("Error: number of test inputs != number of test outputs")
         return 1
 
     print(type(task).__name__)
 
-    success = True
+    if stdout_as_output:
+        saved_stdout = sys.stdout
+
     tests_passed = True
     print_str = "  test {}/{}: {}"
     for i in range(0, len(inputs)):
         print("  ".format(type(task).__name__), end="")
-        output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+
+        if stdout_as_output:
+            new_stdout = io.StringIO()
+            sys.stdout = new_stdout
+            unused_output, file_changed, success = \
+                task.run(inputs[i][0], inputs[i][1])
+            sys.stdout = saved_stdout
+            new_stdout.seek(0)
+            output = new_stdout.read()
+        else:
+            output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+
         if output != outputs[i][0] or file_changed != outputs[i][1] or \
                 success != outputs[i][2]:
             tests_passed = False
@@ -324,6 +339,45 @@ def test_licenseupdate():
     return test(task, inputs, outputs)
 
 
+def test_namespace():
+    task = Namespace()
+
+    inputs = []
+    outputs = []
+
+    # Before class block
+    inputs.append(("./Test.h",
+        "using std::chrono;" + os.linesep + \
+        "class Test {" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append(("./Test.h: 1: 'using std::chrono;' in global namespace\n",
+                    False, False))
+
+    # Inside enum block
+    inputs.append(("./Test.h",
+        "enum Test {" + os.linesep + \
+        "  using std::chrono;" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append(("", False, True))
+
+    # After { block
+    inputs.append(("./Test.h",
+        "{" + os.linesep + \
+        "}" + os.linesep + \
+        "using std::chrono;" + os.linesep))
+    outputs.append(("./Test.h: 3: 'using std::chrono;' in global namespace\n",
+                    False, False))
+
+    # Before class block with NOLINT
+    inputs.append(("./Test.h",
+        "using std::chrono;  // NOLINT" + os.linesep + \
+        "class Test {" + os.linesep + \
+        "}" + os.linesep))
+    outputs.append(("", False, True))
+
+    return test(task, inputs, outputs, True)
+
+
 def test_newline():
     task = Newline()
 
@@ -454,6 +508,7 @@ def main():
     success = True
     success &= test_includeorder()
     success &= test_licenseupdate()
+    success &= test_namespace()
     success &= test_newline()
     success &= test_stdlib()
     success &= test_whitespace()
