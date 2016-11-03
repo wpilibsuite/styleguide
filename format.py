@@ -100,7 +100,9 @@ def main():
     directory = os.getcwd()
     while not git_dir_found:
         git_location = directory + os.sep + ".git"
-        if os.path.isdir(git_location):
+
+        # ".git" can be a directory or a file within Git submodules
+        if os.path.exists(git_location):
             git_dir_found = True
             if config_path == "":
                 config_path = "."
