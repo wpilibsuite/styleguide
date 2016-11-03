@@ -182,7 +182,11 @@ def main():
     chunk_size = math.ceil(len(files) / jobs)
     work = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
 
-    assert len(work) == jobs
+    assert len(work) <= jobs
+
+    # If there isn't enough work for all work queues, decrease number of jobs
+    if len(work) < jobs:
+        jobs = len(work)
 
     # Start worker processes
     ret_dict = manager.dict()
