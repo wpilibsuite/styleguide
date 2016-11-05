@@ -26,7 +26,7 @@ def in_git_repo(directory):
     return returncode == 0
 
 
-def proc_func(procnum, work, is_verbose, print_lock, ret_dict):
+def proc_func(procnum, work, verbose1, verbose2, print_lock, ret_dict):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -43,15 +43,16 @@ def proc_func(procnum, work, is_verbose, print_lock, ret_dict):
     ret_dict[procnum] = True
 
     for name in work:
-        if is_verbose:
+        if verbose1 or verbose2:
             with print_lock:
                 print("Processing", name)
-                for task in task_pipeline:
-                    if task.file_matches_extension(name):
-                        print("  with " + type(task).__name__)
-                for task in final_tasks:
-                    if task.file_matches_extension(name):
-                        print("  with " + type(task).__name__)
+                if verbose2:
+                    for task in task_pipeline:
+                        if task.file_matches_extension(name):
+                            print("  with " + type(task).__name__)
+                    for task in final_tasks:
+                        if task.file_matches_extension(name):
+                            print("  with " + type(task).__name__)
 
         lines = ""
         with open(name, "r") as file:
@@ -161,9 +162,15 @@ def main():
     )
     parser.add_argument(
         "-v",
-        dest="verbose",
+        dest="verbose1",
         action="store_true",
-        help="enable output verbosity")
+        help="verbosity level 1 (prints names of processed files)")
+    parser.add_argument(
+        "-vv",
+        dest="verbose2",
+        action="store_true",
+        help="verbosity level 2 (prints names of processed files and tasks run on them)"
+    )
     parser.add_argument(
         "-j",
         dest="jobs",
@@ -171,8 +178,9 @@ def main():
         default=multiprocessing.cpu_count(),
         help="number of jobs to run (default is number of cores)")
     args = parser.parse_args()
+    verbose1 = args.verbose1
+    verbose2 = args.verbose2
     jobs = args.jobs
-    is_verbose = args.verbose
 
     processes = []
     print_lock = multiprocessing.Lock()
@@ -193,7 +201,7 @@ def main():
     for i in range(0, jobs):
         proc = multiprocessing.Process(
             target=proc_func,
-            args=(i, work[i], is_verbose, print_lock, ret_dict))
+            args=(i, work[i], verbose1, verbose2, print_lock, ret_dict))
         proc.daemon = True
         proc.start()
         processes.append(proc)
