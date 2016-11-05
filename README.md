@@ -28,7 +28,7 @@ This file contains groups of file name regular expressions. There are two groups
 - generated files
 - modifiable files
 
-Generated files should not be modified; if they are, `format.py` will emit warnings.
+Generated files should not be modified; if they are, `format.py` will emit warnings. All files ignored by patterns in a repository's .gitignore file are considered modifiable files.
 
 Config groups may be empty, but may not be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 

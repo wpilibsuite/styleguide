@@ -3,6 +3,7 @@
 from abc import *
 import os
 import re
+import subprocess
 import sys
 
 regex_sep = os.sep
@@ -141,6 +142,13 @@ class Task(object):
     @staticmethod
     def is_generated_file(name):
         return gen_regex_exclude.search(name)
+
+    # Returns True if file is in .gitignore
+    @staticmethod
+    def is_ignored_file(name):
+        cmd = ["git", "check-ignore", "-q", "--no-index", name]
+        returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
+        return returncode == 0
 
     # Returns True if file has an extension this task can process
     def file_matches_extension(self, name):

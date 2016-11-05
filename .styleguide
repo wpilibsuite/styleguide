@@ -24,7 +24,6 @@ genFileExclude {
 
 modifiableFolderExclude {
   \.git
-  __pycache__
 }
 
 modifiableFileExclude {
