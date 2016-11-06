@@ -9,19 +9,14 @@ class Newline(Task):
         linesep = Task.get_linesep(lines)
 
         newlines = 0
-
-        # Handle trivial case
-        if len(lines) == 0:
-            return (linesep, True, True)
-
         pos = len(lines) - 1
 
         # While last character is a newline
-        while lines[pos] == "\n":
+        while pos >= 0 and lines[pos] == "\n":
             newlines += 1
 
             # Seek to character before newline
-            pos = pos - len(linesep)
+            pos -= len(linesep)
 
         if newlines < 1:
             # Append newline to end of file
