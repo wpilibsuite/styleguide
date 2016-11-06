@@ -133,11 +133,22 @@ def is_generated_file(name):
     return gen_regex_exclude.search(name)
 
 
-# Returns True if file is in .gitignore
-def is_ignored_file(name):
-    cmd = ["git", "check-ignore", "-q", "--no-index", name]
-    returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
-    return returncode == 0
+# Returns list of files not in .gitignore
+def filter_ignored_files(names):
+    cmd = ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+
+    # "git check-ignore" misbehaves when the names are separated by "\r\n" on
+    # Windows, so os.linesep isn't used here.
+    output = proc.communicate("\n".join(names).encode())[0]
+
+    # "git check-ignore" prefixes the names of non-ignored files with "::",
+    # wraps names in quotes on Windows, and outputs "\n" line separators on all
+    # platforms.
+    return [
+        name[2:].lstrip().strip("\"").replace("\\\\", "\\")
+        for name in output.decode().split("\n") if name[0:2] == "::"
+    ]
 
 
 # Returns autodetected line separator for file

@@ -133,11 +133,11 @@ def main():
         print("Error: no files found to format", file=sys.stderr)
         sys.exit(1)
 
-    # Don't check for changes in or run tasks on modifiable or ignored files
-    files = [
-        name for name in files
-        if not task.is_modifiable_file(name) and not task.is_ignored_file(name)
-    ]
+    # Don't check for changes in or run tasks on modifiable files
+    files = [name for name in files if not task.is_modifiable_file(name)]
+
+    # Don't check for changes in or run tasks on ignored files
+    files = task.filter_ignored_files(files)
 
     # Create list of all changed files
     changed_file_list = []
