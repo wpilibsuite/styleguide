@@ -2,16 +2,16 @@
 
 import re
 
-from task import Task
+import task
 
 
-class Namespace(Task):
+class Namespace(task.Task):
 
     def get_file_extensions(self):
-        return Task.get_config("cppHeaderExtensions")
+        return task.get_config("cppHeaderExtensions")
 
     def run(self, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = task.get_linesep(lines)
         format_succeeded = True
 
         # Tokenize file as brace opens, brace closes, and "using" declarations.

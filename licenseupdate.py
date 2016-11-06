@@ -5,22 +5,21 @@ import os
 import re
 import sys
 
-from task import Task
+import task
 
 
-class LicenseUpdate(Task):
+class LicenseUpdate(task.Task):
 
     def get_file_extensions(self):
-        return Task.get_config("cExtensions") + \
-            Task.get_config("cppHeaderExtensions") + \
-            Task.get_config("cppSrcExtensions") + \
-            Task.get_config("otherExtensions")
+        return task.get_config("cExtensions") + \
+            task.get_config("cppHeaderExtensions") + \
+            task.get_config("cppSrcExtensions") + \
+            task.get_config("otherExtensions")
 
     def run(self, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = task.get_linesep(lines)
 
-        license_template = \
-            self.read_license_template(".styleguide-license", name)
+        license_template = task.read_config_file(".styleguide-license")
         if not license_template:
             print("Error: license template file '.styleguide-license' not " \
                   "found")
@@ -107,32 +106,3 @@ class LicenseUpdate(Task):
             output += file_parts[1]
 
         return (output, lines != output, True)
-
-    """Read license template from file
-
-    Checks current directory for config file. If one doesn't exist, try all
-    parent directories as well.
-
-    template_name -- name of license template file
-    file_name -- name of file currently being processed
-
-    Returns list containing license template or None if file was not found.
-    """
-
-    @staticmethod
-    def read_license_template(template_name, file_name):
-        config_found = False
-        directory = os.path.dirname(file_name)
-
-        if not directory.startswith("./"):
-            directory = "./" + directory
-
-        while not config_found and len(directory) > 0:
-            template_location = directory + os.sep + template_name
-            if os.path.isfile(template_location):
-                with open(template_location, "r") as template_file:
-                    config_found = True
-                    return template_file.read().splitlines()
-            else:
-                directory = directory[:directory.rfind(os.sep)]
-        return None

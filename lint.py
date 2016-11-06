@@ -13,14 +13,14 @@ import sys
 
 import cpplint
 
-from task import Task
+import task
 
 
-class Lint(Task):
+class Lint(task.Task):
 
     def get_file_extensions(self):
-        return Task.get_config("cppHeaderExtensions") + \
-            Task.get_config("cppSrcExtensions")
+        return task.get_config("cppHeaderExtensions") + \
+            task.get_config("cppSrcExtensions")
 
     def run(self, name, lines):
         # Handle running in either the root or styleguide directories
@@ -41,10 +41,10 @@ class Lint(Task):
                     "-runtime/string,"
                     "-whitespace/indent",  # clangformat.py handles indentation
                     "--extensions=" + \
-                        ",".join(self.get_config("cppHeaderExtensions") + \
-                                 self.get_config("cppSrcExtensions")),
+                        ",".join(task.get_config("cppHeaderExtensions") + \
+                                 task.get_config("cppSrcExtensions")),
                     "--headers=" + \
-                        ",".join(Task.get_config("cppHeaderExtensions")),
+                        ",".join(task.get_config("cppHeaderExtensions")),
                     "--quiet",
                     name]
 

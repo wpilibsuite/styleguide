@@ -3,13 +3,13 @@
 import os
 import re
 
-from task import Task
+import task
 
 
-class IncludeOrder(Task):
+class IncludeOrder(task.Task):
 
     def __init__(self):
-        Task.__init__(self)
+        task.Task.__init__(self)
 
         self.c_std = [
             "assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h", "float.h",
@@ -48,11 +48,11 @@ class IncludeOrder(Task):
                                        "(?P<postfix>.*)")
 
     def get_file_extensions(self):
-        return Task.get_config("cppHeaderExtensions") + \
-            Task.get_config("cppSrcExtensions")
+        return task.get_config("cppHeaderExtensions") + \
+            task.get_config("cppSrcExtensions")
 
     def run(self, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = task.get_linesep(lines)
 
         self.name = name
 
@@ -74,10 +74,10 @@ class IncludeOrder(Task):
                 "includeRelated", "includeCSys", "includeCppSys",
                 "includeOtherLibs", "includeProject"
         ]:
-            if not len(Task.get_config(group)):
+            if not len(task.get_config(group)):
                 override_regexes.append(re.compile("a^"))
             else:
-                regex_str = "(" + "|".join(Task.get_config(group)) + ")"
+                regex_str = "(" + "|".join(task.get_config(group)) + ")"
 
                 # On Windows, fix forward slash for include regexes
                 if os.sep == "\\":
@@ -138,7 +138,7 @@ class IncludeOrder(Task):
                     # Is related if include has same base name as file name and
                     # file has a source extension
                     include_is_related = include_name[0] == file_name[0] and \
-                        file_name[1][1:] in Task.get_config("cppSrcExtensions")
+                        file_name[1][1:] in task.get_config("cppSrcExtensions")
 
                     if include_is_related or "NOLINT" in lines_list[line_count]:
                         includes[0].append(self.fixup_include(name, 0))

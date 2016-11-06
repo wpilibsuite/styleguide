@@ -15,7 +15,7 @@ from namespace import Namespace
 from newline import Newline
 from pyformat import PyFormat
 from stdlib import Stdlib
-from task import Task
+import task
 from whitespace import Whitespace
 
 
@@ -136,7 +136,7 @@ def main():
     # Don't check for changes in or run tasks on modifiable or ignored files
     files = [
         name for name in files
-        if not Task.is_modifiable_file(name) and not Task.is_ignored_file(name)
+        if not task.is_modifiable_file(name) and not task.is_ignored_file(name)
     ]
 
     # Create list of all changed files
@@ -149,11 +149,11 @@ def main():
 
     # Emit warning if a generated file was editted
     for name in files:
-        if Task.is_generated_file(name) and name in changed_file_list:
+        if task.is_generated_file(name) and name in changed_file_list:
             print("Warning: generated file '" + name + "' modified")
 
     # Don't format generated files
-    files = [name for name in files if not Task.is_generated_file(name)]
+    files = [name for name in files if not task.is_generated_file(name)]
 
     # If there are no files left, do nothing
     if len(files) == 0:

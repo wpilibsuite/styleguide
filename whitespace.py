@@ -2,13 +2,13 @@
 
 import os
 
-from task import Task
+import task
 
 
-class Whitespace(Task):
+class Whitespace(task.Task):
 
     def run(self, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = task.get_linesep(lines)
 
         file_changed = False
         output = ""

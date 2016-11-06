@@ -1,12 +1,12 @@
 """This task ensures that the file has exactly one EOF newline."""
 
-from task import Task
+import task
 
 
-class Newline(Task):
+class Newline(task.Task):
 
     def run(self, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = task.get_linesep(lines)
 
         newlines = 0
         pos = len(lines) - 1

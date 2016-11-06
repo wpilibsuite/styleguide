@@ -3,15 +3,15 @@
 import subprocess
 import sys
 
-from task import Task
+import task
 
 
-class ClangFormat(Task):
+class ClangFormat(task.Task):
 
     def get_file_extensions(self):
-        return Task.get_config("cExtensions") + \
-            Task.get_config("cppHeaderExtensions") + \
-            Task.get_config("cppSrcExtensions")
+        return task.get_config("cExtensions") + \
+            task.get_config("cppHeaderExtensions") + \
+            task.get_config("cppSrcExtensions")
 
     def run(self, name, lines):
         args = ["-assume-filename=" + name, "-style=file", "-"]

@@ -3,10 +3,10 @@
 import subprocess
 import sys
 
-from task import Task
+import task
 
 
-class PyFormat(Task):
+class PyFormat(task.Task):
 
     def get_file_extensions(self):
         return ["py"]

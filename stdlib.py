@@ -4,22 +4,22 @@ and assert.h are exceptions.
 
 import re
 
-from task import Task
+import task
 
 
 class Header(object):
-    """Manages function and type names in standard library header.
-
-    Keyword arguments:
-    name -- header name string
-    func_names -- set of function name strings (default set())
-    type_regexes -- list of type regex strings (default [])
-    add_prefix -- determines whether std:: prefix is added or removed
-                  (default True)
-    """
 
     def __init__(self, name, func_names=set(), type_regexes=[],
                  add_prefix=True):
+        """Manages function and type names in standard library header.
+
+        Keyword arguments:
+        name -- header name string
+        func_names -- set of function name strings (default set())
+        type_regexes -- list of type regex strings (default [])
+        add_prefix -- determines whether std:: prefix is added or removed
+                      (default True)
+        """
         self.name = name
         self.func_names = func_names
         self.add_prefix = add_prefix
@@ -57,11 +57,11 @@ class Header(object):
             self.type_regex = None
 
 
-class Stdlib(Task):
+class Stdlib(task.Task):
 
     def get_file_extensions(self):
-        return Task.get_config("cppHeaderExtensions") + \
-            Task.get_config("cppSrcExtensions")
+        return task.get_config("cppHeaderExtensions") + \
+            task.get_config("cppSrcExtensions")
 
     def run(self, name, lines):
         headers = []
@@ -173,9 +173,8 @@ class Stdlib(Task):
 
         return (lines, file_changed, True)
 
-    """Returns modified lines and whether string changed."""
-
     def func_substitute(self, header, lines):
+        """Returns modified lines and whether string changed."""
         pos = 0
         lines_changed = False
         while pos < len(lines):
