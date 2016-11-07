@@ -22,7 +22,7 @@ class Lint(task.Task):
         return task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
 
-    def run(self, name, lines):
+    def run_all(self, names):
         # Handle running in either the root or styleguide directories
         cpplintPrefix = ""
         if os.getcwd().rpartition(os.sep)[2] != "styleguide":
@@ -45,8 +45,7 @@ class Lint(task.Task):
                                  task.get_config("cppSrcExtensions")),
                     "--headers=" + \
                         ",".join(task.get_config("cppHeaderExtensions")),
-                    "--quiet",
-                    name]
+                    "--quiet"] + names
 
         # Run cpplint.py
         try:
@@ -56,4 +55,4 @@ class Lint(task.Task):
             sys.argv = saved_argv
 
             # Report success if error code is 0 (False)
-            return (lines, False, e.code == False)
+            return e.code == False

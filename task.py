@@ -191,6 +191,17 @@ class Task(object):
         """
         return ("", False, True)
 
+    @abstractmethod
+    def run_all(self, names):
+        """Performs task on list of files.
+
+        Keyword arguments:
+        names -- list of file name strings
+
+        Returns True if task succeeded in formatting the files.
+        """
+        return True
+
     # Returns True if file has an extension this task can process
     def file_matches_extension(self, name):
         if self.get_file_extensions() != []:

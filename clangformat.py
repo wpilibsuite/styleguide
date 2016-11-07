@@ -13,27 +13,16 @@ class ClangFormat(task.Task):
             task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
 
-    def run(self, name, lines):
-        args = ["-assume-filename=" + name, "-style=file", "-"]
+    def run_all(self, names):
+        args = ["-style=file", "-i"] + names
         try:
-            output = self.run_clangformat("clang-format-3.8", args, lines)
+            returncode = subprocess.call(["clang-format-3.8"] + args)
         except FileNotFoundError:
             try:
-                output = self.run_clangformat("clang-format", args, lines)
+                returncode = subprocess.call(["clang-format"] + args)
             except FileNotFoundError:
                 print(
                     "Error: clang-format not found in PATH. Is it installed?",
                     file=sys.stderr)
-                return (lines, False, False)
-
-        if lines == output:
-            return (lines, False, True)
-        else:
-            return (output, True, True)
-
-    @staticmethod
-    def run_clangformat(binary, args, lines):
-        proc = subprocess.Popen(
-            [binary] + args, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-        output = proc.communicate(lines.encode())[0]
-        return output.decode()
+                return False
+        return returncode == 0

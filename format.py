@@ -32,12 +32,13 @@ def proc_func(procnum, work, verbose1, verbose2, print_lock, ret_dict):
     # so it can clean up their formatting.
     task_pipeline = [
         LicenseUpdate(), Namespace(), Newline(), Stdlib(), IncludeOrder(),
-        Whitespace(), ClangFormat()
+        Whitespace()
     ]
 
-    # These tasks are performed on files directly. Lint is run last since
-    # previous tasks can affect its output.
-    final_tasks = [PyFormat(), Lint()]
+    # These tasks read and write to the files directly. They are given a list of
+    # all files at once to avoid spawning too many subprocesses. Lint is run
+    # last since previous tasks can affect its output.
+    final_tasks = [ClangFormat(), PyFormat(), Lint()]
 
     # The success flag is aggregated across multiple file processing results
     ret_dict[procnum] = True
@@ -72,20 +73,10 @@ def proc_func(procnum, work, verbose1, verbose2, print_lock, ret_dict):
             # After file is written, reset file_changed flag
             file_changed = False
 
-        for task in final_tasks:
-            if task.file_matches_extension(name):
-                lines, file_changed, success = task.run(name, "")
-                ret_dict[procnum] &= success
-
-                # Since these tasks read from the file instead of the pipeline,
-                # any changes made by the previous task should be written to the
-                # file before running the next task.
-                if file_changed:
-                    with open(name, "wb") as file:
-                        file.write(lines.encode())
-
-                    # After file is written, reset file_changed flag
-                    file_changed = False
+    for task in final_tasks:
+        files = [name for name in work if task.file_matches_extension(name)]
+        if files:
+            ret_dict[procnum] &= task.run_all(files)
 
 
 def main():
