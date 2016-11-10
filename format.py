@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-import math
-import multiprocessing
+from functools import partial
+import multiprocessing as mp
 import os
 import subprocess
 import sys
@@ -26,7 +26,12 @@ def in_git_repo(directory):
     return returncode == 0
 
 
-def proc_func(procnum, work, verbose1, verbose2, print_lock, ret_dict):
+def proc_init(lock):
+    global print_lock
+    print_lock = lock
+
+
+def proc_func(verbose1, verbose2, name):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -41,42 +46,42 @@ def proc_func(procnum, work, verbose1, verbose2, print_lock, ret_dict):
     final_tasks = [ClangFormat(), PyFormat(), Lint()]
 
     # The success flag is aggregated across multiple file processing results
-    ret_dict[procnum] = True
+    all_success = True
 
-    for name in work:
-        if verbose1 or verbose2:
-            with print_lock:
-                print("Processing", name)
-                if verbose2:
-                    for task in task_pipeline:
-                        if task.file_matches_extension(name):
-                            print("  with " + type(task).__name__)
-                    for task in final_tasks:
-                        if task.file_matches_extension(name):
-                            print("  with " + type(task).__name__)
+    if verbose1 or verbose2:
+        with print_lock:
+            print("Processing", name)
+            if verbose2:
+                for task in task_pipeline:
+                    if task.file_matches_extension(name):
+                        print("  with " + type(task).__name__)
+                for task in final_tasks:
+                    if task.file_matches_extension(name):
+                        print("  with " + type(task).__name__)
 
-        lines = ""
-        with open(name, "r") as file:
-            lines = file.read()
+    lines = ""
+    with open(name, "r") as file:
+        lines = file.read()
+    file_changed = False
+
+    for task in task_pipeline:
+        if task.file_matches_extension(name):
+            lines, changed, success = task.run(name, lines)
+            file_changed |= changed
+            all_success &= success
+
+    if file_changed:
+        with open(name, "wb") as file:
+            file.write(lines.encode())
+
+        # After file is written, reset file_changed flag
         file_changed = False
 
-        for task in task_pipeline:
-            if task.file_matches_extension(name):
-                lines, changed, success = task.run(name, lines)
-                file_changed |= changed
-                ret_dict[procnum] &= success
-
-        if file_changed:
-            with open(name, "wb") as file:
-                file.write(lines.encode())
-
-            # After file is written, reset file_changed flag
-            file_changed = False
-
     for task in final_tasks:
-        files = [name for name in work if task.file_matches_extension(name)]
-        if files:
-            ret_dict[procnum] &= task.run_all(files)
+        if task.file_matches_extension(name):
+            all_success &= task.run_all([name])
+
+    return all_success
 
 
 def main():
@@ -169,49 +174,20 @@ def main():
         "-j",
         dest="jobs",
         type=int,
-        default=multiprocessing.cpu_count(),
+        default=mp.cpu_count(),
         help="number of jobs to run (default is number of cores)")
     args = parser.parse_args()
-    verbose1 = args.verbose1
-    verbose2 = args.verbose2
-    jobs = args.jobs
-
-    processes = []
-    print_lock = multiprocessing.Lock()
-    manager = multiprocessing.Manager()
-
-    # Make list of evenly-sized work chunks
-    chunk_size = math.ceil(len(files) / jobs)
-    work = [files[i:i + chunk_size] for i in range(0, len(files), chunk_size)]
-
-    assert len(work) <= jobs
-
-    # If there isn't enough work for all work queues, decrease number of jobs
-    if len(work) < jobs:
-        jobs = len(work)
 
     # Start worker processes
-    ret_dict = manager.dict()
-    for i in range(0, jobs):
-        proc = multiprocessing.Process(
-            target=proc_func,
-            args=(i, work[i], verbose1, verbose2, print_lock, ret_dict))
-        proc.daemon = True
-        proc.start()
-        processes.append(proc)
+    print_lock = mp.Lock()
+    with mp.Pool(
+            args.jobs, initializer=proc_init, initargs=(print_lock,)) as pool:
+        func = partial(proc_func, args.verbose1, args.verbose2)
+        results = pool.map(func, files)
 
-    # Wait for worker processes to finish
-    for i in range(0, jobs):
-        processes[i].join()
-
-    success = True
-    for i in range(0, jobs):
-        success &= ret_dict[i]
-
-    if success:
-        sys.exit(0)
-    else:
-        sys.exit(1)
+        for result in results:
+            if result == False:
+                sys.exit(1)
 
 
 if __name__ == "__main__":
