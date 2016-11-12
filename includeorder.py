@@ -86,7 +86,7 @@ class IncludeOrder(task.Task):
                 override_regexes.append(re.compile(regex_str))
 
         # Retrieve includes
-        for line_count in range(0, len(lines_list)):
+        for line_count in range(len(lines_list)):
             if not in_ifdef and "#ifdef" in lines_list[line_count]:
                 if not found_includes:
                     include_start = line_count
@@ -124,7 +124,7 @@ class IncludeOrder(task.Task):
 
                     # Process override regexes
                     include_overriden = False
-                    for override_count in range(0, 5):
+                    for override_count in range(5):
                         if override_regexes[override_count].search(
                                 name.group("name")):
                             fixed_name = \
@@ -163,7 +163,7 @@ class IncludeOrder(task.Task):
 
             # Write out includes
             output_list = lines_list[0:include_start]
-            for include_count in range(0, len(includes)):
+            for include_count in range(len(includes)):
                 if len(includes[include_count]):
                     output_list.extend(includes[include_count])
                     output_list.append("")  # Delimits groups of includes

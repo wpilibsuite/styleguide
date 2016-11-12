@@ -25,7 +25,7 @@ def test(task, inputs, outputs, stdout_as_output=False):
 
     tests_passed = True
     print_str = "  test {}/{}: {}"
-    for i in range(0, len(inputs)):
+    for i in range(len(inputs)):
         print("  ".format(type(task).__name__), end="")
 
         if stdout_as_output:
