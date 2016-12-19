@@ -12,23 +12,23 @@ import subprocess
 import sys
 
 
-def read_config_file(file_name):
-    """Find config file and return contents
+def read_file(file_name):
+    """Find file and return contents
 
-    Checks current directory for config file. If one doesn't exist, try all
-    parent directories as well.
+    Checks current directory for file. If one doesn't exist, try all parent
+    directories as well.
 
-    file_name -- name of config file
+    file_name -- name of file
 
     Returns list containing file contents or None if file was not found.
     """
-    config_found = False
+    file_found = False
     directory = os.getcwd()
-    while not config_found and len(directory) > 0:
+    while not file_found and len(directory) > 0:
         try:
-            with open(directory + os.sep + file_name, "r") as config_file:
-                config_found = True
-                return config_file.read().splitlines()
+            with open(directory + os.sep + file_name, "r") as file_contents:
+                file_found = True
+                return file_contents.read().splitlines()
         except OSError:
             directory = directory[:directory.rfind(os.sep)]
     return None
@@ -55,7 +55,11 @@ def parse_config_file(file_name):
     group_name = ""
     group_elements = []
 
-    for line in read_config_file(file_name):
+    lines = read_file(file_name)
+    if not lines:
+        return None
+
+    for line in lines:
         # Skip empty lines
         if line.strip() == "":
             continue

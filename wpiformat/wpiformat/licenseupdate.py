@@ -19,7 +19,7 @@ class LicenseUpdate(task.Task):
     def run(self, name, lines):
         linesep = task.get_linesep(lines)
 
-        license_template = task.read_config_file(".styleguide-license")
+        license_template = task.read_file(".styleguide-license")
         if not license_template:
             print("Error: license template file '.styleguide-license' not " \
                   "found")
