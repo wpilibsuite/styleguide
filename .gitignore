@@ -137,11 +137,13 @@ local.properties
 .loadpath
 
 ### Python ###
-*.pyc
 .cache
 __pycache__
 *.egg-info/
 *.egg
+*.pyc
+*.tar.gz
+*.whl
 version.py
 
 # External tool builders
