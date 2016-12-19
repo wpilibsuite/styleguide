@@ -650,18 +650,18 @@ name. One typical pattern is <code>test<i>&lt;MethodUnderTest&gt;</i>_<i>&lt;sta
 for example <code class="prettyprint lang-java">testPop_emptyStack</code>. There is no One Correct
 Way to name test methods.</p><a name="constants"/><a name="s5.2.4-constant-names"/>
     <h4>5.2.4 Constant names&nbsp;<a href="#s5.2.4-constant-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
-    <p>Constant names use <code class="prettyprint lang-java">CONSTANT_CASE</code>: all uppercase
-letters, with words separated by underscores. But what <em>is</em> a constant, exactly?</p><p>Every constant is a static final field, but not all static final fields are constants. Before
-choosing constant case, consider whether the field really <em>feels like</em> a constant. For
-example, if any of that instance's observable state can change, it is almost certainly not a
-constant. Merely <em>intending</em> to never mutate the object is generally not
-enough. Examples:</p><pre class="prettyprint lang-java">
+    <p>Constant names use <code class="prettyprint lang-java">kConstantCase</code>: camel case
+prefixed by a lowercase k. But what <em>is</em> a constant, exactly?</p><p>Every constant is a
+static final field, but not all static final fields are constants. Before choosing constant case,
+consider whether the field really <em>feels like</em> a constant. For example, if any of that
+instance's observable state can change, it is almost certainly not a constant. Merely
+<em>intending</em> to never mutate the object is generally not enough. Examples:</p><pre class="prettyprint lang-java">
 // Constants
-static final int NUMBER = 5;
-static final ImmutableList&lt;String&gt; NAMES = ImmutableList.of("Ed", "Ann");
-static final Joiner COMMA_JOINER = Joiner.on(',');  // because Joiner is immutable
-static final SomeMutableType[] EMPTY_ARRAY = {};
-enum SomeEnum { ENUM_CONSTANT }
+static final int kNumber = 5;
+static final ImmutableList&lt;String&gt; kNames = ImmutableList.of("Ed", "Ann");
+static final Joiner kCommaJoiner = Joiner.on(',');  // because Joiner is immutable
+static final SomeMutableType[] kEmptyArray = {};
+enum SomeEnum { kEnumConstant }
 
 // Not constants
 static String nonFinal = "non-final";
