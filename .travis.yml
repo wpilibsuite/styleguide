@@ -1,12 +1,11 @@
-sudo: required
-dist: trusty
 language: python
 python:
   - 3.4
+  - 3.5
+  - 3.6
 
-before_install:
-  - sudo apt-get update -q || true
-  - sudo apt-get install clang-format-3.8 -y
+install:
+  - git fetch --unshallow
 
 script:
   - cd wpiformat
@@ -15,3 +14,15 @@ script:
   - python3 setup.py test
   - cd .. && python3 -m wpiformat -v
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+
+before_deploy:
+  - cd ~/build/wpilibsuite/styleguide/wpiformat
+
+deploy:
+  provider: pypi
+  user: calcmogul
+  password:
+    secure: MwEJH+57k8rP1VoMZfWfdgCORgKw6mHT7VyWBja2smgqsQF+SdCzSAPbdBKu+hI8Pn58oAYxF8fZiBNw+yes1UQr19zrtokoIFy+0iekXk2PyZje1nKy/V8D5GEoxAACDJg0t3EHHQJ5PXbiny9xyaVFv1AviiSJyCv5ppbjeTzTTelib2cNsJUrmgvmTi/ewRTsQf2u311//1cgExcqWghsy9pCdgdXYGUlig1V2Wb7/xZAQkTARHZhjmRRZZWSIKsQNqU4dfYyuwJSIzH9EBvn1ArKOO0czg2W1cbQHSxMH6O4GqIF1RgMLKiZ1Xl/+WI0HqR8Y0q1Y3Vf4jWzNjsArImcDe/8Vw0FK7dvfJuQV+/TR1x7yCIYny9s0SBBYqYTWL0zNh3zj2VvheQlxfyTKIyWpzEYMMWsrzMY7XYZ8IlDb2cFr1We40BFUXMEULReincANhfBBnECaCzICwUIbFCTQgEu4MptFxxxt6YoWk+8Yq5ZiVWOC1VVHGJ/veWxw2oenBNS0tprN+OYB6Nm4bYM6ojYG+43b6mQ+0wtSdC0Gzmb0ed3T5sPpldqDbxfW/xhyLU0Mi0eFrqI9DBG8f0L5oFjsyR4tIziaA6PRHdhqtZg5/QXRLpnuaJfyrwK84XD6OpKy8gN5JSNs+cZqFIh0hdU79stXlKjCf4=
+  skip_upload_docs: true
+  server: https://testpypi.python.org/pypi
+  distributions: sdist bdist_wheel
