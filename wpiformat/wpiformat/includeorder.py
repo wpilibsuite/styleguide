@@ -11,6 +11,19 @@ class IncludeOrder(task.Task):
     def __init__(self):
         task.Task.__init__(self)
 
+        # There are 5 header groups:
+        # 0. Related headers
+        # 1. C system headers (includes standard library headers)
+        # 2. C++ system headers (includes standard library headers)
+        # 3. Other library headers
+        # 4. Project headers
+        #
+        # See comments below for how headers are classified.
+
+        # Header type 0: Related headers
+        # Base name of include matches base name of current file
+
+        # Header type 1: C standard library headers
         self.c_std = [
             "assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h", "float.h",
             "inttypes.h", "iso646.h", "limits.h", "locale.h", "math.h",
@@ -20,6 +33,10 @@ class IncludeOrder(task.Task):
             "uchar.h", "wchar.h", "wctype.h"
         ]
 
+        # Header type 1: C system headers
+        self.c_sys_regex = re.compile("<[a-z].*\.h>")
+
+        # Header type 2: C++ standard library headers
         self.cpp_std = [
             "cstdlib", "csignal", "csetjmp", "cstdarg", "typeinfo", "typeindex",
             "type_traits", "bitset", "functional", "utility", "ctime", "chrono",
@@ -38,9 +55,11 @@ class IncludeOrder(task.Task):
             "cstdbool"
         ]
 
-        # All other headers matching this pattern are C system headers
-        self.c_sys_regex = re.compile("<[a-z].*\.h>")
-
+        # Header type 3: Other library headers
+        # They use angle brackets (open_bracket group is angle bracket)
+        #
+        # Header type 4: Project headers
+        # They use double quotes (all other headers)
         self.header_regex = re.compile("(?P<header>"
                                        "(?P<open_bracket><|\")"
                                        "(?P<name>.*)"
