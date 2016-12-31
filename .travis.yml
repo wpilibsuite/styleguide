@@ -1,12 +1,8 @@
-sudo: required
-dist: trusty
 language: python
 python:
   - 3.4
-
-before_install:
-  - sudo apt-get update -q || true
-  - sudo apt-get install clang-format-3.8 -y
+  - 3.5
+  - 3.6
 
 script:
   - cd wpiformat
@@ -15,3 +11,10 @@ script:
   - python3 setup.py test
   - cd .. && python3 -m wpiformat -v
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+
+deploy:
+  provider: pypi
+  user: calcmogul
+  password:
+    secure: IXnZQGtIpDHpx178gdAOB/KlgqR5LT5LR4Xrv9dTkAutVWe4IBvPBqFkoIAURe8FnQDX6U/74b2ucU1yZ/x+Lajif+snnhatzCA4+GKcyH4Pc4bQ5VAWmX8PiLEXoW+fnm3oJXTfmvah/DtqlM70Z9S5IcZbQWMW6URVp7qr1hEt95ZmhFwQ3H6dIGQwaX3mj4QpsvM5KmpzUXtgJUBUu5AuJvEteUyCPG6YRCb/hiAmt6iEcVLjT7lT5kdPuTAuKqS2gp7hp5KLp4vCkq4f6aCqJasNDSXvq4i+o4xiCvOxTk4DfB4+FaBSL6gPJ8bbu4KWAB9/iB7oHQTQWBZXQxdeQEy1RtnmdfJ1kp4IRw1uMU/j6Yh13f+/v59M4ykFMN9OkF3e3jI8WOxaU/wxVIEQZjUkjDjFkDG0knVdsPWxM/urrtB/8kYb/jbLaZIDwykJhbXk8ZQSRBQxdrizOVB96TWOTbrweFwMiWjZaQr0tj65C8VGdeo0gGAjuwnE9r/72FsgM6aNdar4b+X72LWH3+C/lQJz20iEhLbw0fU849LLPcVbrph/ayNVSVrJyA0A+BC5emQzbaRVPE0ruQDOlNAyUR1BJJTdFEJAPtCnCj+wphMLnIFTKvcQ2h2RFZMt3tXtwCVi/6H66ZVy+zcjCmrqZQ4GYXxjO0A56ao=
+  distributions: "sdist bdist_wheel"

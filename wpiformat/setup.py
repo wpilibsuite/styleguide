@@ -21,8 +21,12 @@ version_file = join(setup_dir, base_package, "version.py")
 if exists(git_dir):
     proc = subprocess.Popen(
         [
-            "git", "rev-list", "--count",
-            "--after=\"master@{" + str(date.today().year) + "-01-01}\"",
+            "git",
+            "rev-list",
+            "--count",
+            # Includes previous year's commits in case one was merged after the
+            # year incremented. Otherwise, the version wouldn't increment.
+            "--after=\"master@{" + str(date.today().year - 1) + "-01-01}\"",
             "master"
         ],
         stdout=subprocess.PIPE,
