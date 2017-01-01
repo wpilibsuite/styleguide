@@ -1,6 +1,5 @@
 """This task updates the license header at the top of the file."""
 
-from datetime import date
 import os
 import re
 import sys
@@ -9,6 +8,11 @@ from . import task
 
 
 class LicenseUpdate(task.Task):
+
+    def __init__(self, current_year):
+        task.Task.__init__(self)
+
+        self.current_year = current_year
 
     def get_file_extensions(self):
         return task.get_config("cExtensions") + \
@@ -67,8 +71,10 @@ class LicenseUpdate(task.Task):
         else:
             file_parts = ["", linesep + lines.lstrip()]
 
+        # Default year when none is found is current one
+        year = self.current_year
+
         year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s+(20..)")
-        year = ""
         modify_copyright = False
         for line in file_parts[0].split(linesep):
             match = year_regex.search(line)
@@ -81,13 +87,12 @@ class LicenseUpdate(task.Task):
         output = ""
 
         # Determine copyright range and trailing padding
-        current_year = str(date.today().year)
-        if modify_copyright and year != current_year:
-            current_year = year + "-" + current_year
+        if modify_copyright and year != self.current_year:
+            year = year + "-" + self.current_year
 
         for line in license_template:
             # Insert copyright year range
-            line = line.replace("{year}", current_year)
+            line = line.replace("{year}", year)
 
             # Insert padding which expands to the 80th column. If there is more
             # than one padding token, the line may contain fewer than 80

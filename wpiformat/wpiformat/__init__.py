@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from datetime import date
 from functools import partial
 import multiprocessing as mp
 import os
@@ -31,12 +32,12 @@ def proc_init(lock):
     print_lock = lock
 
 
-def proc_func(verbose1, verbose2, name):
+def proc_func(verbose1, verbose2, year, name):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
     task_pipeline = [
-        LicenseUpdate(), Namespace(), Newline(), Stdlib(), IncludeOrder(),
+        LicenseUpdate(year), Namespace(), Newline(), Stdlib(), IncludeOrder(),
         Whitespace()
     ]
 
@@ -176,13 +177,20 @@ def main():
         type=int,
         default=mp.cpu_count(),
         help="number of jobs to run (default is number of cores)")
+    parser.add_argument(
+        "-y",
+        dest="year",
+        type=int,
+        default=date.today().year,
+        help="year to use when updating license headers (default is current year)"
+    )
     args = parser.parse_args()
 
     # Start worker processes
     print_lock = mp.Lock()
     with mp.Pool(
             args.jobs, initializer=proc_init, initargs=(print_lock,)) as pool:
-        func = partial(proc_func, args.verbose1, args.verbose2)
+        func = partial(proc_func, args.verbose1, args.verbose2, str(args.year))
         results = pool.map(func, files)
 
         for result in results:

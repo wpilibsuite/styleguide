@@ -5,9 +5,9 @@ from wpiformat.licenseupdate import LicenseUpdate
 
 
 def test_licenseupdate():
-    task = LicenseUpdate()
-
     year = str(date.today().year)
+
+    task = LicenseUpdate(year)
 
     inputs = []
     outputs = []
