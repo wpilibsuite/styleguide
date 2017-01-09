@@ -35,12 +35,13 @@ class Header(object):
             regex_prefix = "std::"
 
         if func_names != []:
-            # Funcion uses are preceded by a space, a comma, or an open
-            # parenthesis. C standard library function names are alphanumeric
-            # and start with a letter. Function names are followed by an open
-            # parenthesis.
-            self.func_regex = re.compile("(?: |,|\()" + regex_prefix +
-                                         "([a-z][a-z0-9]*)" + "(?:\()")
+            # Matches C standard library function uses. C standard library
+            # function names are alphanumeric and start with a letter.
+            self.func_regex = re.compile(
+                "(?: |,|\()" +  # Preceded by space, comma, or "("
+                regex_prefix + "([a-z][a-z0-9]*)" +  # C stdlib function name
+                "(?:\()"  # Followed by open parenthesis
+            )
         else:
             self.func_regex = None
 
@@ -51,8 +52,11 @@ class Header(object):
             # asterisks.
             # FIXME: Types at the beginning of the line are not matched.
             self.type_regex = re.compile(
-                "(?<=\<| |,|\()" + regex_prefix + "(" + "|".join(
-                    type_regexes) + ")" + "(?=\)|,|;| |\*+)")
+                "(?<=\<| |,|\()" +  #  Preceded by space, comma, or "("
+                regex_prefix + "(" + "|".join(type_regexes) + ")"  # Type names
+                +
+                "(?=\)|,|;| |\*+)"  # Followed by ")", ",", ";", " ", or pointer asterisks
+            )
         else:
             self.type_regex = None
 

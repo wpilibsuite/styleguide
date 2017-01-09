@@ -74,7 +74,7 @@ class LicenseUpdate(task.Task):
         # Default year when none is found is current one
         year = self.current_year
 
-        year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s+(20..)")
+        year_regex = re.compile("Copyright \(c\) [\w\s,\.]+\s(20..)")
         modify_copyright = False
         for line in file_parts[0].split(linesep):
             match = year_regex.search(line)
