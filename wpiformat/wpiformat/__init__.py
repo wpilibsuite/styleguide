@@ -26,6 +26,7 @@ from wpiformat.stdlib import Stdlib
 from wpiformat.task import BatchTask, PipelineTask, StandaloneTask, Task
 from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.usingnamespacestd import UsingNamespaceStd
+from wpiformat.virtualspecifier import VirtualSpecifier
 from wpiformat.whitespace import Whitespace
 
 
@@ -526,6 +527,7 @@ def main():
             IncludeOrder(),
             UsingDeclaration(),
             UsingNamespaceStd(),
+            VirtualSpecifier(),
             Whitespace(),
             ClangFormat(args.clang_version),
             Jni(),  # Fixes clang-format formatting
