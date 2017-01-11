@@ -187,6 +187,11 @@ optimizations enabled, there is negligible performance impact for the extra
 precision on ARMv7.
 </p>
 
+<h3 id="Error_Handling">Error Handling</h3>
+<p>Exceptions should only be thrown for programming (i.e., user) errors.
+Runtime errors should be handled internally to avoid crashing the application.
+</p>
+
 <h3 id="Generated_Files">Generated Files</h3>
 <p>Since changes would be overwritten upon regeneration, generated files should
 not be modified under any circumstances, including for formatting changes. The

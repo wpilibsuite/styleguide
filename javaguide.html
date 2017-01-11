@@ -218,7 +218,10 @@
 <a href="#s6.5-built-in-types">6.5 Built-in Types</a>
 </dd>
 <dd>
-<a href="#s6.6-generated-files">6.6 Generated Files</a>
+<a href="#s6.6-error-handling">6.6 Error Handling</a>
+</dd>
+<dd>
+<a href="#s6.7-generated-files">6.7 Generated Files</a>
 </dd>
 <br>
 <dt class="toc1">
@@ -755,7 +758,11 @@ Item 7, "Avoid Finalizers," very carefully, and <em>then</em> don't do it.</p><a
     <code>int</code> for user-facing interfaces instead of <code>byte</code> to
     avoid needing casts.</p>
     <p>doubles are used everywhere instead of floats for consistency.</p>
-    <h3>6.6 Generated Files&nbsp;<a name="s6.6-generated-files"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.6 Error Handling&nbsp;<a name="s6.6-error-handling"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <p>Exceptions should only be thrown for programming (i.e., user) errors.
+    Runtime errors should be handled internally to avoid crashing the
+    application.</p>
+    <h3>6.7 Generated Files&nbsp;<a name="s6.7-generated-files"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
     <p>Since changes would be overwritten upon regeneration, generated files
     should not be modified under any circumstances, including for formatting
     changes. The generator for those files should be modified instead. The
