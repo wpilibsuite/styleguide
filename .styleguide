@@ -23,7 +23,6 @@ genFileExclude {
 }
 
 modifiableFolderExclude {
-  \.git
 }
 
 modifiableFileExclude {
