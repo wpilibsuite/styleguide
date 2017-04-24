@@ -145,8 +145,8 @@ def main():
     proc = subprocess.Popen(
         ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
     for line in proc.stdout:
-        changed_file_list.append(config_path + os.sep + line.strip().decode(
-            "ascii"))
+        changed_file_list.append(config_path + os.sep +
+                                 line.strip().decode("ascii"))
 
     # Emit warning if a generated file was editted
     for name in files:
@@ -162,7 +162,8 @@ def main():
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description="Runs all formatting tasks on the code base. This should be invoked from a directory within the project."
+        description=
+        "Runs all formatting tasks on the code base. This should be invoked from a directory within the project."
     )
     parser.add_argument(
         "-v",
@@ -173,7 +174,8 @@ def main():
         "-vv",
         dest="verbose2",
         action="store_true",
-        help="verbosity level 2 (prints names of processed files and tasks run on them)"
+        help=
+        "verbosity level 2 (prints names of processed files and tasks run on them)"
     )
     parser.add_argument(
         "-j",
@@ -186,8 +188,8 @@ def main():
         dest="year",
         type=int,
         default=date.today().year,
-        help="year to use when updating license headers (default is current year)"
-    )
+        help=
+        "year to use when updating license headers (default is current year)")
     args = parser.parse_args()
 
     # Start worker processes
