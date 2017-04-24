@@ -98,6 +98,21 @@ def test_licenseupdate():
         format(year) + os.linesep + os.linesep + inputs[len(inputs) - 1][1],
         True, True))
 
+    # File containing license year range in different postion than template
+    # (If the year isn't extracted, the range will be replaced with one year and
+    # the test will fail.)
+    inputs.append((
+        "./Test.h",
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
+        format(year) + os.linesep + os.linesep + file_appendix))
+    outputs.append((
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
+        format(year) + os.linesep + os.linesep + file_appendix, True, True))
+
     assert len(inputs) == len(outputs)
 
     for i in range(len(inputs)):
