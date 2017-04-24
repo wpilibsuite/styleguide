@@ -101,17 +101,15 @@ class Stdlib(task.Task):
             Header("signal", {"signal", "raise"}, ["sig_atomic_t"], False))
         headers.append(Header("stdarg", {"va_list"}))
         headers.append(
-            Header(
-                "stddef", type_regexes=["(ptrdiff|max_align|nullptr)_t"]))
+            Header("stddef", type_regexes=["(ptrdiff|max_align|nullptr)_t"]))
 
         # size_t isn't actually defined in size_t, but it fits best here for
         # removing the std:: prefix
         headers.append(
             Header(
                 "stdint",
-                type_regexes=[
-                    "((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"
-                ],
+                type_regexes=
+                ["((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"],
                 add_prefix=False))
 
         headers.append(

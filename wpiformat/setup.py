@@ -57,7 +57,8 @@ with open(join(setup_dir, "README.rst"), "r") as readme_file:
 setup(
     name="wpiformat",
     version=__version__,
-    description="Linters and formatters for ensuring WPILib\'s source code conforms to its style guide",
+    description=
+    "Linters and formatters for ensuring WPILib\'s source code conforms to its style guide",
     long_description=long_description,
     author="WPILib",
     maintainer="Tyler Veness",
