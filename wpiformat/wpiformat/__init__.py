@@ -37,7 +37,11 @@ def proc_func(verbose1, verbose2, year, name):
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
     task_pipeline = [
-        LicenseUpdate(year), Namespace(), Newline(), Stdlib(), IncludeOrder(),
+        LicenseUpdate(year),
+        Namespace(),
+        Newline(),
+        Stdlib(),
+        IncludeOrder(),
         Whitespace()
     ]
 
