@@ -108,8 +108,9 @@ class Stdlib(task.Task):
         headers.append(
             Header(
                 "stdint",
-                type_regexes=
-                ["((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"],
+                type_regexes=[
+                    "((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"
+                ],
                 add_prefix=False))
 
         headers.append(
