@@ -415,12 +415,15 @@ outputs.</p>
 function, output from the function, or both. Input
 parameters are usually values or <code>const</code>
 references, while output and input/output parameters will
-be non-<code>const</code> pointers. When ordering
-function parameters, put all input-only parameters before
-any output parameters. In particular, do not add new
-parameters to the end of the function just because they
-are new; place new input-only parameters before the
-output parameters.</p>
+be non-<code>const</code> pointers. Constructors may use
+non-<code>const</code> reference parameters for class types,
+but not built-in types. In other words, do not use
+non-<code>const</code> reference output parameters. When
+ordering function parameters, put all input-only parameters
+before any output parameters. In particular, do not add new
+parameters to the end of the function just because they are
+new; place new input-only parameters before the output
+parameters.</p>
 
 <p>This is not a hard-and-fast rule. Parameters that are
 both input and output (often classes/structs) muddy the
