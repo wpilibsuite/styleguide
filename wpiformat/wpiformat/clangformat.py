@@ -8,6 +8,14 @@ from . import task
 
 class ClangFormat(task.Task):
 
+    def __init__(self, clang_version):
+        task.Task.__init__(self)
+
+        if clang_version == "":
+            self.exec_name = "clang-format"
+        else:
+            self.exec_name = "clang-format-" + clang_version
+
     def should_process_file(self, name):
         extensions = task.get_config("cExtensions") + \
             task.get_config("cppHeaderExtensions") + \
@@ -18,13 +26,11 @@ class ClangFormat(task.Task):
     def run_all(self, names):
         args = ["-style=file", "-i"] + names
         try:
-            returncode = subprocess.call(["clang-format-3.8"] + args)
+            returncode = subprocess.call([self.exec_name] + args)
         except FileNotFoundError:
-            try:
-                returncode = subprocess.call(["clang-format"] + args)
-            except FileNotFoundError:
-                print(
-                    "Error: clang-format not found in PATH. Is it installed?",
-                    file=sys.stderr)
-                return False
+            print(
+                "Error: " + self.exec_name +
+                " not found in PATH. Is it installed?",
+                file=sys.stderr)
+            return False
         return returncode == 0
