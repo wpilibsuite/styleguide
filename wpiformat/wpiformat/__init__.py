@@ -32,7 +32,7 @@ def proc_init(lock):
     print_lock = lock
 
 
-def proc_func(verbose1, verbose2, year, name):
+def proc_func(verbose1, verbose2, year, clang_version, name):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -48,7 +48,7 @@ def proc_func(verbose1, verbose2, year, name):
     # These tasks read and write to the files directly. They are given a list of
     # all files at once to avoid spawning too many subprocesses. Lint is run
     # last since previous tasks can affect its output.
-    final_tasks = [ClangFormat(), PyFormat(), Lint()]
+    final_tasks = [ClangFormat(clang_version), PyFormat(), Lint()]
 
     # The success flag is aggregated across multiple file processing results
     all_success = True
@@ -194,13 +194,22 @@ def main():
         default=date.today().year,
         help=
         "year to use when updating license headers (default is current year)")
+    parser.add_argument(
+        "-clang",
+        dest="clang_version",
+        type=str,
+        default="",
+        help=
+        "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
+    )
     args = parser.parse_args()
 
     # Start worker processes
     print_lock = mp.Lock()
     with mp.Pool(
             args.jobs, initializer=proc_init, initargs=(print_lock,)) as pool:
-        func = partial(proc_func, args.verbose1, args.verbose2, str(args.year))
+        func = partial(proc_func, args.verbose1, args.verbose2,
+                       str(args.year), args.clang_version)
         results = pool.map(func, files)
 
         for result in results:
