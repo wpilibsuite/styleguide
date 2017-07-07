@@ -8,6 +8,7 @@ Dependencies
 
 - `Python 3.6 or newer <https://www.python.org/downloads/>`_
 - clang-format (included with `LLVM <http://llvm.org/releases/download.html>`_)
+- `tidy-html5 <https://github.com/htacg/tidy-html5>`_
 
 To obtain newer versions of clang-format on older Debian and Ubuntu releases, either upgrade to one that does or add the appropriate ``deb ... main`` line from `apt.llvm.org <http://apt.llvm.org/>`_ to ``/etc/apt/sources.list``. Then install ``clang-format-#`` where ``#`` is the version number.
 
@@ -25,7 +26,7 @@ On Linux/OSX, execute::
 Project Setup
 *************
 
-To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
+To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project, create a new ``.clang-format`` file based on the desired C/C++ style, and copy `tidy-html.conf`_ and/or `tidy-xml.conf`_ into the project.
 
 Note: Since wpiformat already handles include ordering, it is recommended to use ``SortIncludes: false`` in ``.clang-format``.
 

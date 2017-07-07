@@ -12,6 +12,7 @@ from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
+from wpiformat.htmlformat import HtmlFormat
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
@@ -24,6 +25,7 @@ from wpiformat.task import Task
 from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
+from wpiformat.xmlformat import XmlFormat
 
 
 def filter_ignored_files(names):
@@ -365,7 +367,7 @@ def main():
     run_pipeline(task_pipeline, args, files)
 
     # Lint is run last since previous tasks can affect its output.
-    task_pipeline = [PyFormat(), Lint()]
+    task_pipeline = [HtmlFormat(), PyFormat(), XmlFormat(), Lint()]
     run_batch(task_pipeline, args, file_batches)
 
 

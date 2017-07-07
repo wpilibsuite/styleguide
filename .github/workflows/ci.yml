@@ -24,11 +24,12 @@ jobs:
       shell: bash
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get install clang-format-10
+          sudo apt-get install clang-format-10 tidy
         elif [ "$RUNNER_OS" == "Windows" ]; then
           choco install llvm --version 10.0.0
+          choco install html-tidy
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install clang-format
+          brew install clang-format tidy-html5
         else
           echo "$RUNNER_OS not supported"
           exit 1
