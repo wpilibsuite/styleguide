@@ -13,7 +13,7 @@ import sys
 
 
 def read_file(file_name):
-    """Find file and return contents
+    """Find file and return contents.
 
     Checks current directory for file. If one doesn't exist, try all parent
     directories as well.
@@ -41,7 +41,7 @@ if regex_sep == "\\":
 
 
 def parse_config_file(file_name):
-    """Parse values from config file
+    """Parse values from config file.
 
     Checks current directory for config file. If one doesn't exist, try all
     parent directories as well.
@@ -91,12 +91,19 @@ if not config_dict:
     print("Error: config file '.styleguide' not found")
     sys.exit(1)
 
+
+def get_config(key_name):
+    """Returns value from config dictionary given key string.
+    """
+    return config_dict[key_name]
+
+
 # List of regexes for folders which contain generated files
 gen_folder_exclude = \
-    [name + regex_sep for name in config_dict["genFolderExclude"]]
+    [name + regex_sep for name in get_config("genFolderExclude")]
 
 # List of regexes for generated files
-gen_file_exclude = config_dict["genFileExclude"]
+gen_file_exclude = get_config("genFileExclude")
 
 # Regex for generated file exclusions
 gen_exclude = gen_folder_exclude + gen_file_exclude
@@ -108,10 +115,10 @@ else:
 
 # Regex for folders which contain modifiable files
 modifiable_folder_exclude = \
-    [name + regex_sep for name in config_dict["modifiableFolderExclude"]]
+    [name + regex_sep for name in get_config("modifiableFolderExclude")]
 
 # List of regexes for modifiable files
-modifiable_file_exclude = config_dict["modifiableFileExclude"]
+modifiable_file_exclude = get_config("modifiableFileExclude")
 
 # Regex for modifiable file exclusions
 modifiable_exclude = modifiable_folder_exclude + modifiable_file_exclude
@@ -122,23 +129,21 @@ else:
     modifiable_regex_exclude = re.compile("|".join(modifiable_exclude))
 
 
-# Returns value from config dictionary given key string
-def get_config(key_name):
-    return config_dict[key_name]
-
-
-# Returns True if file is modifiable but should not have tasks run on it
 def is_modifiable_file(name):
+    """Returns True if file is modifiable but should not have tasks run on it.
+    """
     return modifiable_regex_exclude.search(name)
 
 
-# Returns True if file isn't generated (generated files are skipped)
 def is_generated_file(name):
+    """Returns True if file isn't generated (generated files are skipped).
+    """
     return gen_regex_exclude.search(name)
 
 
-# Returns list of files not in .gitignore
 def filter_ignored_files(names):
+    """Returns list of files not in .gitignore.
+    """
     cmd = ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
 
@@ -155,8 +160,9 @@ def filter_ignored_files(names):
     ]
 
 
-# Returns autodetected line separator for file
 def get_linesep(lines):
+    """Returns autodetected line separator for file.
+    """
     # Find potential line separator
     pos = lines.find("\n")
 
@@ -177,9 +183,11 @@ class Task(object):
             re.compile("|".join(["\." + ext + "$" for ext in
                                  self.get_file_extensions()]))
 
-    # Extensions of files which should be included in processing
     def get_file_extensions(self):
-        # Match anything by default
+        """Returns extensions of files which should be included in processing.
+
+        Match anything by default.
+        """
         return [".*"]
 
     @abstractmethod
@@ -206,8 +214,9 @@ class Task(object):
         """
         return True
 
-    # Returns True if file has an extension this task can process
     def file_matches_extension(self, name):
+        """Returns True if file has an extension this task can process.
+        """
         if self.get_file_extensions() != []:
             return self.regex_include.search(name)
         else:
