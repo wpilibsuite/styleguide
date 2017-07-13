@@ -58,10 +58,10 @@ def proc_func(verbose1, verbose2, year, name):
             print("Processing", name)
             if verbose2:
                 for task in task_pipeline:
-                    if task.file_matches_extension(name):
+                    if task.should_process_file(name):
                         print("  with " + type(task).__name__)
                 for task in final_tasks:
-                    if task.file_matches_extension(name):
+                    if task.should_process_file(name):
                         print("  with " + type(task).__name__)
 
     lines = ""
@@ -70,7 +70,7 @@ def proc_func(verbose1, verbose2, year, name):
     file_changed = False
 
     for task in task_pipeline:
-        if task.file_matches_extension(name):
+        if task.should_process_file(name):
             lines, changed, success = task.run(name, lines)
             file_changed |= changed
             all_success &= success
@@ -83,7 +83,7 @@ def proc_func(verbose1, verbose2, year, name):
         file_changed = False
 
     for task in final_tasks:
-        if task.file_matches_extension(name):
+        if task.should_process_file(name):
             all_success &= task.run_all([name])
 
     return all_success

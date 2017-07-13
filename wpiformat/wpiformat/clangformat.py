@@ -8,10 +8,12 @@ from . import task
 
 class ClangFormat(task.Task):
 
-    def get_file_extensions(self):
-        return task.get_config("cExtensions") + \
+    def should_process_file(self, name):
+        extensions = task.get_config("cExtensions") + \
             task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
+
+        return any(name.endswith("." + ext) for ext in extensions)
 
     def run_all(self, names):
         args = ["-style=file", "-i"] + names

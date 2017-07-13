@@ -8,8 +8,8 @@ from . import task
 
 class PyFormat(task.Task):
 
-    def get_file_extensions(self):
-        return ["py"]
+    def should_process_file(self, name):
+        return name.endswith(".py")
 
     def run_all(self, names):
         try:

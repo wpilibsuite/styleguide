@@ -66,9 +66,11 @@ class IncludeOrder(task.Task):
                                        "(?P<close_bracket>>|\"))"
                                        "(?P<postfix>.*)")
 
-    def get_file_extensions(self):
-        return task.get_config("cppHeaderExtensions") + \
+    def should_process_file(self, name):
+        extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
+
+        return any(name.endswith("." + ext) for ext in extensions)
 
     def run(self, name, lines):
         linesep = task.get_linesep(lines)
@@ -93,16 +95,8 @@ class IncludeOrder(task.Task):
                 "includeRelated", "includeCSys", "includeCppSys",
                 "includeOtherLibs", "includeProject"
         ]:
-            if not len(task.get_config(group)):
-                override_regexes.append(re.compile("a^"))
-            else:
-                regex_str = "(" + "|".join(task.get_config(group)) + ")"
-
-                # On Windows, fix forward slash for include regexes
-                if os.sep == "\\":
-                    regex_str = regex_str.replace("\\\\", "/")
-
-                override_regexes.append(re.compile(regex_str))
+            regex_str = task.group_to_regex(group)
+            override_regexes.append(re.compile(regex_str))
 
         # Retrieve includes
         for line_count in range(len(lines_list)):

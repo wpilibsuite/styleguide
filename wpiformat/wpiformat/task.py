@@ -101,6 +101,33 @@ def get_config(key_name):
         return []
 
 
+def group_to_regex(*args):
+    """Converts contents of groups from config file into properly escaped regex.
+
+    Keyword arguments:
+    *args -- argument list of groups. They are all joined by "|".
+    """
+    group_contents = []
+
+    for group in args:
+        group = get_config(group)
+
+        # If group exists
+        if len(group) > 0:
+            group_contents.extend(group)
+
+    if len(group_contents) == 0:
+        # If regex string is empty, make regex match nothing
+        return "a^"
+    else:
+        regex_str = "|".join(group_contents)
+        if os.sep == "\\":
+            # On Windows, fix forward slash for include regexes
+            return regex_str.replace("\\\\", "/")
+        else:
+            return regex_str
+
+
 # List of regexes for folders which contain generated files
 gen_folder_exclude = \
     [name + regex_sep for name in get_config("genFolderExclude")]
@@ -131,6 +158,8 @@ if len(modifiable_exclude) == 0:
 else:
     modifiable_regex_exclude = re.compile("|".join(modifiable_exclude))
 
+licenseupdate_regex_exclude = re.compile(group_to_regex("licenseUpdateExclude"))
+
 
 def is_modifiable_file(name):
     """Returns True if file is modifiable but should not have tasks run on it.
@@ -142,6 +171,12 @@ def is_generated_file(name):
     """Returns True if file isn't generated (generated files are skipped).
     """
     return gen_regex_exclude.search(name)
+
+
+def skip_licenseupdate(name):
+    """Returns True if file should be skipped in license update.
+    """
+    return licenseupdate_regex_exclude.search(name)
 
 
 def filter_ignored_files(names):
@@ -181,13 +216,8 @@ def get_linesep(lines):
 class Task(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self):
-        self.regex_include = \
-            re.compile("|".join(["\." + ext + "$" for ext in
-                                 self.get_file_extensions()]))
-
-    def get_file_extensions(self):
-        """Returns extensions of files which should be included in processing.
+    def should_process_file(self, name):
+        """Returns True if file should be processed by this task.
 
         Match anything by default.
         """
@@ -216,11 +246,3 @@ class Task(object):
         Returns True if task succeeded in formatting the files.
         """
         return True
-
-    def file_matches_extension(self, name):
-        """Returns True if file has an extension this task can process.
-        """
-        if self.get_file_extensions() != []:
-            return self.regex_include.search(name)
-        else:
-            return True
