@@ -14,11 +14,14 @@ class LicenseUpdate(task.Task):
 
         self.current_year = current_year
 
-    def get_file_extensions(self):
-        return task.get_config("cExtensions") + \
+    def should_process_file(self, name):
+        extensions = task.get_config("cExtensions") + \
             task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions") + \
             task.get_config("otherExtensions")
+
+        return not task.skip_licenseupdate(name) and \
+            any(name.endswith("." + ext) for ext in extensions)
 
     def run(self, name, lines):
         linesep = task.get_linesep(lines)

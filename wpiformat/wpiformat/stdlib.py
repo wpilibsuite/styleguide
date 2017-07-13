@@ -63,9 +63,11 @@ class Header(object):
 
 class Stdlib(task.Task):
 
-    def get_file_extensions(self):
-        return task.get_config("cppHeaderExtensions") + \
+    def should_process_file(self, name):
+        extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
+
+        return any(name.endswith("." + ext) for ext in extensions)
 
     def run(self, name, lines):
         headers = []

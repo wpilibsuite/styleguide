@@ -113,10 +113,24 @@ def test_licenseupdate():
         "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
         format(year) + os.linesep + os.linesep + file_appendix, True, True))
 
+    # File excluded from license update isn't modified
+    inputs.append(("./Excluded.h",
+                   "/* Copyright (c) Company Name 2011-{}. */".format(year) +
+                   os.linesep + os.linesep + file_appendix))
+    outputs.append(("/* Copyright (c) Company Name 2011-{}. */".format(year) +
+                    os.linesep + os.linesep + file_appendix, False, True))
+
     assert len(inputs) == len(outputs)
 
     for i in range(len(inputs)):
-        output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+        # Ensure files excluded from license update won't be processed
+        if inputs[i][0] == "./Excluded.h":
+            assert not task.should_process_file(inputs[i][0])
+        else:
+            assert task.should_process_file(inputs[i][0])
+
+        if task.should_process_file(inputs[i][0]):
+            output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+            assert output == outputs[i][0]
+            assert file_changed == outputs[i][1]
+            assert success == outputs[i][2]

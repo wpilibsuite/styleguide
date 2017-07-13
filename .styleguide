@@ -30,6 +30,10 @@ modifiableFileExclude {
   \.png$
 }
 
+licenseUpdateExclude {
+  Excluded\.h$
+}
+
 includeRelated {
 }
 

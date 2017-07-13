@@ -7,8 +7,10 @@ from . import task
 
 class Namespace(task.Task):
 
-    def get_file_extensions(self):
-        return task.get_config("cppHeaderExtensions")
+    def should_process_file(self, name):
+        extensions = task.get_config("cppHeaderExtensions")
+
+        return any(name.endswith("." + ext) for ext in extensions)
 
     def run(self, name, lines):
         linesep = task.get_linesep(lines)

@@ -17,9 +17,11 @@ from . import task
 
 class Lint(task.Task):
 
-    def get_file_extensions(self):
-        return task.get_config("cppHeaderExtensions") + \
+    def should_process_file(self, name):
+        extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
+
+        return any(name.endswith("." + ext) for ext in extensions)
 
     def run_all(self, names):
         # Handle running in either the root or styleguide directories
