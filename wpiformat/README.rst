@@ -37,7 +37,7 @@ This file contains groups of file name regular expressions. There are two groups
 
 Generated files should not be modified; if they are, wpiformat will emit warnings. All files ignored by patterns in a repository's .gitignore file are considered modifiable files.
 
-Config groups may be empty, but may not be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
+Empty config groups can be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 
 The groups ``includeRelated``, ``includeCSys``, ``includeCppSys``, ``includeOtherLibs``, and ``includeProject`` correspond to the header groups in the style guide. If a header name matches a regex in one of the groups, it overrides the default ordering and is placed in the corresponding group. The groups of regexes are checked in order of include group precedence.
 
