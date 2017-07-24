@@ -95,7 +95,10 @@ if not config_dict:
 def get_config(key_name):
     """Returns value from config dictionary given key string.
     """
-    return config_dict[key_name]
+    try:
+        return config_dict[key_name]
+    except KeyError:
+        return []
 
 
 # List of regexes for folders which contain generated files
