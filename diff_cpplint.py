@@ -25,7 +25,7 @@ def main():
     sys.stdout.flush()
     url = "https://raw.githubusercontent.com/theandrewdavis/cpplint/master/cpplint.py"
     with urllib.request.urlopen(url) as response, \
-            open("wpiformat" + os.sep + "src" + os.sep + "cpplint.py.master", "wb") as out:
+            open("wpiformat" + os.sep + "wpiformat" + os.sep + "cpplint.py.master", "wb") as out:
         data = response.read()
         out.write(data)
     print(" done")
@@ -37,8 +37,8 @@ def main():
     proc = subprocess.Popen(
         [
             "git", "diff", "--no-index",
-            "wpiformat" + os.sep + "src" + os.sep + "cpplint.py.master",
-            "wpiformat" + os.sep + "src" + os.sep + "cpplint.py"
+            "wpiformat" + os.sep + "wpiformat" + os.sep + "cpplint.py.master",
+            "wpiformat" + os.sep + "wpiformat" + os.sep + "cpplint.py"
         ],
         stdout=subprocess.PIPE)
     diff, err = proc.communicate()
@@ -53,7 +53,7 @@ def main():
                 diff_file.write(line + "\n")
 
     # Remove "from" file
-    os.remove("wpiformat" + os.sep + "src" + os.sep + "cpplint.py.master")
+    os.remove("wpiformat" + os.sep + "wpiformat" + os.sep + "cpplint.py.master")
     print(" done")
 
 
