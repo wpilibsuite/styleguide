@@ -1,6 +1,6 @@
-diff --git a/cpplint.py b/cpplint.py
---- a/cpplint.py
-+++ b/cpplint.py
+diff --git a/wpiformat/wpiformat/cpplint.py b/wpiformat/wpiformat/cpplint.py
+--- a/wpiformat/wpiformat/cpplint.py
++++ b/wpiformat/wpiformat/cpplint.py
 @@ -1367,10 +1367,10 @@ def _ShouldPrintError(category, confidence, linenum):
    is_filtered = False
    for one_filter in _Filters():
