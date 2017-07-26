@@ -20,11 +20,22 @@ from wpiformat import task
 from wpiformat.whitespace import Whitespace
 
 
-# Check that the current directory is part of a Git repository
 def in_git_repo(directory):
+    """Check that the current directory is part of a Git repository.
+    """
     cmd = ["git", "rev-parse"]
     returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
     return returncode == 0
+
+
+def get_repo_root():
+    """Get the Git repository root as an absolute path.
+    """
+    current_dir = os.getcwd()
+    while current_dir != os.path.dirname(current_dir):
+        if (os.path.exists(os.path.join(current_dir, ".git"))):
+            return current_dir
+        current_dir = os.path.dirname(current_dir)
 
 
 def proc_init(lock):
@@ -32,7 +43,7 @@ def proc_init(lock):
     print_lock = lock
 
 
-def proc_func(verbose1, verbose2, year, clang_version, name):
+def proc_func(verbose1, verbose2, year, clang_version, repo_root, name):
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -48,7 +59,7 @@ def proc_func(verbose1, verbose2, year, clang_version, name):
     # These tasks read and write to the files directly. They are given a list of
     # all files at once to avoid spawning too many subprocesses. Lint is run
     # last since previous tasks can affect its output.
-    final_tasks = [ClangFormat(clang_version), PyFormat(), Lint()]
+    final_tasks = [ClangFormat(clang_version), PyFormat(), Lint(repo_root)]
 
     # The success flag is aggregated across multiple file processing results
     all_success = True
@@ -209,7 +220,7 @@ def main():
     with mp.Pool(
             args.jobs, initializer=proc_init, initargs=(print_lock,)) as pool:
         func = partial(proc_func, args.verbose1, args.verbose2,
-                       str(args.year), args.clang_version)
+                       str(args.year), args.clang_version, get_repo_root())
         results = pool.map(func, files)
 
         for result in results:

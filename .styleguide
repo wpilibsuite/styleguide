@@ -18,6 +18,7 @@ otherExtensions {
 genFolderExclude {
 }
 
+# Extra "/" used by unit tests
 genFileExclude {
   /cpplint\.py$
 }
@@ -26,7 +27,6 @@ modifiableFolderExclude {
 }
 
 modifiableFileExclude {
-  \.patch$
   \.png$
 }
 

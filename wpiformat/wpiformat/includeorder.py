@@ -72,12 +72,24 @@ class IncludeOrder(task.Task):
 
         return any(name.endswith("." + ext) for ext in extensions)
 
+    def include_is_header(self, file_name, include_name):
+        """Return True if include name has header extension.
+        """
+        base, ext = os.path.splitext(include_name)
+        if ext[1:] not in task.get_config("cppHeaderExtensions"):
+            print("Error: " + file_name + ": include '" + include_name + \
+                "' has extension not in header list")
+            return False
+        else:
+            return True
+
     def run(self, name, lines):
         linesep = task.get_linesep(lines)
 
-        self.name = name
+        file_name = os.path.basename(name)
 
-        includes = [[], [], [], [], []]
+        # Using sets here eliminates duplicate includes
+        includes = [set(), set(), set(), set(), set()]
         found_includes = False
 
         lines_list = lines.splitlines()
@@ -131,9 +143,6 @@ class IncludeOrder(task.Task):
                     # placed in the first group since maintaining the header's
                     # relative ordering beyond that is not feasible.
                     name = self.header_regex.search(lines_list[line_count])
-                    include_name = \
-                        os.path.splitext(os.path.basename(name.group("name")))
-                    file_name = os.path.splitext(os.path.basename(self.name))
 
                     # Process override regexes
                     include_overriden = False
@@ -141,44 +150,50 @@ class IncludeOrder(task.Task):
                         if override_regexes[override_count].search(
                                 name.group("name")):
                             fixed_name = \
-                                self.fixup_include(name, override_count)
-                            includes[override_count].append(fixed_name)
+                                self.build_include(name, override_count)
+                            includes[override_count].add(fixed_name)
                             include_overriden = True
 
                     if include_overriden:
                         continue
 
+                    include_name = os.path.basename(name.group("name"))
+                    include_base, include_ext = os.path.splitext(include_name)
+                    file_base, file_ext = os.path.splitext(file_name)
+
                     # Is related if include has same base name as file name and
                     # file has a source extension
-                    include_is_related = include_name[0] == file_name[0] and \
-                        file_name[1][1:] in task.get_config("cppSrcExtensions")
+                    include_is_related = include_base == file_base and \
+                        file_ext[1:] in task.get_config("cppSrcExtensions")
 
                     if include_is_related or "NOLINT" in lines_list[line_count]:
-                        includes[0].append(self.fixup_include(name, 0))
+                        includes[0].add(self.build_include(name, 0))
                     elif name.group("name") in self.c_std:
-                        includes[1].append(self.fixup_include(name, 1))
+                        includes[1].add(self.build_include(name, 1))
                     elif self.c_sys_regex.search(name.group("header")):
-                        includes[1].append(self.fixup_include(name, 1))
+                        includes[1].add(self.build_include(name, 1))
                     elif name.group("name") in self.cpp_std:
-                        includes[2].append(self.fixup_include(name, 2))
+                        includes[2].add(self.build_include(name, 2))
                     elif name.group("open_bracket") == "<":
-                        includes[3].append(self.fixup_include(name, 3))
+                        includes[3].add(self.build_include(name, 3))
                     else:
-                        includes[4].append(self.fixup_include(name, 4))
+                        if self.include_is_header(file_name, include_name):
+                            includes[4].add(self.build_include(name, 4))
+                        else:
+                            return (lines, False, False)
 
         # If no includes were found, write whole file as-is
         if not found_includes:
             output_list = lines_list
         else:
-            # Sort include lists
-            for sublist in includes:
-                sublist.sort()
+            # Write from beginning of file to includes
+            output_list = lines_list[0:include_start]
 
             # Write out includes
-            output_list = lines_list[0:include_start]
-            for include_count in range(len(includes)):
-                if len(includes[include_count]):
-                    output_list.extend(includes[include_count])
+            for subset in includes:
+                if len(subset):
+                    sublist = sorted(list(subset))
+                    output_list.extend(sublist)
                     output_list.append("")  # Delimits groups of includes
 
             # ifdef blocks go after all other includes
@@ -195,8 +210,11 @@ class IncludeOrder(task.Task):
         else:
             return (lines, False, True)
 
-    def fixup_include(self, name_match, group_number):
-        if group_number == 1 or group_number == 2 or group_number == 3:
+    def build_include(self, name_match, group_number):
+        """Adds appropriate brackets around and "#include" before include name
+        based on group number.
+        """
+        if group_number >= 1 and group_number <= 3:
             return "#include <" + name_match.group("name") + ">" + \
                 name_match.group("postfix")
         else:
