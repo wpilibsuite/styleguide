@@ -17,6 +17,11 @@ from . import task
 
 class Lint(task.Task):
 
+    def __init__(self, repo_root):
+        task.Task.__init__(self)
+
+        self.repo_root = repo_root
+
     def should_process_file(self, name):
         extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
@@ -31,22 +36,13 @@ class Lint(task.Task):
 
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
-        sys.argv = ["cpplint.py", "--filter="
-                    "-build/c++11,"
-                    "-build/include,"
-                    "-build/include_order,"  # includeorder.py handles ordering
-                    "-build/include_subdir,"
-                    "-build/namespaces,"
-                    "-readability/todo,"
-                    "-runtime/references,"
-                    "-runtime/string,"
-                    "-whitespace/indent",  # clangformat.py handles indentation
+        sys.argv = ["cpplint.py",
                     "--extensions=" + \
                         ",".join(task.get_config("cppHeaderExtensions") + \
                                  task.get_config("cppSrcExtensions")),
                     "--headers=" + \
                         ",".join(task.get_config("cppHeaderExtensions")),
-                    "--quiet"] + names
+                    "--repository=" + self.repo_root] + names
 
         # Run cpplint.py
         try:

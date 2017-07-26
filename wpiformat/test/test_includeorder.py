@@ -183,6 +183,43 @@ def test_includeorder():
     inputs.append(("./PDP.cpp", outputs[len(outputs) - 1][0]))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
+    # Verify subgroups are sorted
+    inputs.append(("./PDP.cpp",
+        "#include \"support/jni_util.h\"" + os.linesep + \
+        "#include \"llvm/SmallString.h\"" + os.linesep + \
+        "#include \"llvm/raw_ostream.h\"" + os.linesep))
+    outputs.append((
+        "#include \"llvm/SmallString.h\"" + os.linesep + \
+        "#include \"llvm/raw_ostream.h\"" + os.linesep + \
+        "#include \"support/jni_util.h\"" + os.linesep, True, True))
+
+    # Check duplicate headers are removed
+    inputs.append(("./PDP.cpp",
+        "#include <memory>" + os.linesep + \
+        "#include \"ctre/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "#include \"HAL/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "#include \"ctre/PDP.h\"" + os.linesep + \
+        "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "using namespace hal;" + os.linesep))
+    outputs.append((
+        "#include \"HAL/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "#include \"ctre/PDP.h\"" + os.linesep + \
+        os.linesep + \
+        "using namespace hal;" + os.linesep, True, True))
+
+    # Check source file inclusion is disallowed
+    inputs.append(("./Test.h",
+        "#include <memory>" + os.linesep + \
+        os.linesep + \
+        "#include \"Stuff.cpp\"" + os.linesep, False, False))
+    outputs.append((inputs[len(inputs) - 1][1], False, False))
+
     assert len(inputs) == len(outputs)
 
     for i in range(len(inputs)):
