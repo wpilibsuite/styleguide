@@ -26,7 +26,7 @@ def test_licenseupdate():
     outputs.append((
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + os.linesep + file_appendix, True, True))
 
     # pragma once at top of file preceded by newline
@@ -39,7 +39,7 @@ def test_licenseupdate():
         "./Test.h", os.linesep +
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + os.linesep + file_appendix))
     outputs.append((inputs[len(inputs) - 1][1].lstrip(), True, True))
 
@@ -48,12 +48,12 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "// Copyright (c) Company Name 2011-{}. All Rights Reserved.".format(
+        "// Copyright (c) 2011-{} Company Name. All Rights Reserved.".format(
             year) + os.linesep + os.linesep + file_appendix))
     outputs.append((
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
         format(year) + os.linesep + os.linesep + file_appendix, True, True))
 
     # File containing up-to-date license with one year
@@ -61,7 +61,7 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + os.linesep + file_appendix))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
@@ -70,7 +70,7 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + os.linesep + os.linesep + file_appendix))
     outputs.append((outputs[len(outputs) - 1][0], True, True))
 
@@ -79,7 +79,7 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + file_appendix))
     outputs.append((outputs[len(outputs) - 1][0], True, True))
 
@@ -94,7 +94,7 @@ def test_licenseupdate():
     outputs.append((
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name {}. All Rights Reserved.                      */".
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
         format(year) + os.linesep + os.linesep + inputs[len(inputs) - 1][1],
         True, True))
 
@@ -105,12 +105,12 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
+        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
         format(year) + os.linesep + os.linesep + file_appendix))
     outputs.append((
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
         format(year) + os.linesep + os.linesep + file_appendix, True, True))
 
     assert len(inputs) == len(outputs)
