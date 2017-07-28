@@ -138,6 +138,7 @@ local.properties
 
 ### Python ###
 .cache
+.eggs/
 __pycache__
 *.egg-info/
 *.egg
