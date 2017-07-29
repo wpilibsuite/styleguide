@@ -12,7 +12,7 @@ Dependencies
 - `Python 3.4 or newer <https://www.python.org/downloads/>`_
 - clang-format 3.8 or newer (included with `LLVM <http://llvm.org/releases/download.html>`_)
 
-If you would like to use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ into the project.
+If you would like to use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project.
 
 Installation
 ============
