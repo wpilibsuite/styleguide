@@ -105,7 +105,7 @@ class Stdlib(task.Task):
         headers.append(
             Header("stddef", type_regexes=["(ptrdiff|max_align|nullptr)_t"]))
 
-        # size_t isn't actually defined in size_t, but it fits best here for
+        # size_t isn't actually defined in stdint, but it fits best here for
         # removing the std:: prefix
         headers.append(
             Header(

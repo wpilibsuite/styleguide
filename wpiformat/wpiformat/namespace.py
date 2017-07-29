@@ -17,12 +17,12 @@ class Namespace(Task):
         format_succeeded = True
 
         # Tokenize file as brace opens, brace closes, and "using" declarations.
-        # "using" declarations are scoped, so content inside any bracket pair
-        # is considered outside the global namespace.
-        regex_str = "(\{|\}|using .*;)"
+        # "using" declarations are scoped, so content inside any bracket pair is
+        # considered outside the global namespace.
+        regex = re.compile("(\{|\}|using .*;)")
 
         brace_count = 0
-        for match in re.finditer(regex_str, lines):
+        for match in re.finditer(regex, lines):
             token = match.group(0)
 
             if token == "{":
