@@ -18,7 +18,7 @@ class ClangFormat(task.Task):
     def run_all(self, names):
         args = ["-style=file", "-i"] + names
         try:
-            returncode = subprocess.call(["clang-format-3.8"] + args)
+            returncode = subprocess.call(["clang-format-3.9"] + args)
         except FileNotFoundError:
             try:
                 returncode = subprocess.call(["clang-format"] + args)
