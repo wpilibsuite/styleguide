@@ -34,7 +34,7 @@ class IncludeOrder(task.Task):
         ]
 
         # Header type 1: C system headers
-        self.c_sys_regex = re.compile("<[a-z].*\.h>")
+        self.c_sys_regex = re.compile("<[a-z][A-Za-z0-9/_-]*\.h>")
 
         # Header type 2: C++ standard library headers
         self.cpp_std = [
