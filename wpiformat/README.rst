@@ -43,6 +43,8 @@ Empty config groups can be omitted. Directory separators must be "/", not "\". D
 
 The groups ``includeRelated``, ``includeCSys``, ``includeCppSys``, ``includeOtherLibs``, and ``includeProject`` correspond to the header groups in the style guide. If a header name matches a regex in one of the groups, it overrides the default ordering and is placed in the corresponding group. The groups of regexes are checked in order of include group precedence.
 
+The regex for C system headers produces false positives on headers from "other libraries". Regexes for them should be added to ``includeOtherLibs``. Libraries with many headers generally group them within a folder, so a regex for just the folder will suffice.
+
 .styleguide-license
 -------------------
 
