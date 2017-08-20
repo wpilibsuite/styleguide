@@ -41,6 +41,8 @@ File names matching regexes in the group ``licenseUpdateExclude`` will be skippe
 
 Empty config groups can be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 
+Valid include guard patterns use capital letters, start with the repository name, include the path to the file and the file name itself, and have directory separators and hyphens replaced with underscores. The path to the file starts from the repository root by default. Other paths, such as include directories, can be specified in the group ``includeGuardRoots``. If a path matches, that string will be truncated from the include guard pattern.
+
 The groups ``includeRelated``, ``includeCSys``, ``includeCppSys``, ``includeOtherLibs``, and ``includeProject`` correspond to the header groups in the style guide. If a header name matches a regex in one of the groups, it overrides the default ordering and is placed in the corresponding group. The groups of regexes are checked in order of include group precedence.
 
 The regex for C system headers produces false positives on headers from "other libraries". Regexes for them should be added to ``includeOtherLibs``. Libraries with many headers generally group them within a folder, so a regex for just the folder will suffice.

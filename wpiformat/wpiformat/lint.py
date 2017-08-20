@@ -42,7 +42,9 @@ class Lint(task.Task):
                                  task.get_config("cppSrcExtensions")),
                     "--headers=" + \
                         ",".join(task.get_config("cppHeaderExtensions")),
-                    "--repository=" + self.repo_root] + names
+                    "--repository=" + self.repo_root,
+                    "--includeroots=" + \
+                        ",".join(task.get_config("includeGuardRoots"))] + names
 
         # Run cpplint.py
         try:
