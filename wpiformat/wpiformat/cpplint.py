@@ -281,6 +281,8 @@ _error_suppressions = {}
 # This is set by the --repository flag.
 _repository = None
 
+_include_roots = None
+
 if sys.version_info < (3,):
   #  -- pylint: disable=no-member
   # BINARY_TYPE = str
@@ -535,7 +537,12 @@ class FileInfo(object):
 
     # If the file exists and the user specified a repository path, use it
     if os.path.exists(fullname) and _repository:
-      return os.path.relpath(fullname, _repository).replace("\\", "/")
+      name = os.path.relpath(fullname, _repository).replace("\\", "/")
+      if _include_roots:
+        for include_root in _include_roots:
+          if name.startswith(include_root):
+            return os.path.basename(_repository) + "/" + name[len(include_root):]
+      return os.path.basename(_repository) + "/" + name
     # Don't know what to do; header guard warnings may be wrong...
     else:
       return fullname
@@ -3887,6 +3894,7 @@ def ParseArguments(args):
   try:
     (opts, filenames) = getopt.getopt(args, '', ['help',
                                                  'repository=',
+                                                 'includeroots=',
                                                  'extensions=',
                                                  'headers='])
   except getopt.GetoptError:
@@ -3898,6 +3906,12 @@ def ParseArguments(args):
     elif opt == '--repository':
       global _repository
       _repository = val
+    elif opt == '--includeroots':
+      global _include_roots
+      try:
+        _include_roots = list(val.split(','))
+      except ValueError:
+          PrintUsage('Include roots must be comma separated list.')
     elif opt == '--extensions':
       global _valid_extensions
       try:
