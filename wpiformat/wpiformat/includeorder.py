@@ -66,11 +66,55 @@ class IncludeOrder(task.Task):
                                        "(?P<close_bracket>>|\"))"
                                        "(?P<postfix>.*)")
 
+        self.override_regexes = []
+
+        # Compile include sorting override regexes
+        for group in [
+                "includeRelated", "includeCSys", "includeCppSys",
+                "includeOtherLibs", "includeProject"
+        ]:
+            regex_str = task.group_to_regex(group)
+            self.override_regexes.append(re.compile(regex_str))
+
     def should_process_file(self, name):
         extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
 
         return any(name.endswith("." + ext) for ext in extensions)
+
+    def classify_header(self, include_line, file_name):
+        """Classify the given header name and return the corresponding index.
+        """
+        # Process override regexes
+        for idx in range(5):
+            if self.override_regexes[idx].search(include_line.group("name")):
+                return idx
+
+        include_name = os.path.basename(include_line.group("name"))
+        include_base, include_ext = os.path.splitext(include_name)
+        file_base, file_ext = os.path.splitext(file_name)
+
+        # Is related if include has same base name as file name and file has a
+        # source extension
+        include_is_related = include_base == file_base and \
+            file_ext[1:] in task.get_config("cppSrcExtensions")
+
+        # NOLINT lines are placed in the first group since maintaining the
+        # header's relative ordering beyond that is not feasible.
+        if include_is_related or "NOLINT" in include_line.group("postfix"):
+            return 0
+        elif include_line.group("name") in self.c_std:
+            return 1
+        elif self.c_sys_regex.search(include_line.group("header")):
+            return 1
+        elif include_line.group("name") in self.cpp_std:
+            return 2
+        elif include_line.group("open_bracket") == "<":
+            return 3
+        elif self.include_is_header(file_name, include_name):
+            return 4
+        else:
+            return -1
 
     def include_is_header(self, file_name, include_name):
         """Return True if include name has header extension.
@@ -83,6 +127,17 @@ class IncludeOrder(task.Task):
         else:
             return True
 
+    def add_brackets(self, name_match, group_number):
+        """Adds appropriate brackets around and "#include" before include name
+        based on group number.
+        """
+        if group_number >= 1 and group_number <= 3:
+            return "#include <" + name_match.group("name") + ">" + \
+                name_match.group("postfix")
+        else:
+            return "#include \"" + name_match.group("name") + "\"" + \
+                name_match.group("postfix")
+
     def run(self, name, lines):
         linesep = task.get_linesep(lines)
 
@@ -93,102 +148,58 @@ class IncludeOrder(task.Task):
         found_includes = False
 
         lines_list = lines.splitlines()
-        include_start = 0
         include_stop = len(lines_list)
 
         ifdef_blocks = []
-        ifdef_count = 0
         in_ifdef = False
 
-        override_regexes = []
-
-        # Compile include sorting override regexes
-        for group in [
-                "includeRelated", "includeCSys", "includeCppSys",
-                "includeOtherLibs", "includeProject"
-        ]:
-            regex_str = task.group_to_regex(group)
-            override_regexes.append(re.compile(regex_str))
-
         # Retrieve includes
-        for line_count in range(len(lines_list)):
-            if not in_ifdef and "#ifdef" in lines_list[line_count]:
+        for line_idx in range(len(lines_list)):
+            if not in_ifdef and "#ifdef" in lines_list[line_idx]:
                 if not found_includes:
-                    include_start = line_count
                     found_includes = True
 
+                    # Write from beginning of file to includes
+                    output_list = lines_list[0:line_idx]
+
                 in_ifdef = True
-                ifdef_blocks.append([lines_list[line_count]])
-            elif in_ifdef and "#endif" in lines_list[line_count]:
+                ifdef_blocks.append(lines_list[line_idx])
+            elif in_ifdef and "#endif" in lines_list[line_idx]:
                 in_ifdef = False
-                ifdef_blocks[ifdef_count].append(lines_list[line_count])
-                ifdef_count = ifdef_count + 1
+                ifdef_blocks.append(lines_list[line_idx])
+                ifdef_blocks.append("")
             elif in_ifdef:
-                ifdef_blocks[ifdef_count].append(lines_list[line_count])
+                ifdef_blocks.append(lines_list[line_idx])
             else:
                 valid_preproc = \
-                    lines_list[line_count].strip() == "" or \
-                    "#include" in lines_list[line_count] or in_ifdef
+                    lines_list[line_idx].strip() == "" or \
+                    "#include" in lines_list[line_idx] or in_ifdef
 
                 if found_includes and not valid_preproc:
-                    include_stop = line_count
+                    include_stop = line_idx
                     break
 
-                if "#include" in lines_list[line_count]:
+                if "#include" in lines_list[line_idx]:
                     if not found_includes:
-                        include_start = line_count
                         found_includes = True
 
-                    # Insert header into apprioriate list. NOLINT lines are
-                    # placed in the first group since maintaining the header's
-                    # relative ordering beyond that is not feasible.
-                    name = self.header_regex.search(lines_list[line_count])
+                        # Write from beginning of file to includes
+                        output_list = lines_list[0:line_idx]
 
-                    # Process override regexes
-                    include_overriden = False
-                    for override_count in range(5):
-                        if override_regexes[override_count].search(
-                                name.group("name")):
-                            fixed_name = \
-                                self.build_include(name, override_count)
-                            includes[override_count].add(fixed_name)
-                            include_overriden = True
+                    # Insert header into apprioriate list
+                    include_line = \
+                        self.header_regex.search(lines_list[line_idx])
 
-                    if include_overriden:
-                        continue
-
-                    include_name = os.path.basename(name.group("name"))
-                    include_base, include_ext = os.path.splitext(include_name)
-                    file_base, file_ext = os.path.splitext(file_name)
-
-                    # Is related if include has same base name as file name and
-                    # file has a source extension
-                    include_is_related = include_base == file_base and \
-                        file_ext[1:] in task.get_config("cppSrcExtensions")
-
-                    if include_is_related or "NOLINT" in lines_list[line_count]:
-                        includes[0].add(self.build_include(name, 0))
-                    elif name.group("name") in self.c_std:
-                        includes[1].add(self.build_include(name, 1))
-                    elif self.c_sys_regex.search(name.group("header")):
-                        includes[1].add(self.build_include(name, 1))
-                    elif name.group("name") in self.cpp_std:
-                        includes[2].add(self.build_include(name, 2))
-                    elif name.group("open_bracket") == "<":
-                        includes[3].add(self.build_include(name, 3))
+                    idx = self.classify_header(include_line, file_name)
+                    if idx != -1:
+                        includes[idx].add(self.add_brackets(include_line, idx))
                     else:
-                        if self.include_is_header(file_name, include_name):
-                            includes[4].add(self.build_include(name, 4))
-                        else:
-                            return (lines, False, False)
+                        return (lines, False, False)
 
         # If no includes were found, write whole file as-is
         if not found_includes:
             output_list = lines_list
         else:
-            # Write from beginning of file to includes
-            output_list = lines_list[0:include_start]
-
             # Write out includes
             for subset in includes:
                 if len(subset):
@@ -197,10 +208,8 @@ class IncludeOrder(task.Task):
                     output_list.append("")  # Delimits groups of includes
 
             # ifdef blocks go after all other includes
-            if ifdef_blocks != [[]]:
-                for block in ifdef_blocks:
-                    output_list.append(linesep.join(block))
-                    output_list.append("")
+            if ifdef_blocks:
+                output_list.append(linesep.join(ifdef_blocks))
 
             output_list.extend(lines_list[include_stop:])
 
@@ -209,14 +218,3 @@ class IncludeOrder(task.Task):
             return (output, True, True)
         else:
             return (lines, False, True)
-
-    def build_include(self, name_match, group_number):
-        """Adds appropriate brackets around and "#include" before include name
-        based on group number.
-        """
-        if group_number >= 1 and group_number <= 3:
-            return "#include <" + name_match.group("name") + ">" + \
-                name_match.group("postfix")
-        else:
-            return "#include \"" + name_match.group("name") + "\"" + \
-                name_match.group("postfix")
