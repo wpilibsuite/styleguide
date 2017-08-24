@@ -77,7 +77,7 @@ def test_includeorder():
         "#include \"MyHeader.h\"" + os.linesep + \
         "#include \"Test.inc\"" + os.linesep, True, True))
 
-    # Check "other header" isn't identified as C system include
+    # Verify "other header" isn't identified as C system include
     inputs.append(("./Test.h",
         "#include <OtherHeader.h>" + os.linesep + \
         "#include <sys/time.h>" + os.linesep))
@@ -86,7 +86,7 @@ def test_includeorder():
         os.linesep + \
         "#include <OtherHeader.h>" + os.linesep, True, True))
 
-    # Check newline is added between last header and code after it
+    # Verify newline is added between last header and code after it
     inputs.append(("./Test.cpp",
         "#include \"MyFile.h\"" + os.linesep + \
         os.linesep + \
@@ -101,7 +101,7 @@ def test_includeorder():
         "namespace std {" + os.linesep + \
         "}" + os.linesep, True, True))
 
-    # Check newlines are removed between last header and code after it
+    # Verify newlines are removed between last header and code after it
     inputs.append(("./Test.cpp",
         "#include \"MyFile.h\"" + os.linesep + \
         os.linesep + \
@@ -129,7 +129,7 @@ def test_includeorder():
         "namespace std {" + os.linesep + \
         "}" + os.linesep, True, True))
 
-    # Check "#ifdef _WIN32" is sorted after all other includes
+    # Verify headers are sorted across #ifdef
     inputs.append(("./Error.h",
         "#pragma once" + os.linesep + \
         os.linesep + \
@@ -143,6 +143,8 @@ def test_includeorder():
         "#undef GetMessage" + os.linesep + \
         "#endif" + os.linesep + \
         os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
         "#include \"Base.h\"" + os.linesep + \
         "#include \"llvm/StringRef.h\"" + os.linesep))
     outputs.append((
@@ -152,14 +154,217 @@ def test_includeorder():
         os.linesep + \
         "#include <string>" + os.linesep + \
         os.linesep + \
-        "#include \"Base.h\"" + os.linesep + \
-        "#include \"llvm/StringRef.h\"" + os.linesep + \
-        os.linesep + \
         "#ifdef _WIN32" + os.linesep + \
         "#include <Windows.h>" + os.linesep + \
         "// This is a comment" + os.linesep + \
         "#undef GetMessage" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep, True, True))
+
+    # Verify "#ifdef _WIN32" acts as barrier for out-of-order includes
+    inputs.append(("./Error.h",
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#include <stdint.h>" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#include <Windows.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
+
+    # Verify "#ifdef __linux__" is sorted in correct category below other
+    # headers
+    inputs.append(("./Error.h",
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#include <stdlib.h>" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep))
+    outputs.append((
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#include <stdlib.h>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep, True, True))
+
+    # Verify "#ifdef __linux__" is included in output if no headers are in same
+    # category
+    inputs.append(("./Error.h",
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include <string>" + os.linesep + \
+        os.linesep + \
+        "#include \"Base.h\"" + os.linesep + \
+        "#include \"llvm/StringRef.h\"" + os.linesep))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
+
+    # Verify #ifdef blocks in a row are handled properly
+    inputs.append(("./Log.cpp",
+        "#include \"Log.h\"" + os.linesep + \
+        os.linesep + \
+        "#include <cstdio>" + os.linesep + \
+        os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "#include <cstdlib>" + os.linesep + \
+        "#else" + os.linesep + \
+        "#include <cstring>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#ifdef __APPLE__" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#ifdef __ANDROID__" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "using namespace cs;" + os.linesep))
+    outputs.append((
+        "#include \"Log.h\"" + os.linesep + \
+        os.linesep + \
+        "#ifdef __APPLE__" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#ifdef __ANDROID__" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include <cstdio>" + os.linesep + \
+        os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "#include <cstdlib>" + os.linesep + \
+        "#else" + os.linesep + \
+        "#include <cstring>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "using namespace cs;" + os.linesep, True, True))
+
+    # Verify comments aren't mangled
+    inputs.append(("./cscore.h",
+        "/* C API */" + os.linesep + \
+        "#include \"cscore_c.h\"" + os.linesep + \
+        os.linesep + \
+        "#ifdef __cplusplus" + os.linesep + \
+        "/* C++ API */" + os.linesep + \
+        "#include \"cscore_cpp.h\"" + os.linesep + \
+        "#include \"cscore_oo.h\"" + os.linesep + \
+        "#endif /* __cplusplus */" + os.linesep))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
+
+    # Check recursive #ifdef
+    inputs.append(("./Test.h",
+        "#include <algorithm>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <sys/socket.h>" + os.linesep + \
+        "#include <sys/syscall.h>" + os.linesep + \
+        "#ifdef __GNUC__ > 4" + os.linesep + \
+        "#include <algorithm>" + os.linesep + \
+        "#endif" + os.linesep + \
+        "#endif" + os.linesep))
+    outputs.append((
+        "#include <algorithm>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <sys/socket.h>" + os.linesep + \
+        "#include <sys/syscall.h>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __GNUC__ > 4" + os.linesep + \
+        "#include <algorithm>" + os.linesep + \
+        "#endif" + os.linesep + \
         "#endif" + os.linesep, True, True))
+
+    # Large test
+    inputs.append(("./UsbCameraImpl.cpp",
+        "#include <algorithm>" + os.linesep + \
+        os.linesep + \
+        "#include \"Handle.h\"" + os.linesep + \
+        "#include \"Log.h\"" + os.linesep + \
+        "#include \"Notifier.h\"" + os.linesep + \
+        "#include \"UsbUtil.h\"" + os.linesep + \
+        "#include \"c_util.h\"" + os.linesep + \
+        "#include \"cscore_cpp.h\"" + os.linesep + \
+        os.linesep + \
+        "#ifdef __linux__" + os.linesep + \
+        "#include <dirent.h>" + os.linesep + \
+        "#include <fcntl.h>" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#include <linux/kernel.h>" + os.linesep + \
+        "#include <linux/types.h>" + os.linesep + \
+        "#include <linux/videodev2.h>" + os.linesep + \
+        "#include <sys/eventfd.h>" + os.linesep + \
+        "#include <sys/inotify.h>" + os.linesep + \
+        "#include <sys/ioctl.h>" + os.linesep + \
+        "#include <sys/select.h>" + os.linesep + \
+        "#include <sys/stat.h>" + os.linesep + \
+        "#include <sys/time.h>" + os.linesep + \
+        "#include <sys/types.h>" + os.linesep + \
+        "#include <unistd.h>" + os.linesep + \
+        os.linesep + \
+        "#elif defined(_WIN32)" + os.linesep + \
+        os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "using namespace cs;" + os.linesep))
+    outputs.append((
+        "#ifdef __linux__" + os.linesep + \
+        "#include <dirent.h>" + os.linesep + \
+        "#include <fcntl.h>" + os.linesep + \
+        "#include <libgen.h>" + os.linesep + \
+        "#include <linux/kernel.h>" + os.linesep + \
+        "#include <linux/types.h>" + os.linesep + \
+        "#include <linux/videodev2.h>" + os.linesep + \
+        "#include <sys/eventfd.h>" + os.linesep + \
+        "#include <sys/inotify.h>" + os.linesep + \
+        "#include <sys/ioctl.h>" + os.linesep + \
+        "#include <sys/select.h>" + os.linesep + \
+        "#include <sys/stat.h>" + os.linesep + \
+        "#include <sys/time.h>" + os.linesep + \
+        "#include <sys/types.h>" + os.linesep + \
+        "#include <unistd.h>" + os.linesep + \
+        "#elif defined(_WIN32)" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#include <algorithm>" + os.linesep + \
+        os.linesep + \
+        "#include \"Handle.h\"" + os.linesep + \
+        "#include \"Log.h\"" + os.linesep + \
+        "#include \"Notifier.h\"" + os.linesep + \
+        "#include \"UsbUtil.h\"" + os.linesep + \
+        "#include \"c_util.h\"" + os.linesep + \
+        "#include \"cscore_cpp.h\"" + os.linesep + \
+        os.linesep + \
+        "using namespace cs;" + os.linesep, True, True))
 
     # Verify relevant headers are found and sorted correctly
     inputs.append(("./PDP.cpp",
@@ -193,7 +398,7 @@ def test_includeorder():
         "#include \"llvm/raw_ostream.h\"" + os.linesep + \
         "#include \"support/jni_util.h\"" + os.linesep, True, True))
 
-    # Check duplicate headers are removed
+    # Verify duplicate headers are removed
     inputs.append(("./PDP.cpp",
         "#include <memory>" + os.linesep + \
         "#include \"ctre/PDP.h\"" + os.linesep + \
@@ -213,7 +418,7 @@ def test_includeorder():
         os.linesep + \
         "using namespace hal;" + os.linesep, True, True))
 
-    # Check source file inclusion is disallowed
+    # Verify source file inclusion is disallowed
     inputs.append(("./Test.h",
         "#include <memory>" + os.linesep + \
         os.linesep + \
