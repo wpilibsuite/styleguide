@@ -76,6 +76,8 @@ class IncludeOrder(task.Task):
             regex_str = task.group_to_regex(group)
             self.override_regexes.append(re.compile(regex_str))
 
+        self.ifdef_level = 0
+
     def should_process_file(self, name):
         extensions = task.get_config("cppHeaderExtensions") + \
             task.get_config("cppSrcExtensions")
@@ -138,82 +140,171 @@ class IncludeOrder(task.Task):
             return "#include \"" + name_match.group("name") + "\"" + \
                 name_match.group("postfix")
 
-    def run(self, name, lines):
-        linesep = task.get_linesep(lines)
+    def write_headers(self, includes, ifdef_blocks=[[], [], [], [], []]):
+        """Write out includes from sets.
 
-        file_name = os.path.basename(name)
+        Returns list of output lines.
+        """
+        output_list = []
+
+        for i in range(5):
+            if includes[i]:
+                sublist = sorted(list(includes[i]))
+                output_list.extend(sublist)
+                output_list.append("")  # Delimits groups of includes
+
+            # #ifdef blocks go after other includes
+            if ifdef_blocks[i]:
+                # Remove newline from last #endif
+                output_list.append(self.linesep.join(ifdef_blocks[i]).rstrip())
+                output_list.append("")  # Delimits groups of #ifdef blocks
+        if output_list:
+            del output_list[-1]  # Remove last newline
+        return output_list
+
+    def header_sort(self, lines_list, file_name, start, end):
+        """Recursively parses within #ifdef blocks for header includes and sorts
+        them.
+
+        Returns tuple of the following:
+        sorted output
+        list of flags of instances of header categories within #ifdef block
+        the index of the last line processed
+        whether all header includes had header extension
+        """
+        output_list = []
 
         # Using sets here eliminates duplicate includes
         includes = [set(), set(), set(), set(), set()]
-        found_includes = False
+        include_flags = [0, 0, 0, 0, 0]
+
+        ifdef_blocks = [[], [], [], [], []]
+
+        i = start
+        while i < end:
+            if "#ifdef" in lines_list[i]:
+                self.ifdef_level += 1
+                ifdef_count = 1
+                for j in range(i + 1, end):
+                    if "#ifdef" in lines_list[j]:
+                        ifdef_count += 1
+                    elif "#endif" in lines_list[j]:
+                        ifdef_count -= 1
+                    if ifdef_count == 0:
+                        # Add #ifdef or #else line
+                        ifdef = lines_list[i] + self.linesep
+
+                        suboutput, flags, idx, valid_headers = self.header_sort(
+                            lines_list, file_name, i + 1, j)
+                        i = j
+                        self.ifdef_level -= 1
+
+                        # If header failed to classify, return failure
+                        if not valid_headers:
+                            return (output_list, flags, i, False)
+
+                        if suboutput:
+                            ifdef += self.linesep.join(suboutput) + self.linesep
+
+                        # Add #endif line
+                        ifdef += lines_list[j]
+
+                        # #endif gets an extra line separator
+                        if "#endif" in lines_list[j]:
+                            ifdef += self.linesep
+
+                        for k in range(len(include_flags)):
+                            include_flags[k] |= flags[k]
+
+                        if sum(flags) == 1:
+                            ifdef_idx = 0
+                            for k in range(len(flags)):
+                                if flags[k] == 1:
+                                    ifdef_idx = k
+                                    break
+
+                            # Only one type of include, so add it to sorts
+                            ifdef_blocks[ifdef_idx].append(ifdef)
+                        else:
+                            # Treat #ifdef as barrier and flush includes
+                            output_list.extend(self.write_headers(includes))
+                            output_list.append("")
+                            includes = [set(), set(), set(), set(), set()]
+
+                            output_list.append(ifdef)
+                        break
+            elif "#include" in lines_list[i]:
+                # Insert header into appropriate list
+                include_line = self.header_regex.search(lines_list[i])
+
+                idx = self.classify_header(include_line, file_name)
+                if idx != -1:
+                    includes[idx].add(self.add_brackets(include_line, idx))
+                    include_flags[idx] = 1
+                else:
+                    # If header failed to classify, return failure
+                    return (output_list, include_flags, i, False)
+            elif self.ifdef_level > 0 and lines_list[i] != "":
+                # Non-preprocessor statements within a #ifdef block don't mark
+                # the end of header include processing, but act as barrier for
+                # sorting.
+
+                # Dump currently collected header includes to file.
+                # include_flags isn't reset as well here because that info is
+                # still valid and necessary for sorting.
+                written = self.write_headers(includes)
+                if written:
+                    output_list.append(self.linesep.join(written))
+                    includes = [set(), set(), set(), set(), set()]
+
+                output_list.append(lines_list[i])
+            elif lines_list[i].strip() != "":
+                # Write headers and #ifdef blocks if found
+                written = self.write_headers(includes, ifdef_blocks)
+                if written:
+                    output_list.extend(written)
+
+                return (output_list, include_flags, i, True)
+            i += 1
+
+        # Write headers and #ifdef blocks if found
+        written = self.write_headers(includes, ifdef_blocks)
+        if written:
+            output_list.extend(written)
+
+        return (output_list, include_flags, i, True)
+
+    def run(self, name, lines):
+        self.linesep = task.get_linesep(lines)
+        self.ifdef_level = 0
+
+        file_name = os.path.basename(name)
 
         lines_list = lines.splitlines()
-        include_stop = len(lines_list)
 
-        ifdef_blocks = []
-        in_ifdef = False
+        # Write lines from beginning of file to headers
+        i = 0
+        while i < len(lines_list) and ("#ifdef" not in lines_list[i] and
+                                       "#include" not in lines_list[i]):
+            i += 1
+        output_list = lines_list[0:i]
 
-        # Retrieve includes
-        for line_idx in range(len(lines_list)):
-            if not in_ifdef and "#ifdef" in lines_list[line_idx]:
-                if not found_includes:
-                    found_includes = True
+        suboutput, flags, idx, valid_headers = self.header_sort(
+            lines_list, file_name, i, len(lines_list))
+        i = idx
 
-                    # Write from beginning of file to includes
-                    output_list = lines_list[0:line_idx]
+        # If header failed to classify, return failure
+        if not valid_headers:
+            return (lines, False, False)
 
-                in_ifdef = True
-                ifdef_blocks.append(lines_list[line_idx])
-            elif in_ifdef and "#endif" in lines_list[line_idx]:
-                in_ifdef = False
-                ifdef_blocks.append(lines_list[line_idx])
-                ifdef_blocks.append("")
-            elif in_ifdef:
-                ifdef_blocks.append(lines_list[line_idx])
-            else:
-                valid_preproc = \
-                    lines_list[line_idx].strip() == "" or \
-                    "#include" in lines_list[line_idx] or in_ifdef
+        if suboutput:
+            output_list.extend(suboutput)
 
-                if found_includes and not valid_preproc:
-                    include_stop = line_idx
-                    break
+        # Write rest of file
+        output_list.append("")
+        output_list.extend(lines_list[i:])
 
-                if "#include" in lines_list[line_idx]:
-                    if not found_includes:
-                        found_includes = True
-
-                        # Write from beginning of file to includes
-                        output_list = lines_list[0:line_idx]
-
-                    # Insert header into apprioriate list
-                    include_line = \
-                        self.header_regex.search(lines_list[line_idx])
-
-                    idx = self.classify_header(include_line, file_name)
-                    if idx != -1:
-                        includes[idx].add(self.add_brackets(include_line, idx))
-                    else:
-                        return (lines, False, False)
-
-        # If no includes were found, write whole file as-is
-        if not found_includes:
-            output_list = lines_list
-        else:
-            # Write out includes
-            for subset in includes:
-                if len(subset):
-                    sublist = sorted(list(subset))
-                    output_list.extend(sublist)
-                    output_list.append("")  # Delimits groups of includes
-
-            # ifdef blocks go after all other includes
-            if ifdef_blocks:
-                output_list.append(linesep.join(ifdef_blocks))
-
-            output_list.extend(lines_list[include_stop:])
-
-        output = linesep.join(output_list).rstrip() + linesep
+        output = self.linesep.join(output_list).rstrip() + self.linesep
         if output != lines:
             return (output, True, True)
         else:
