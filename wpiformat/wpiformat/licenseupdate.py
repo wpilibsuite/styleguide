@@ -12,6 +12,9 @@ class LicenseUpdate(task.Task):
     def __init__(self, current_year):
         task.Task.__init__(self)
 
+        self.licenseupdate_exclude_regex = re.compile(
+            task.group_to_regex("licenseUpdateExclude"))
+
         self.current_year = current_year
 
     def should_process_file(self, name):
@@ -20,7 +23,7 @@ class LicenseUpdate(task.Task):
             task.get_config("cppSrcExtensions") + \
             task.get_config("otherExtensions")
 
-        return not task.skip_licenseupdate(name) and \
+        return not self.licenseupdate_exclude_regex.search(name) and \
             any(name.endswith("." + ext) for ext in extensions)
 
     def run(self, name, lines):
