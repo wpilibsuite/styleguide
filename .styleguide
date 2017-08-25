@@ -15,15 +15,9 @@ otherExtensions {
   java
 }
 
-genFolderExclude {
-}
-
 # Extra "/" used by unit tests
 genFileExclude {
   /cpplint\.py$
-}
-
-modifiableFolderExclude {
 }
 
 modifiableFileExclude {

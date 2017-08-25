@@ -34,12 +34,6 @@ def read_file(file_name):
     return None
 
 
-regex_sep = os.sep
-# If directory separator is backslash, escape it for regexes
-if regex_sep == "\\":
-    regex_sep += "\\"
-
-
 def parse_config_file(file_name):
     """Parse values from config file.
 
@@ -78,9 +72,14 @@ def parse_config_file(file_name):
         elif in_group:
             value = line.strip()
 
-            # On Windows, replace "/" with escaped "\" for regexes
-            if os.sep == "\\":
-                value = value.replace("/", regex_sep)
+            # header includes still use forward slash on Windows
+            nonescaped_groups = [
+                "includeRelated", "includeCSys", "includeCppSys",
+                "includeOtherLibs", "includeProject"
+            ]
+            if group_name not in nonescaped_groups and os.sep == "\\":
+                # On Windows, replace "/" with escaped "\" for regexes
+                value = value.replace("/", os.sep + os.sep)
 
             group_elements.extend([value])
     return config_groups
@@ -121,62 +120,26 @@ def group_to_regex(*args):
         return "a^"
     else:
         regex_str = "|".join(group_contents)
-        if os.sep == "\\":
-            # On Windows, fix forward slash for include regexes
-            return regex_str.replace("\\\\", "/")
-        else:
-            return regex_str
+    return regex_str
 
-
-# List of regexes for folders which contain generated files
-gen_folder_exclude = \
-    [name + regex_sep for name in get_config("genFolderExclude")]
-
-# List of regexes for generated files
-gen_file_exclude = get_config("genFileExclude")
 
 # Regex for generated file exclusions
-gen_exclude = gen_folder_exclude + gen_file_exclude
-if len(gen_exclude) == 0:
-    # If there are no file exclusions, make regex match nothing
-    gen_regex_exclude = re.compile("a^")
-else:
-    gen_regex_exclude = re.compile("|".join(gen_exclude))
-
-# Regex for folders which contain modifiable files
-modifiable_folder_exclude = \
-    [name + regex_sep for name in get_config("modifiableFolderExclude")]
-
-# List of regexes for modifiable files
-modifiable_file_exclude = get_config("modifiableFileExclude")
+gen_exclude_regex = re.compile(group_to_regex("genFileExclude"))
 
 # Regex for modifiable file exclusions
-modifiable_exclude = modifiable_folder_exclude + modifiable_file_exclude
-if len(modifiable_exclude) == 0:
-    # If there are no file exclusions, make regex match nothing
-    modifiable_regex_exclude = re.compile("a^")
-else:
-    modifiable_regex_exclude = re.compile("|".join(modifiable_exclude))
-
-licenseupdate_regex_exclude = re.compile(group_to_regex("licenseUpdateExclude"))
+modifiable_exclude_regex = re.compile(group_to_regex("modifiableFileExclude"))
 
 
 def is_modifiable_file(name):
     """Returns True if file is modifiable but should not have tasks run on it.
     """
-    return modifiable_regex_exclude.search(name)
+    return modifiable_exclude_regex.search(name)
 
 
 def is_generated_file(name):
     """Returns True if file isn't generated (generated files are skipped).
     """
-    return gen_regex_exclude.search(name)
-
-
-def skip_licenseupdate(name):
-    """Returns True if file should be skipped in license update.
-    """
-    return licenseupdate_regex_exclude.search(name)
+    return gen_exclude_regex.search(name)
 
 
 def filter_ignored_files(names):

@@ -15,22 +15,16 @@ otherExtensions {
   java
 }
 
-genFolderExclude {
-  folder1
-  folder2/subdir1/subdir2
-}
-
 genFileExclude {
+  folder1/
+  folder2/subdir1/subdir2/
   header1\.h$
   header2\.h$
 }
 
-modifiableFolderExclude {
-  __pycache__
-  folder/subdir
-}
-
 modifiableFileExclude {
+  __pycache__/
+  folder/subdir/
   \.jar$
   \.patch$
 }
