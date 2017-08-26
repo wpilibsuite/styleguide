@@ -47,6 +47,8 @@ The groups ``includeRelated``, ``includeCSys``, ``includeCppSys``, ``includeOthe
 
 The regex for C system headers produces false positives on headers from "other libraries". Regexes for them should be added to ``includeOtherLibs``. Libraries with many headers generally group them within a folder, so a regex for just the folder will suffice.
 
+``NOLINT`` can be appended in a comment to a header include to prevent wpiformat's header include sorter from modifying it and to maintain its relative ordering with other header includes. This will, in effect, treat it as a barrier across which no header includes will be moved. Header includes on each side of the barrier will still be sorted as normal.
+
 .styleguide-license
 -------------------
 

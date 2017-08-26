@@ -48,17 +48,22 @@ def test_includeorder():
         "#include <iostream>" + os.linesep + \
         "#include <memory>" + os.linesep, True, True))
 
-    # Ensure NOLINT headers are considered related headers
+    # Ensure NOLINT headers take precedence over overrides and have newline
+    # inserted
     inputs.append(("./Test.h",
-        "#include <cstdio>" + os.linesep + \
-        "#include \"ImportantHeader.h\"  // NOLINT" + os.linesep))
+        "#include \"ctre/PDP.h\"  // NOLINT" + os.linesep + \
+        "#include <atomic>" + os.linesep + \
+        "#include <condition_variable>" + os.linesep + \
+        "#include <thread>" + os.linesep))
     outputs.append((
-        "#include \"ImportantHeader.h\"  // NOLINT" + os.linesep + \
+        "#include \"ctre/PDP.h\"  // NOLINT" + os.linesep + \
         os.linesep + \
-        "#include <cstdio>" + os.linesep, True, True))
+        "#include <atomic>" + os.linesep + \
+        "#include <condition_variable>" + os.linesep + \
+        "#include <thread>" + os.linesep, True, True))
 
     # Check sorting for at least one header from each group except related
-    # headeer. Test.inc isn't considered related in headers.
+    # header. Test.inc isn't considered related in headers.
     inputs.append(("./Test.h",
         "#include \"MyHeader.h\"" + os.linesep + \
         "#include <stdio.h>" + os.linesep + \

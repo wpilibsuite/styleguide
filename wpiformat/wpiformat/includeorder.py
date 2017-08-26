@@ -101,9 +101,7 @@ class IncludeOrder(task.Task):
         include_is_related = include_base == file_base and \
             file_ext[1:] in task.get_config("cppSrcExtensions")
 
-        # NOLINT lines are placed in the first group since maintaining the
-        # header's relative ordering beyond that is not feasible.
-        if include_is_related or "NOLINT" in include_line.group("postfix"):
+        if include_is_related:
             return 0
         elif include_line.group("name") in self.c_std:
             return 1
@@ -234,6 +232,23 @@ class IncludeOrder(task.Task):
                             output_list.append(ifdef)
                         break
             elif "#include" in lines_list[i]:
+                if "NOLINT" in lines_list[i]:
+                    # NOLINT is a barrier, so flush includes
+                    written = self.write_headers(includes)
+                    if written:
+                        output_list.append(self.linesep.join(written))
+                        includes = [set(), set(), set(), set(), set()]
+
+                    # NOLINT line will have newlines above and below, unless it
+                    # is the first line being processed.
+                    if output_list and output_list[-1] != "":
+                        output_list.append("")
+                    output_list.append(lines_list[i])
+                    output_list.append("")
+
+                    i += 1
+                    continue
+
                 # Insert header into appropriate list
                 include_line = self.header_regex.search(lines_list[i])
 
