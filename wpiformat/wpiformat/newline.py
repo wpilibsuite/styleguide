@@ -1,12 +1,12 @@
 """This task ensures that the file has exactly one EOF newline."""
 
-from . import task
+from wpiformat.task import Task
 
 
-class Newline(task.Task):
+class Newline(Task):
 
-    def run(self, name, lines):
-        linesep = task.get_linesep(lines)
+    def run(self, config_file, name, lines):
+        linesep = Task.get_linesep(lines)
 
         newlines = 0
         pos = len(lines) - 1

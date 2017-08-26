@@ -8,10 +8,10 @@ from . import task
 
 class PyFormat(task.Task):
 
-    def should_process_file(self, name):
+    def should_process_file(self, config_file, name):
         return name.endswith(".py")
 
-    def run_all(self, names):
+    def run_all(self, config_file, names):
         try:
             args = ["python3", "-m", "yapf", "--style", "google", "-i"]
             returncode = subprocess.call(args + names)

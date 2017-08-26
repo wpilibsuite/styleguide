@@ -1,5 +1,6 @@
 import os
 
+from wpiformat.config import Config
 from wpiformat.stdlib import Stdlib
 
 
@@ -48,8 +49,10 @@ def test_stdlib():
 
     assert len(inputs) == len(outputs)
 
+    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
     for i in range(len(inputs)):
-        output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+        output, file_changed, success = task.run(config_file, inputs[i][0],
+                                                 inputs[i][1])
         assert output == outputs[i][0]
         assert file_changed == outputs[i][1]
         assert success == outputs[i][2]

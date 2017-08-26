@@ -63,13 +63,13 @@ class Header(object):
 
 class Stdlib(task.Task):
 
-    def should_process_file(self, name):
-        extensions = task.get_config("cppHeaderExtensions") + \
-            task.get_config("cppSrcExtensions")
+    def should_process_file(self, config_file, name):
+        extensions = config_file.group("cppHeaderExtensions") + \
+            config_file.group("cppSrcExtensions")
 
         return any(name.endswith("." + ext) for ext in extensions)
 
-    def run(self, name, lines):
+    def run(self, config_file, name, lines):
         headers = []
 
         # assert is a macro, so it's ommitted to avoid prefixing with std::
