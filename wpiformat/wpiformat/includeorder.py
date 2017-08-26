@@ -3,13 +3,13 @@
 import os
 import re
 
-from . import task
+from wpiformat.task import Task
 
 
-class IncludeOrder(task.Task):
+class IncludeOrder(Task):
 
     def __init__(self):
-        task.Task.__init__(self)
+        Task.__init__(self)
 
         # There are 5 header groups:
         # 0. Related headers
@@ -66,27 +66,16 @@ class IncludeOrder(task.Task):
                                        "(?P<close_bracket>>|\"))"
                                        "(?P<postfix>.*)")
 
-        self.override_regexes = []
-
-        # Compile include sorting override regexes
-        for group in [
-                "includeRelated", "includeCSys", "includeCppSys",
-                "includeOtherLibs", "includeProject"
-        ]:
-            regex_str = task.group_to_regex(group)
-            self.override_regexes.append(re.compile(regex_str))
-
         self.ifdef_level = 0
 
-    def should_process_file(self, name):
-        extensions = task.get_config("cppHeaderExtensions") + \
-            task.get_config("cppSrcExtensions")
+    def should_process_file(self, config_file, name):
+        extensions = config_file.group("cppHeaderExtensions") + \
+            config_file.group("cppSrcExtensions")
 
         return any(name.endswith("." + ext) for ext in extensions)
 
-    def classify_header(self, include_line, file_name):
-        """Classify the given header name and return the corresponding index.
-        """
+    def classify_header(self, config_file, include_line, file_name):
+        """Classify the given header name and return the corresponding index."""
         # Process override regexes
         for idx in range(5):
             if self.override_regexes[idx].search(include_line.group("name")):
@@ -99,7 +88,7 @@ class IncludeOrder(task.Task):
         # Is related if include has same base name as file name and file has a
         # source extension
         include_is_related = include_base == file_base and \
-            file_ext[1:] in task.get_config("cppSrcExtensions")
+            file_ext[1:] in config_file.group("cppSrcExtensions")
 
         if include_is_related:
             return 0
@@ -111,16 +100,15 @@ class IncludeOrder(task.Task):
             return 2
         elif include_line.group("open_bracket") == "<":
             return 3
-        elif self.include_is_header(file_name, include_name):
+        elif self.include_is_header(config_file, file_name, include_name):
             return 4
         else:
             return -1
 
-    def include_is_header(self, file_name, include_name):
-        """Return True if include name has header extension.
-        """
+    def include_is_header(self, config_file, file_name, include_name):
+        """Return True if include name has header extension."""
         base, ext = os.path.splitext(include_name)
-        if ext[1:] not in task.get_config("cppHeaderExtensions"):
+        if ext[1:] not in config_file.group("cppHeaderExtensions"):
             print("Error: " + file_name + ": include '" + include_name + \
                 "' has extension not in header list")
             return False
@@ -160,7 +148,7 @@ class IncludeOrder(task.Task):
             del output_list[-1]  # Remove last newline
         return output_list
 
-    def header_sort(self, lines_list, file_name, start, end):
+    def header_sort(self, config_file, lines_list, file_name, start, end):
         """Recursively parses within #ifdef blocks for header includes and sorts
         them.
 
@@ -193,7 +181,7 @@ class IncludeOrder(task.Task):
                         ifdef = lines_list[i] + self.linesep
 
                         suboutput, flags, idx, valid_headers = self.header_sort(
-                            lines_list, file_name, i + 1, j)
+                            config_file, lines_list, file_name, i + 1, j)
                         i = j
                         self.ifdef_level -= 1
 
@@ -252,7 +240,7 @@ class IncludeOrder(task.Task):
                 # Insert header into appropriate list
                 include_line = self.header_regex.search(lines_list[i])
 
-                idx = self.classify_header(include_line, file_name)
+                idx = self.classify_header(config_file, include_line, file_name)
                 if idx != -1:
                     includes[idx].add(self.add_brackets(include_line, idx))
                     include_flags[idx] = 1
@@ -289,8 +277,18 @@ class IncludeOrder(task.Task):
 
         return (output_list, include_flags, i, True)
 
-    def run(self, name, lines):
-        self.linesep = task.get_linesep(lines)
+    def run(self, config_file, name, lines):
+        self.override_regexes = []
+
+        # Compile include sorting override regexes
+        for group in [
+                "includeRelated", "includeCSys", "includeCppSys",
+                "includeOtherLibs", "includeProject"
+        ]:
+            regex_str = config_file.regex(group)
+            self.override_regexes.append(re.compile(regex_str))
+
+        self.linesep = Task.get_linesep(lines)
         self.ifdef_level = 0
 
         file_name = os.path.basename(name)
@@ -305,7 +303,7 @@ class IncludeOrder(task.Task):
         output_list = lines_list[0:i]
 
         suboutput, flags, idx, valid_headers = self.header_sort(
-            lines_list, file_name, i, len(lines_list))
+            config_file, lines_list, file_name, i, len(lines_list))
         i = idx
 
         # If header failed to classify, return failure

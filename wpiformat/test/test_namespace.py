@@ -2,6 +2,7 @@ import io
 import os
 import sys
 
+from wpiformat.config import Config
 from wpiformat.namespace import Namespace
 
 
@@ -43,12 +44,13 @@ def test_namespace():
 
     assert len(inputs) == len(outputs)
 
+    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
     saved_stdout = sys.stdout
     for i in range(len(inputs)):
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
-        unused_output, file_changed, success = \
-            task.run(inputs[i][0], inputs[i][1])
+        unused_output, file_changed, success = task.run(
+            config_file, inputs[i][0], inputs[i][1])
         sys.stdout = saved_stdout
         new_stdout.seek(0)
         output = new_stdout.read()

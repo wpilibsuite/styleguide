@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 from wpiformat.clangformat import ClangFormat
+from wpiformat.config import Config
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
@@ -31,11 +32,30 @@ def in_git_repo(directory):
 def get_repo_root():
     """Get the Git repository root as an absolute path.
     """
-    current_dir = os.getcwd()
+    current_dir = os.path.abspath(os.getcwd())
     while current_dir != os.path.dirname(current_dir):
-        if (os.path.exists(os.path.join(current_dir, ".git"))):
+        if os.path.exists(current_dir + os.sep + ".git"):
             return current_dir
         current_dir = os.path.dirname(current_dir)
+
+
+def filter_ignored_files(names):
+    """Returns list of files not in .gitignore.
+    """
+    cmd = ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+
+    # "git check-ignore" misbehaves when the names are separated by "\r\n" on
+    # Windows, so os.linesep isn't used here.
+    output = proc.communicate("\n".join(names).encode())[0]
+
+    # "git check-ignore" prefixes the names of non-ignored files with "::",
+    # wraps names in quotes on Windows, and outputs "\n" line separators on all
+    # platforms.
+    return [
+        name[2:].lstrip().strip("\"").replace("\\\\", "\\")
+        for name in output.decode().split("\n") if name[0:2] == "::"
+    ]
 
 
 def proc_init(lock):
@@ -43,7 +63,19 @@ def proc_init(lock):
     print_lock = lock
 
 
-def proc_func(verbose1, verbose2, year, clang_version, repo_root, name):
+def proc_func(verbose1, verbose2, year, clang_version, changed_file_list,
+              repo_root, name):
+    config_file = Config(os.path.dirname(name), ".styleguide")
+
+    if config_file.is_modifiable_file(name) or ".git" + os.sep in name:
+        return True
+
+    if config_file.is_generated_file(name):
+        # Emit warning if a generated file was editted
+        if name in changed_file_list:
+            print("Warning: generated file '" + name + "' modified")
+        return True
+
     # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
@@ -68,21 +100,21 @@ def proc_func(verbose1, verbose2, year, clang_version, repo_root, name):
         with print_lock:
             print("Processing", name)
             if verbose2:
-                for task in task_pipeline:
-                    if task.should_process_file(name):
-                        print("  with " + type(task).__name__)
-                for task in final_tasks:
-                    if task.should_process_file(name):
-                        print("  with " + type(task).__name__)
+                for subtask in task_pipeline:
+                    if subtask.should_process_file(config_file, name):
+                        print("  with " + type(subtask).__name__)
+                for subtask in final_tasks:
+                    if subtask.should_process_file(config_file, name):
+                        print("  with " + type(subtask).__name__)
 
     lines = ""
     with open(name, "r") as file:
         lines = file.read()
     file_changed = False
 
-    for task in task_pipeline:
-        if task.should_process_file(name):
-            lines, changed, success = task.run(name, lines)
+    for subtask in task_pipeline:
+        if subtask.should_process_file(config_file, name):
+            lines, changed, success = subtask.run(config_file, name, lines)
             file_changed |= changed
             all_success &= success
 
@@ -93,9 +125,9 @@ def proc_func(verbose1, verbose2, year, clang_version, repo_root, name):
         # After file is written, reset file_changed flag
         file_changed = False
 
-    for task in final_tasks:
-        if task.should_process_file(name):
-            all_success &= task.run_all([name])
+    for subtask in final_tasks:
+        if subtask.should_process_file(config_file, name):
+            all_success &= subtask.run_all(config_file, [name])
 
     return all_success
 
@@ -145,15 +177,18 @@ def main():
         print("Error: no files found to format", file=sys.stderr)
         sys.exit(1)
 
-    # Don't check for changes in or run tasks on modifiable files or Git
-    # metadata
-    files = [
-        name for name in files
-        if not task.is_modifiable_file(name) and ".git" + os.sep not in name
-    ]
+    # Convert relative paths of files to absolute paths
+    files = [os.path.abspath(name) for name in files]
+
+    # Don't run tasks on Git metadata
+    files = [name for name in files if ".git" + os.sep not in name]
 
     # Don't check for changes in or run tasks on ignored files
-    files = task.filter_ignored_files(files)
+    files = filter_ignored_files(files)
+
+    # If there are no files left, do nothing
+    if len(files) == 0:
+        sys.exit(0)
 
     # Create list of all changed files
     changed_file_list = []
@@ -162,18 +197,6 @@ def main():
     for line in proc.stdout:
         changed_file_list.append(config_path + os.sep +
                                  line.strip().decode("ascii"))
-
-    # Emit warning if a generated file was editted
-    for name in files:
-        if task.is_generated_file(name) and name in changed_file_list:
-            print("Warning: generated file '" + name + "' modified")
-
-    # Don't format generated files
-    files = [name for name in files if not task.is_generated_file(name)]
-
-    # If there are no files left, do nothing
-    if len(files) == 0:
-        sys.exit(0)
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
@@ -220,7 +243,8 @@ def main():
     with mp.Pool(
             args.jobs, initializer=proc_init, initargs=(print_lock,)) as pool:
         func = partial(proc_func, args.verbose1, args.verbose2,
-                       str(args.year), args.clang_version, get_repo_root())
+                       str(args.year), args.clang_version, changed_file_list,
+                       get_repo_root())
         results = pool.map(func, files)
 
         for result in results:

@@ -1,6 +1,7 @@
 from datetime import date
 import os
 
+from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
 
 
@@ -122,15 +123,17 @@ def test_licenseupdate():
 
     assert len(inputs) == len(outputs)
 
+    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
     for i in range(len(inputs)):
         # Ensure files excluded from license update won't be processed
         if inputs[i][0] == "./Excluded.h":
-            assert not task.should_process_file(inputs[i][0])
+            assert not task.should_process_file(config_file, inputs[i][0])
         else:
-            assert task.should_process_file(inputs[i][0])
+            assert task.should_process_file(config_file, inputs[i][0])
 
-        if task.should_process_file(inputs[i][0]):
-            output, file_changed, success = task.run(inputs[i][0], inputs[i][1])
+        if task.should_process_file(config_file, inputs[i][0]):
+            output, file_changed, success = task.run(config_file, inputs[i][0],
+                                                     inputs[i][1])
             assert output == outputs[i][0]
             assert file_changed == outputs[i][1]
             assert success == outputs[i][2]

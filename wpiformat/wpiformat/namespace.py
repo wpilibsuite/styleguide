@@ -2,18 +2,18 @@
 
 import re
 
-from . import task
+from wpiformat.task import Task
 
 
-class Namespace(task.Task):
+class Namespace(Task):
 
-    def should_process_file(self, name):
-        extensions = task.get_config("cppHeaderExtensions")
+    def should_process_file(self, config_file, name):
+        extensions = config_file.group("cppHeaderExtensions")
 
         return any(name.endswith("." + ext) for ext in extensions)
 
-    def run(self, name, lines):
-        linesep = task.get_linesep(lines)
+    def run(self, config_file, name, lines):
+        linesep = Task.get_linesep(lines)
         format_succeeded = True
 
         # Tokenize file as brace opens, brace closes, and "using" declarations.

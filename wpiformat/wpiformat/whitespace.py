@@ -2,13 +2,13 @@
 
 import os
 
-from . import task
+from wpiformat.task import Task
 
 
-class Whitespace(task.Task):
+class Whitespace(Task):
 
-    def run(self, name, lines):
-        linesep = task.get_linesep(lines)
+    def run(self, config_file, name, lines):
+        linesep = Task.get_linesep(lines)
 
         file_changed = False
         output = ""

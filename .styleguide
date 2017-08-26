@@ -28,21 +28,6 @@ licenseUpdateExclude {
   Excluded\.h$
 }
 
-includeGuardRoots {
-}
-
-includeRelated {
-}
-
-includeCSys {
-}
-
-includeCppSys {
-}
-
-includeOtherLibs {
-}
-
 # Used by unit tests
 includeProject {
   ^ctre/

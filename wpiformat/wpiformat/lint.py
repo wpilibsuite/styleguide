@@ -22,13 +22,13 @@ class Lint(task.Task):
 
         self.repo_root = repo_root
 
-    def should_process_file(self, name):
-        extensions = task.get_config("cppHeaderExtensions") + \
-            task.get_config("cppSrcExtensions")
+    def should_process_file(self, config_file, name):
+        extensions = config_file.group("cppHeaderExtensions") + \
+            config_file.group("cppSrcExtensions")
 
         return any(name.endswith("." + ext) for ext in extensions)
 
-    def run_all(self, names):
+    def run_all(self, config_file, names):
         # Handle running in either the root or styleguide directories
         cpplintPrefix = ""
         if os.getcwd().rpartition(os.sep)[2] != "styleguide":
@@ -38,13 +38,14 @@ class Lint(task.Task):
         saved_argv = sys.argv
         sys.argv = ["cpplint.py",
                     "--extensions=" + \
-                        ",".join(task.get_config("cppHeaderExtensions") + \
-                                 task.get_config("cppSrcExtensions")),
+                        ",".join(config_file.group("cppHeaderExtensions") + \
+                                 config_file.group("cppSrcExtensions")),
                     "--headers=" + \
-                        ",".join(task.get_config("cppHeaderExtensions")),
+                        ",".join(config_file.group("cppHeaderExtensions")),
                     "--repository=" + self.repo_root,
                     "--includeroots=" + \
-                        ",".join(task.get_config("includeGuardRoots"))] + names
+                        ",".join(config_file.group("includeGuardRoots"))] + \
+                   names
 
         # Run cpplint.py
         try:

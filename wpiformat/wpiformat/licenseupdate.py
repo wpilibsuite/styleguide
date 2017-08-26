@@ -4,36 +4,32 @@ import os
 import re
 import sys
 
-from . import task
+from wpiformat.config import Config
+from wpiformat.task import Task
 
 
-class LicenseUpdate(task.Task):
+class LicenseUpdate(Task):
 
     def __init__(self, current_year):
-        task.Task.__init__(self)
+        Task.__init__(self)
 
-        self.licenseupdate_exclude_regex = re.compile(
-            task.group_to_regex("licenseUpdateExclude"))
+        self.__current_year = current_year
 
-        self.current_year = current_year
+    def should_process_file(self, config_file, name):
+        extensions = config_file.group("cExtensions") + \
+            config_file.group("cppHeaderExtensions") + \
+            config_file.group("cppSrcExtensions") + \
+            config_file.group("otherExtensions")
+        license_regex = config_file.regex("licenseUpdateExclude")
 
-    def should_process_file(self, name):
-        extensions = task.get_config("cExtensions") + \
-            task.get_config("cppHeaderExtensions") + \
-            task.get_config("cppSrcExtensions") + \
-            task.get_config("otherExtensions")
-
-        return not self.licenseupdate_exclude_regex.search(name) and \
+        return not license_regex.search(name) and \
             any(name.endswith("." + ext) for ext in extensions)
 
-    def run(self, name, lines):
-        linesep = task.get_linesep(lines)
+    def run(self, config_file, name, lines):
+        linesep = Task.get_linesep(lines)
 
-        license_template = task.read_file(".styleguide-license")
-        if not license_template:
-            print("Error: license template file '.styleguide-license' not " \
-                  "found")
-            sys.exit(1)
+        license_template = Config.read_file(
+            os.path.dirname(os.path.abspath(name)), ".styleguide-license")
 
         # Strip newlines at top of file
         stripped_lines = lines.lstrip().split(linesep)
@@ -78,7 +74,7 @@ class LicenseUpdate(task.Task):
             file_parts = ["", linesep + lines.lstrip()]
 
         # Default year when none is found is current one
-        year = self.current_year
+        year = self.__current_year
 
         year_regex = re.compile("Copyright \(c\).*\s(20..)")
         modify_copyright = False
@@ -93,8 +89,8 @@ class LicenseUpdate(task.Task):
         output = ""
 
         # Determine copyright range and trailing padding
-        if modify_copyright and year != self.current_year:
-            year = year + "-" + self.current_year
+        if modify_copyright and year != self.__current_year:
+            year = year + "-" + self.__current_year
 
         for line in license_template:
             # Insert copyright year range
