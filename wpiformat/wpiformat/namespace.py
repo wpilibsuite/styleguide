@@ -8,9 +8,7 @@ from wpiformat.task import Task
 class Namespace(Task):
 
     def should_process_file(self, config_file, name):
-        extensions = config_file.group("cppHeaderExtensions")
-
-        return any(name.endswith("." + ext) for ext in extensions)
+        return config_file.is_cpp_header_file(name)
 
     def run(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)

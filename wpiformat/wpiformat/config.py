@@ -9,7 +9,10 @@ class Config:
 
     def __init__(self, directory, file_name):
         self.__config_dict = self.__parse_config_file(directory, file_name)
-        self.__generated_exclude_regex = self.regex("genFileExclude")
+        self.__c_header_include_regex = self.regex("cHeaderFileInclude")
+        self.__cpp_header_include_regex = self.regex("cppHeaderFileInclude")
+        self.__cpp_src_include_regex = self.regex("cppSrcFileInclude")
+        self.__generated_exclude_regex = self.regex("generatedFileExclude")
         self.__modifiable_exclude_regex = self.regex("modifiableFileExclude")
 
     @staticmethod
@@ -66,14 +69,28 @@ class Config:
         else:
             return re.compile("|".join(group_contents))
 
+    def is_c_file(self, name):
+        """Returns True if file is either C header or C source file."""
+        return self.__c_header_include_regex.search(name) or name.endswith(".c")
+
+    def is_cpp_file(self, name):
+        """Returns True if file is either C++ header or C++ source file."""
+        return self.is_cpp_header_file(name) or self.is_cpp_src_file(name)
+
+    def is_cpp_header_file(self, name):
+        """Returns True if file is C++ header file."""
+        return self.__cpp_header_include_regex.search(name)
+
+    def is_cpp_src_file(self, name):
+        """Returns True if file is C++ source file."""
+        return self.__cpp_src_include_regex.search(name)
+
     def is_generated_file(self, name):
-        """Returns True if file isn't generated (generated files are skipped).
-        """
+        """Returns True if file is generated (generated files are skipped)."""
         return self.__generated_exclude_regex.search(name)
 
     def is_modifiable_file(self, name):
-        """Returns True if file is modifiable but should not have tasks run on it.
-        """
+        """Returns True if file is modifiable but should be skipped."""
         return self.__modifiable_exclude_regex.search(name)
 
     def __parse_config_file(self, directory, file_name):

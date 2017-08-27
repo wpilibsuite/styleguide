@@ -1,21 +1,17 @@
-cExtensions {
-  c
+cHeaderFileInclude {
+  \.h$
 }
 
-cppHeaderExtensions {
-  h
-  inc
+cppHeaderFileInclude {
+  \.hpp$
+  \.inc$
 }
 
-cppSrcExtensions {
-  cpp
+cppSrcFileInclude {
+  \.cpp$
 }
 
-otherExtensions {
-  java
-}
-
-genFileExclude {
+generatedFileExclude {
   folder1/
   folder2/subdir1/subdir2/
   header1\.h$

@@ -35,7 +35,7 @@ This file contains groups of file name regular expressions. There are two groups
 - generated files
 - modifiable files
 
-Generated files should not be modified; if they are, wpiformat will emit warnings. No warnings are emitted for modifications to modifiable files. All files ignored by patterns in a repository's .gitignore file are considered modifiable files.
+Generated files should not be modified; if they are, wpiformat will emit warnings. No warnings are emitted for modifications to modifiable files. All files ignored by patterns in a repository's .gitignore file are considered modifiable files. Exclusion groups take precedence over inclusion groups.
 
 File names matching regexes in the group ``licenseUpdateExclude`` will be skipped by the license header update task.
 

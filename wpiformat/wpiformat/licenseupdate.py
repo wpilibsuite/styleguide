@@ -16,14 +16,10 @@ class LicenseUpdate(Task):
         self.__current_year = current_year
 
     def should_process_file(self, config_file, name):
-        extensions = config_file.group("cExtensions") + \
-            config_file.group("cppHeaderExtensions") + \
-            config_file.group("cppSrcExtensions") + \
-            config_file.group("otherExtensions")
         license_regex = config_file.regex("licenseUpdateExclude")
 
-        return not license_regex.search(name) and \
-            any(name.endswith("." + ext) for ext in extensions)
+        return (config_file.is_c_file(name) or config_file.is_cpp_file(name) or
+                name.endswith(".java")) and not license_regex.search(name)
 
     def run(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)

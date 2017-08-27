@@ -69,10 +69,7 @@ class IncludeOrder(Task):
         self.ifdef_level = 0
 
     def should_process_file(self, config_file, name):
-        extensions = config_file.group("cppHeaderExtensions") + \
-            config_file.group("cppSrcExtensions")
-
-        return any(name.endswith("." + ext) for ext in extensions)
+        return config_file.is_cpp_file(name)
 
     def classify_header(self, config_file, include_line, file_name):
         """Classify the given header name and return the corresponding index."""
@@ -88,7 +85,7 @@ class IncludeOrder(Task):
         # Is related if include has same base name as file name and file has a
         # source extension
         include_is_related = include_base == file_base and \
-            file_ext[1:] in config_file.group("cppSrcExtensions")
+            config_file.is_cpp_src_file(file_name)
 
         if include_is_related:
             return 0
@@ -107,8 +104,7 @@ class IncludeOrder(Task):
 
     def include_is_header(self, config_file, file_name, include_name):
         """Return True if include name has header extension."""
-        base, ext = os.path.splitext(include_name)
-        if ext[1:] not in config_file.group("cppHeaderExtensions"):
+        if not config_file.is_cpp_header_file(include_name):
             print("Error: " + file_name + ": include '" + include_name + \
                 "' has extension not in header list")
             return False
