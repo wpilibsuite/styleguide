@@ -15,6 +15,7 @@ from wpiformat.config import Config
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
+from wpiformat.jni import Jni
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
 from wpiformat.newline import Newline
@@ -341,6 +342,9 @@ def main():
         UsingNamespaceStd(),
         Whitespace()
     ]
+    run_pipeline(task_pipeline, args, files)
+
+    task_pipeline = [Jni()]
     run_pipeline(task_pipeline, args, files)
 
     # Lint is run last since previous tasks can affect its output.
