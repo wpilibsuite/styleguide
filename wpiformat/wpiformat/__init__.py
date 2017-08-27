@@ -109,7 +109,12 @@ def proc_func(verbose1, verbose2, year, clang_version, changed_file_list,
 
     lines = ""
     with open(name, "r") as file:
-        lines = file.read()
+        try:
+            lines = file.read()
+        except UnicodeDecodeError:
+            print("Error: " + name + " contains characters not in UTF-8. "
+                  "Should this be considered a generated file?")
+            return False
     file_changed = False
 
     for subtask in task_pipeline:
