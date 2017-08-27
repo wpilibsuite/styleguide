@@ -310,6 +310,19 @@ def test_includeorder():
         "#endif" + os.linesep + \
         "#endif" + os.linesep, True, True))
 
+    # Verify extra newline from #endif is removed
+    inputs.append(("./Test.h",
+        "#include \"HAL/HAL.h\"" + os.linesep + \
+        "#include \"NotifyListener.h\"" + os.linesep + \
+        os.linesep + \
+        "#ifdef __cplusplus" + os.linesep + \
+        "extern \"C\" {" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "void HALSIM_ResetSPIAccelerometerData(int32_t index);" + \
+        os.linesep))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
+
     # Large test
     inputs.append(("./UsbCameraImpl.cpp",
         "#include <algorithm>" + os.linesep + \
