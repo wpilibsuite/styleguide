@@ -313,6 +313,9 @@ class IncludeOrder(Task):
         if suboutput:
             output_list.extend(suboutput)
 
+        # Remove possible extra newline from #endif
+        output_list[-1] = output_list[-1].rstrip()
+
         # Write rest of file
         output_list.append("")
         output_list.extend(lines_list[i:])
