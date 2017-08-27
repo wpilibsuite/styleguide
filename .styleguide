@@ -1,22 +1,14 @@
-cExtensions {
-  c
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
 }
 
-cppHeaderExtensions {
-  h
-  inc
-}
-
-cppSrcExtensions {
-  cpp
-}
-
-otherExtensions {
-  java
+cppSrcFileInclude {
+  \.cpp$
 }
 
 # Extra "/" used by unit tests
-genFileExclude {
+generatedFileExclude {
   /cpplint\.py$
 }
 

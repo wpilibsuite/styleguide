@@ -17,11 +17,7 @@ class ClangFormat(task.Task):
             self.exec_name = "clang-format-" + clang_version
 
     def should_process_file(self, config_file, name):
-        extensions = config_file.group("cExtensions") + \
-            config_file.group("cppHeaderExtensions") + \
-            config_file.group("cppSrcExtensions")
-
-        return any(name.endswith("." + ext) for ext in extensions)
+        return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def run_all(self, config_file, names):
         args = ["-style=file", "-i"] + names

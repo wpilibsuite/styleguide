@@ -64,10 +64,7 @@ class Header(object):
 class Stdlib(task.Task):
 
     def should_process_file(self, config_file, name):
-        extensions = config_file.group("cppHeaderExtensions") + \
-            config_file.group("cppSrcExtensions")
-
-        return any(name.endswith("." + ext) for ext in extensions)
+        return config_file.is_cpp_file(name)
 
     def run(self, config_file, name, lines):
         headers = []
