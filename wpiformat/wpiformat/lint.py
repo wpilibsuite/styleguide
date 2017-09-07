@@ -33,12 +33,22 @@ class Lint(task.Task):
 
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
+
+        # Prepare source file and header file regex strings
+        srcs = config_file.group("cppSrcFileInclude")
+        if srcs:
+            srcs = "|".join(srcs)
+        else:
+            srcs = "a^"
+        headers = config_file.group("cppHeaderFileInclude")
+        if headers:
+            headers = "|".join(headers)
+        else:
+            headers = "a^"
+
         sys.argv = ["cpplint.py",
-                    "--extensions=" + \
-                        ",".join(config_file.group("cppHeaderExtensions") + \
-                                 config_file.group("cppSrcExtensions")),
-                    "--headers=" + \
-                        ",".join(config_file.group("cppHeaderExtensions")),
+                    "--srcs=" + srcs,
+                    "--headers=" + headers,
                     "--repository=" + self.repo_root,
                     "--includeroots=" + \
                         ",".join(config_file.group("includeGuardRoots"))] + \
