@@ -54,32 +54,27 @@ import string
 import sys
 
 # if empty, use defaults
-_header_extensions = set([])
+_header_regex = re.compile("a^")
 
 # if empty, use defaults
-_valid_extensions = set([])
+_source_regex = re.compile("a^")
 
 
-# Files with any of these extensions are considered to be
-# header files (and will undergo different style checks).
+# Files which match the regex are considered to be header
+# files (and will undergo different style checks).
 # This set can be extended by using the --headers
 # option
-def GetHeaderExtensions():
-  return _header_extensions
+def IsHeaderFile(filename):
+  return _header_regex.search(filename)
 
-# The allowed extensions for file names
-# This is set by --extensions flag
-def GetAllExtensions():
-  return _valid_extensions
-
-def GetNonHeaderExtensions():
-  return GetAllExtensions().difference(GetHeaderExtensions())
+def IsSourceFile(filename):
+  return _source_regex.search(filename)
 
 
 _USAGE = """
 Syntax: cpplint.py [--repository=path]
-                   [--headers=ext1,ext2]
-                   [--extensions=hpp,cpp,...]
+                   [--headers=header_regex]
+                   [--srcs=src_regex]
         <file> [file] ...
 
   The style guidelines this tries to follow are those in
@@ -94,9 +89,6 @@ Syntax: cpplint.py [--repository=path]
   suppresses errors of all categories on that line.
 
   The files passed in will be linted; at least one file must be provided.
-  Default linted extensions are %s.
-  Other file types will be ignored.
-  Change the extensions with the --extensions flag.
 
   Flags:
 
@@ -124,23 +116,18 @@ Syntax: cpplint.py [--repository=path]
         Alice => SRC_CHROME_BROWSER_UI_BROWSER_H_
         Bob   => SRC_CHROME_BROWSER_UI_BROWSER_H_
 
-    extensions=extension,extension,...
-      The allowed file extensions that cpplint will check
+    srcs=src_regex
+      The regex for source files that cpplint will check
 
       Examples:
-        --extensions=%s
+        --srcs=\.c$|\.cpp$
 
-    headers=extension,extension,...
-      The allowed header extensions that cpplint will consider to be header files
-      (by default, only files with extensions %s
-      will be assumed to be headers)
+    headers=header_regex
+      The regex for header files that cpplint will use
 
       Examples:
-        --headers=%s
-""" % (list(GetAllExtensions()),
-       ','.join(list(GetAllExtensions())),
-       GetHeaderExtensions(),
-       ','.join(GetHeaderExtensions()))
+        --headers=\.h$|\.hpp$|\.inc$
+"""
 
 # We categorize each error message we print.  Here are the categories.
 # We want an explicit list so we can list them all in cpplint --filter=.
@@ -391,11 +378,6 @@ def Search(pattern, s):
   if pattern not in _regexp_compile_cache:
     _regexp_compile_cache[pattern] = sre_compile.compile(pattern)
   return _regexp_compile_cache[pattern].search(s)
-
-
-def _IsSourceExtension(s):
-  """File extension (excluding dot) matches a source file extension."""
-  return s in GetNonHeaderExtensions()
 
 
 class _IncludeState(object):
@@ -2808,7 +2790,7 @@ def CheckAltTokens(filename, clean_lines, linenum, error):
               _ALT_TOKEN_REPLACEMENT[match.group(1)], match.group(1)))
 
 
-def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
+def CheckStyle(filename, clean_lines, linenum, is_header, nesting_state,
                error):
   """Checks rules from the 'C++ style rules' section of cppguide.html.
 
@@ -2820,7 +2802,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
     filename: The name of the current file.
     clean_lines: A CleansedLines instance containing the file.
     linenum: The number of the line to check.
-    file_extension: The extension (without the dot) of the filename.
+    is_header: Whether file is header.
     nesting_state: A NestingState instance which maintains information about
                    the current stack of nested blocks being parsed.
     error: The function to call with any errors found.
@@ -2850,7 +2832,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
 
   # Check if the line is a header guard.
   is_header_guard = False
-  if file_extension in GetHeaderExtensions():
+  if is_header:
     cppvar = GetHeaderGuardCPPVariable(filename)
     if (line.startswith('#ifndef %s' % cppvar) or
         line.startswith('#define %s' % cppvar) or
@@ -2992,7 +2974,7 @@ _RE_PATTERN_REF_STREAM_PARAM = (
     r'(?:.*stream\s*&\s*' + _RE_PATTERN_IDENT + r')')
 
 
-def CheckLanguage(filename, clean_lines, linenum, file_extension,
+def CheckLanguage(filename, clean_lines, linenum, is_header,
                   include_state, nesting_state, error):
   """Checks rules from the 'C++ language rules' section of cppguide.html.
 
@@ -3003,7 +2985,7 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
     filename: The name of the current file.
     clean_lines: A CleansedLines instance containing the file.
     linenum: The number of the line to check.
-    file_extension: The extension (without the dot) of the filename.
+    is_header: Whether file is header.
     include_state: An _IncludeState instance in which the headers are inserted.
     nesting_state: A NestingState instance which maintains information about
                    the current stack of nested blocks being parsed.
@@ -3032,7 +3014,7 @@ def CheckLanguage(filename, clean_lines, linenum, file_extension,
   CheckGlobalStatic(filename, clean_lines, linenum, error)
   CheckPrintf(filename, clean_lines, linenum, error)
 
-  if file_extension in GetHeaderExtensions():
+  if is_header:
     # TODO(unknown): check that 1-arg constructors are explicit.
     #                How to tell it's a constructor?
     #                (handled in CheckForNonStandardConstructs for now)
@@ -3484,11 +3466,11 @@ def FilesBelongToSameModule(filename_cc, filename_h):
     string: the additional prefix needed to open the header file.
   """
   fileinfo_cc = FileInfo(filename_cc)
-  if not fileinfo_cc.Extension().lstrip('.') in GetNonHeaderExtensions():
+  if not IsSourceFile(filename_cc):
     return (False, '')
 
   fileinfo_h = FileInfo(filename_h)
-  if not fileinfo_h.Extension().lstrip('.') in GetHeaderExtensions():
+  if not IsHeaderFile(filename_h):
     return (False, '')
 
   filename_cc = filename_cc[:-(len(fileinfo_cc.Extension()))]
@@ -3615,9 +3597,8 @@ def CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error,
   # TODO(unknown): Do a better job of finding .h files so we are confident that
   # not having the .h file means there isn't one.
   if not header_found:
-    for extension in GetNonHeaderExtensions():
-      if filename.endswith('.' + extension):
-        return
+    if IsSourceFile(filename):
+      return
 
   # All the lines have been processed, report the errors found.
   for required_header_unstripped in sorted(required, key=required.__getitem__):
@@ -3766,13 +3747,13 @@ def IsBlockInNameSpace(nesting_state, is_forward_declaration):
           isinstance(nesting_state.stack[-2], _NamespaceInfo))
 
 
-def ProcessLine(filename, file_extension, clean_lines, line,
+def ProcessLine(filename, is_header, clean_lines, line,
                 include_state, function_state, nesting_state, error):
   """Processes a single line in the file.
 
   Args:
     filename: Filename of the file that is being processed.
-    file_extension: The extension (dot not included) of the file.
+    is_header: Whether file is header.
     clean_lines: An array of strings, each representing a line of the file,
                  with comments stripped.
     line: Number of line being processed.
@@ -3789,8 +3770,8 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   if nesting_state.InAsmBlock(): return
   CheckForFunctionLengths(filename, clean_lines, line, function_state, error)
   CheckForMultilineCommentsAndStrings(filename, clean_lines, line, error)
-  CheckStyle(filename, clean_lines, line, file_extension, nesting_state, error)
-  CheckLanguage(filename, clean_lines, line, file_extension, include_state,
+  CheckStyle(filename, clean_lines, line, is_header, nesting_state, error)
+  CheckLanguage(filename, clean_lines, line, is_header, include_state,
                 nesting_state, error)
   CheckForNonStandardConstructs(filename, clean_lines, line,
                                 nesting_state, error)
@@ -3800,12 +3781,12 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckRedundantOverrideOrFinal(filename, clean_lines, line, error)
 
 
-def ProcessFileData(filename, file_extension, lines, error):
+def ProcessFileData(filename, is_header, lines, error):
   """Performs lint checks and reports any errors to the given error function.
 
   Args:
     filename: Filename of the file that is being processed.
-    file_extension: The extension (dot not included) of the file.
+    is_header: Whether file is header.
     lines: An array of strings, each representing a line of the file, with the
            last element being empty if the file is terminated with a newline.
     error: A callable to which errors are reported, which takes 4 arguments:
@@ -3824,11 +3805,11 @@ def ProcessFileData(filename, file_extension, lines, error):
   RemoveMultiLineComments(filename, lines, error)
   clean_lines = CleansedLines(lines)
 
-  if file_extension in GetHeaderExtensions():
+  if is_header:
     CheckForHeaderGuard(filename, clean_lines, error)
 
   for line in range(clean_lines.NumLines()):
-    ProcessLine(filename, file_extension, clean_lines, line,
+    ProcessLine(filename, is_header, clean_lines, line,
                 include_state, function_state, nesting_state, error)
 
   CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error)
@@ -3860,10 +3841,9 @@ def ProcessFile(filename):
     if lines[linenum].endswith('\r'):
       lines[linenum] = lines[linenum].rstrip('\r')
 
-  # Note, if no dot is found, this will give the entire filename as the ext.
-  file_extension = filename[filename.rfind('.') + 1:]
+  is_header = IsHeaderFile(filename)
 
-  ProcessFileData(filename, file_extension, lines, Error)
+  ProcessFileData(filename, is_header, lines, Error)
 
 
 def PrintUsage(message):
@@ -3895,7 +3875,7 @@ def ParseArguments(args):
     (opts, filenames) = getopt.getopt(args, '', ['help',
                                                  'repository=',
                                                  'includeroots=',
-                                                 'extensions=',
+                                                 'srcs=',
                                                  'headers='])
   except getopt.GetoptError:
     PrintUsage('Invalid arguments.')
@@ -3912,16 +3892,16 @@ def ParseArguments(args):
         _include_roots = list(val.split(','))
       except ValueError:
           PrintUsage('Include roots must be comma separated list.')
-    elif opt == '--extensions':
-      global _valid_extensions
+    elif opt == '--srcs':
+      global _source_regex
       try:
-        _valid_extensions = set(val.split(','))
+        _source_regex = re.compile(val)
       except ValueError:
           PrintUsage('Extensions must be comma seperated list.')
     elif opt == '--headers':
-      global _header_extensions
+      global _header_regex
       try:
-          _header_extensions = set(val.split(','))
+          _header_regex = re.compile(val)
       except ValueError:
         PrintUsage('Extensions must be comma seperated list.')
 
