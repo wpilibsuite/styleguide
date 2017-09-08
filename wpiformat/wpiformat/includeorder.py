@@ -66,8 +66,6 @@ class IncludeOrder(Task):
                                        "(?P<close_bracket>>|\"))"
                                        "(?P<postfix>.*)")
 
-        self.ifdef_level = 0
-
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_file(name)
 
@@ -144,7 +142,8 @@ class IncludeOrder(Task):
             del output_list[-1]  # Remove last newline
         return output_list
 
-    def header_sort(self, config_file, lines_list, file_name, start, end):
+    def header_sort(self, config_file, lines_list, file_name, start, end,
+                    ifdef_level):
         """Recursively parses within #ifdef blocks for header includes and sorts
         them.
 
@@ -165,7 +164,6 @@ class IncludeOrder(Task):
         i = start
         while i < end:
             if "#ifdef" in lines_list[i]:
-                self.ifdef_level += 1
                 ifdef_count = 1
                 for j in range(i + 1, end):
                     if "#ifdef" in lines_list[j]:
@@ -177,9 +175,9 @@ class IncludeOrder(Task):
                         ifdef = lines_list[i] + self.linesep
 
                         suboutput, flags, idx, valid_headers = self.header_sort(
-                            config_file, lines_list, file_name, i + 1, j)
+                            config_file, lines_list, file_name, i + 1, j,
+                            ifdef_level + 1)
                         i = j
-                        self.ifdef_level -= 1
 
                         # If header failed to classify, return failure
                         if not valid_headers:
@@ -243,7 +241,7 @@ class IncludeOrder(Task):
                 else:
                     # If header failed to classify, return failure
                     return (output_list, include_flags, i, False)
-            elif self.ifdef_level > 0 and lines_list[i] != "":
+            elif ifdef_level > 0 and lines_list[i] != "":
                 # Non-preprocessor statements within a #ifdef block don't mark
                 # the end of header include processing, but act as barrier for
                 # sorting.
@@ -285,7 +283,6 @@ class IncludeOrder(Task):
             self.override_regexes.append(re.compile(regex_str))
 
         self.linesep = Task.get_linesep(lines)
-        self.ifdef_level = 0
 
         file_name = os.path.basename(name)
 
@@ -299,7 +296,7 @@ class IncludeOrder(Task):
         output_list = lines_list[0:i]
 
         suboutput, flags, idx, valid_headers = self.header_sort(
-            config_file, lines_list, file_name, i, len(lines_list))
+            config_file, lines_list, file_name, i, len(lines_list), 0)
         i = idx
 
         # If header failed to classify, return failure

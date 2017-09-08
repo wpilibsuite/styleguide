@@ -67,7 +67,7 @@ def proc_func(verbose1, verbose2, year, clang_version, changed_file_list,
               repo_root, name):
     config_file = Config(os.path.dirname(name), ".styleguide")
 
-    if config_file.is_modifiable_file(name) or ".git" + os.sep in name:
+    if config_file.is_modifiable_file(name):
         return True
 
     if config_file.is_generated_file(name):

@@ -63,25 +63,24 @@ class Header(object):
 
 class Stdlib(task.Task):
 
-    def should_process_file(self, config_file, name):
-        return config_file.is_cpp_file(name)
+    def __init__(self):
+        task.Task.__init__(self)
 
-    def run(self, config_file, name, lines):
-        headers = []
+        self.headers = []
 
         # assert is a macro, so it's ommitted to avoid prefixing with std::
-        headers.append(Header("assert"))
+        self.headers.append(Header("assert"))
 
-        headers.append(
+        self.headers.append(
             Header("ctype", {
                 "isalum", "isalpha", "isblank", "iscntrl", "isdigit", "isgraph",
                 "islower", "isprint", "ispunct", "isspace", "isupper",
                 "isxdigit", "tolower", "toupper"
             }))
-        headers.append(Header("errno"))
-        headers.append(Header("float"))
-        headers.append(Header("limits"))
-        headers.append(
+        self.headers.append(Header("errno"))
+        self.headers.append(Header("float"))
+        self.headers.append(Header("limits"))
+        self.headers.append(
             Header("math", {
                 "cos", "acos", "cosh", "acosh", "sin", "asin", "asinh", "tan",
                 "atan", "atan2", "atanh", "exp", "frexp", "ldexp", "log",
@@ -95,16 +94,17 @@ class Stdlib(task.Task):
                 "isnan", "isnormal", "isgreater", "isgreaterequal", "isless",
                 "islessequal", "islessgreater", "isunordered"
             }))
-        headers.append(Header("setjmp", {"longjmp", "setjmp"}, ["jmp_buf"]))
-        headers.append(
+        self.headers.append(
+            Header("setjmp", {"longjmp", "setjmp"}, ["jmp_buf"]))
+        self.headers.append(
             Header("signal", {"signal", "raise"}, ["sig_atomic_t"], False))
-        headers.append(Header("stdarg", {"va_list"}))
-        headers.append(
+        self.headers.append(Header("stdarg", {"va_list"}))
+        self.headers.append(
             Header("stddef", type_regexes=["(ptrdiff|max_align|nullptr)_t"]))
 
         # size_t isn't actually defined in stdint, but it fits best here for
         # removing the std:: prefix
-        headers.append(
+        self.headers.append(
             Header(
                 "stdint",
                 type_regexes=[
@@ -112,7 +112,7 @@ class Stdlib(task.Task):
                 ],
                 add_prefix=False))
 
-        headers.append(
+        self.headers.append(
             Header("stdio", {
                 "remove", "rename", "rewind", "tmpfile", "tmpnam", "fclose",
                 "fflush", "fopen", "freopen", "fgetc", "fgets", "fputc",
@@ -123,7 +123,7 @@ class Stdlib(task.Task):
                 "vsscanf", "scanf", "getchar", "gets", "putc", "putchar",
                 "puts", "getc", "ungetc", "clearerr", "perror"
             }, ["FILE", "fpos_t"]))
-        headers.append(
+        self.headers.append(
             Header("stdlib", {
                 "atof", "atoi", "atol", "atoll", "strtof", "strtol", "strtod",
                 "strtold", "strtoll", "strtoul", "strtoull", "rand", "srand",
@@ -132,21 +132,25 @@ class Stdlib(task.Task):
                 "bsearch", "qsort", "llabs", "labs", "abs", "lldiv", "ldiv",
                 "div", "mblen", "btowc", "wctomb", "wcstombs", "mbstowcs"
             }, ["(l|ll)?div_t"]))
-        headers.append(
+        self.headers.append(
             Header("string", {
                 "memcpy", "memcmp", "memchr", "memmove", "memset", "strcpy",
                 "strncpy", "strcat", "strncat", "strcmp", "strncmp", "strcoll",
                 "strchr", "strrchr", "strstr", "strxfrm", "strcspn", "strrspn",
                 "strpbrk", "strtok", "strerror", "strlen"
             }))
-        headers.append(
+        self.headers.append(
             Header("time", {
                 "clock", "asctime", "ctime", "difftime", "gmtime", "localtime",
                 "mktime", "strftime", "time"
             }, ["(clock|time)_t"]))
 
+    def should_process_file(self, config_file, name):
+        return config_file.is_cpp_file(name)
+
+    def run(self, config_file, name, lines):
         file_changed = False
-        for header in headers:
+        for header in self.headers:
             # Prepare include names
             before = ""
             after = ""
