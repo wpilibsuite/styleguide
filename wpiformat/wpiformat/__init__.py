@@ -139,7 +139,7 @@ def main():
     # All file paths are relative to Git repo root directory, so find the root.
     # We can assume the ".git" exists because we already checked we are in a Git
     # repo. Checking "len(directory) > 0" isn't necessary.
-    config_path = ""
+    root_path = ""
     git_dir_found = False
     directory = os.getcwd()
     while not git_dir_found:
@@ -148,28 +148,26 @@ def main():
         # ".git" can be a directory or a file within Git submodules
         if os.path.exists(git_location):
             git_dir_found = True
-            if config_path == "":
-                config_path = "."
+            if root_path == "":
+                root_path = "."
         else:
             directory = directory[:directory.rfind(os.sep)]
-            if config_path == "":
-                config_path += ".."
+            if root_path == "":
+                root_path += ".."
             else:
-                config_path += os.sep + ".."
+                root_path += os.sep + ".."
 
     # Delete temporary files from previous incomplete run
     files = [
-        os.path.join(dp, f)
-        for dp, dn, fn in os.walk(os.path.expanduser(config_path)) for f in fn
+        os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
+        if f.endswith(".tmp")
     ]
     for f in files:
-        if f.endswith(".tmp"):
-            os.remove(f)
+        os.remove(f)
 
     # Recursively create list of files in given directory
     files = [
-        os.path.join(dp, f)
-        for dp, dn, fn in os.walk(os.path.expanduser(config_path)) for f in fn
+        os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
     ]
 
     if not files:
@@ -255,7 +253,7 @@ def main():
     proc = subprocess.Popen(
         ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
     for line in proc.stdout:
-        changed_file_list.append(config_path + os.sep +
+        changed_file_list.append(root_path + os.sep +
                                  line.strip().decode("ascii"))
 
     print_lock = mp.Lock()
