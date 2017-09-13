@@ -5,7 +5,7 @@ from wpiformat.task import Task
 
 class Newline(Task):
 
-    def run(self, config_file, name, lines):
+    def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
 
         newlines = 0

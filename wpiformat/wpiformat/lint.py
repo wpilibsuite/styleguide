@@ -25,7 +25,7 @@ class Lint(task.Task):
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_file(name)
 
-    def run_all(self, config_file, names):
+    def run_batch(self, config_file, names):
         # Handle running in either the root or styleguide directories
         cpplintPrefix = ""
         if os.getcwd().rpartition(os.sep)[2] != "styleguide":

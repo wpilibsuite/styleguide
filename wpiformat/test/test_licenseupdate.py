@@ -132,8 +132,8 @@ def test_licenseupdate():
             assert task.should_process_file(config_file, inputs[i][0])
 
         if task.should_process_file(config_file, inputs[i][0]):
-            output, file_changed, success = task.run(config_file, inputs[i][0],
-                                                     inputs[i][1])
+            output, file_changed, success = task.run_pipeline(
+                config_file, inputs[i][0], inputs[i][1])
             assert output == outputs[i][0]
             assert file_changed == outputs[i][1]
             assert success == outputs[i][2]

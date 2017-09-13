@@ -148,7 +148,7 @@ class Stdlib(task.Task):
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_file(name)
 
-    def run(self, config_file, name, lines):
+    def run_pipeline(self, config_file, name, lines):
         file_changed = False
         for header in self.headers:
             # Prepare include names
