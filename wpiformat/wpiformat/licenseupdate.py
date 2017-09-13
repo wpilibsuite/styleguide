@@ -21,7 +21,7 @@ class LicenseUpdate(Task):
         return (config_file.is_c_file(name) or config_file.is_cpp_file(name) or
                 name.endswith(".java")) and not license_regex.search(name)
 
-    def run(self, config_file, name, lines):
+    def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
 
         license_template = Config.read_file(

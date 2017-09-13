@@ -271,7 +271,7 @@ class IncludeOrder(Task):
 
         return (output_list, include_flags, i, True)
 
-    def run(self, config_file, name, lines):
+    def run_pipeline(self, config_file, name, lines):
         self.override_regexes = []
 
         # Compile include sorting override regexes

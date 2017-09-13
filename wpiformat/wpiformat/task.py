@@ -35,8 +35,10 @@ class Task(object):
         return [".*"]
 
     @abstractmethod
-    def run(self, config_file, name, lines):
+    def run_pipeline(self, config_file, name, lines):
         """Performs task on file with given lines.
+
+        This function is for processing the file in a pipeline of tasks.
 
         Keyword arguments:
         name -- file name string
@@ -48,8 +50,11 @@ class Task(object):
         return ("", False, True)
 
     @abstractmethod
-    def run_all(self, config_file, names):
+    def run_batch(self, config_file, names):
         """Performs task on list of files.
+
+        This function is for processing multiple files in one task to reduce
+        overhead.
 
         Keyword arguments:
         names -- list of file name strings

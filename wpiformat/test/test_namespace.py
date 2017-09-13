@@ -49,7 +49,7 @@ def test_namespace():
     for i in range(len(inputs)):
         new_stdout = io.StringIO()
         sys.stdout = new_stdout
-        unused_output, file_changed, success = task.run(
+        unused_output, file_changed, success = task.run_pipeline(
             config_file, inputs[i][0], inputs[i][1])
         sys.stdout = saved_stdout
         new_stdout.seek(0)
