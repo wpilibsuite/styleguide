@@ -3,10 +3,10 @@
 import subprocess
 import sys
 
-from . import task
+from wpiformat.task import Task
 
 
-class PyFormat(task.Task):
+class PyFormat(Task):
 
     def should_process_file(self, config_file, name):
         return name.endswith(".py")
