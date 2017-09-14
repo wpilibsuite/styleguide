@@ -3,13 +3,13 @@
 import subprocess
 import sys
 
-from . import task
+from wpiformat.task import Task
 
 
-class ClangFormat(task.Task):
+class ClangFormat(Task):
 
     def __init__(self, clang_version):
-        task.Task.__init__(self)
+        Task.__init__(self)
 
         if clang_version == "":
             self.exec_name = "clang-format"

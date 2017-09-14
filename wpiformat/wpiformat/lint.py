@@ -11,14 +11,14 @@ required it to be used as a module.
 import os
 import sys
 
-from . import cpplint
-from . import task
+from wpiformat import cpplint
+from wpiformat.task import Task
 
 
-class Lint(task.Task):
+class Lint(Task):
 
     def __init__(self, repo_root):
-        task.Task.__init__(self)
+        Task.__init__(self)
 
         self.repo_root = repo_root
 

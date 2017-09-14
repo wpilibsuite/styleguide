@@ -4,7 +4,7 @@ and assert.h are exceptions.
 
 import re
 
-from . import task
+from wpiformat.task import Task
 
 
 class Header(object):
@@ -61,10 +61,10 @@ class Header(object):
             self.type_regex = None
 
 
-class Stdlib(task.Task):
+class Stdlib(Task):
 
     def __init__(self):
-        task.Task.__init__(self)
+        Task.__init__(self)
 
         self.headers = []
 
