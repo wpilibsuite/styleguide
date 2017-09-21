@@ -214,7 +214,7 @@ def main():
     files = [os.path.abspath(name) for name in files]
 
     # Don't run tasks on Git metadata
-    files = [name for name in files if ".git" + os.sep not in name]
+    files = [name for name in files if os.sep + ".git" + os.sep not in name]
 
     # Don't check for changes in or run tasks on ignored files
     files = filter_ignored_files(files)
