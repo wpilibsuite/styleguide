@@ -86,7 +86,23 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__c_header_include_regex.search(name) or name.endswith(".c")
+        return self.is_c_header_file(name) or self.is_c_src_file(name)
+
+    def is_c_header_file(self, name):
+        """Returns True if file is C header file.
+
+        Keyword arguments:
+        name -- file name string
+        """
+        return self.__c_header_include_regex.search(name)
+
+    def is_c_src_file(self, name):
+        """Returns True if file is C source file.
+
+        Keyword arguments:
+        name -- file name string
+        """
+        return name.endswith(".c")
 
     def is_cpp_file(self, name):
         """Returns True if file is either C++ header or C++ source file.
@@ -111,6 +127,14 @@ class Config:
         name -- file name string
         """
         return self.__cpp_src_include_regex.search(name)
+
+    def is_header_file(self, name):
+        """Returns True if file is either C or C++ header file.
+
+        Keyword arguments:
+        name -- file name string
+        """
+        return self.is_c_header_file(name) or self.is_cpp_header_file(name)
 
     def is_generated_file(self, name):
         """Returns True if file is generated (generated files are skipped).

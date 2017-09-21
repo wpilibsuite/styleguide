@@ -40,7 +40,8 @@ class Lint(Task):
             srcs = "|".join(srcs)
         else:
             srcs = "a^"
-        headers = config_file.group("cppHeaderFileInclude")
+        headers = config_file.group("cHeaderFileInclude") + \
+                  config_file.group("cppHeaderFileInclude")
         if headers:
             headers = "|".join(headers)
         else:
