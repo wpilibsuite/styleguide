@@ -5,7 +5,7 @@ import re
 from wpiformat.task import Task
 
 
-class Namespace(Task):
+class UsingDeclaration(Task):
 
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_header_file(name)

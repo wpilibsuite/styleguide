@@ -3,11 +3,11 @@ import os
 import sys
 
 from wpiformat.config import Config
-from wpiformat.namespace import Namespace
+from wpiformat.usingdeclaration import UsingDeclaration
 
 
-def test_namespace():
-    task = Namespace()
+def test_usingdeclaration():
+    task = UsingDeclaration()
 
     inputs = []
     outputs = []
