@@ -13,11 +13,11 @@ from wpiformat.config import Config
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
-from wpiformat.namespace import Namespace
 from wpiformat.newline import Newline
 from wpiformat.pyformat import PyFormat
 from wpiformat.stdlib import Stdlib
 from wpiformat import task
+from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.whitespace import Whitespace
 
 
@@ -333,10 +333,10 @@ def main():
     # so it can clean up their formatting.
     task_pipeline = [
         LicenseUpdate(str(args.year)),
-        Namespace(),
         Newline(),
         Stdlib(),
         IncludeOrder(),
+        UsingDeclaration(),
         Whitespace()
     ]
     run_pipeline(task_pipeline, args, files)
