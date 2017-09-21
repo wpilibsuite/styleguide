@@ -118,7 +118,7 @@ class IncludeOrder(Task):
 
         Returns true if include name is a header.
         """
-        if not config_file.is_cpp_header_file(include_name):
+        if not config_file.is_header_file(include_name):
             print("Error: " + file_name + ": include '" + include_name + \
                 "' has extension not in header list")
             return False
