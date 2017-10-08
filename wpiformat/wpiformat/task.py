@@ -13,7 +13,10 @@ class Task(object):
 
     @staticmethod
     def get_linesep(lines):
-        """Returns autodetected line separator for file.
+        """Returns string containing autodetected line separator for file.
+
+        Keyword arguments:
+        lines -- file contents string
         """
         # Find potential line separator
         pos = lines.find("\n")
@@ -28,7 +31,11 @@ class Task(object):
 
     @abstractmethod
     def should_process_file(self, config_file, name):
-        """Returns True if file should be processed by this task.
+        """Returns true if file should be processed by this task.
+
+        Keyword arguments:
+        config_file -- Config object
+        name -- file name string
 
         Match anything by default.
         """
@@ -41,8 +48,9 @@ class Task(object):
         This function is for processing the file in a pipeline of tasks.
 
         Keyword arguments:
+        config_file -- Config object
         name -- file name string
-        lines -- file contents
+        lines -- file contents string
 
         Returns tuple containing processed lines, whether lines were changed,
         and whether task succeeded in formatting the file.
@@ -57,6 +65,7 @@ class Task(object):
         overhead.
 
         Keyword arguments:
+        config_file -- Config object
         names -- list of file name strings
 
         Returns True if task succeeded in formatting the files.

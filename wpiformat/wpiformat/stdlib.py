@@ -180,7 +180,16 @@ class Stdlib(Task):
         return (lines, file_changed, True)
 
     def func_substitute(self, header, lines):
-        """Returns modified lines and whether string changed."""
+        """Returns modified lines and whether string changed.
+
+        Keyword arguments:
+        header -- Header object
+        lines -- file contents string
+
+        Returns tuple containing the following:
+          modified file contents string
+          whethr file contents changed
+        """
         pos = 0
         lines_changed = False
         while pos < len(lines):
