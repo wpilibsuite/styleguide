@@ -8,6 +8,12 @@ import sys
 class Config:
 
     def __init__(self, directory, file_name):
+        """Constructor for Config object.
+
+        Keyword arguments:
+        directory -- directory in which to start search for file
+        file_name -- file name string
+        """
         self.__config_dict = self.__parse_config_file(directory, file_name)
         self.__c_header_include_regex = self.regex("cHeaderFileInclude")
         self.__cpp_header_include_regex = self.regex("cppHeaderFileInclude")
@@ -22,8 +28,9 @@ class Config:
         Checks current directory for file. If one doesn't exist, try all parent
         directories as well.
 
+        Keyword arguments:
         directory -- current directory from which to start search
-        file_name -- name of file
+        file_name -- file name string
 
         Returns list containing file contents or triggers program exit.
         """
@@ -40,7 +47,11 @@ class Config:
                 directory = os.path.dirname(directory)
 
     def group(self, group_name):
-        """Returns value from config dictionary given key string."""
+        """Returns value from config dictionary given key string.
+
+        Keyword arguments:
+        group_name -- config group name
+        """
         try:
             return self.__config_dict[group_name]
         except KeyError:
@@ -70,27 +81,51 @@ class Config:
             return re.compile("|".join(group_contents))
 
     def is_c_file(self, name):
-        """Returns True if file is either C header or C source file."""
+        """Returns True if file is either C header or C source file.
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.__c_header_include_regex.search(name) or name.endswith(".c")
 
     def is_cpp_file(self, name):
-        """Returns True if file is either C++ header or C++ source file."""
+        """Returns True if file is either C++ header or C++ source file.
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.is_cpp_header_file(name) or self.is_cpp_src_file(name)
 
     def is_cpp_header_file(self, name):
-        """Returns True if file is C++ header file."""
+        """Returns True if file is C++ header file.
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.__cpp_header_include_regex.search(name)
 
     def is_cpp_src_file(self, name):
-        """Returns True if file is C++ source file."""
+        """Returns True if file is C++ source file.
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.__cpp_src_include_regex.search(name)
 
     def is_generated_file(self, name):
-        """Returns True if file is generated (generated files are skipped)."""
+        """Returns True if file is generated (generated files are skipped).
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.__generated_exclude_regex.search(name)
 
     def is_modifiable_file(self, name):
-        """Returns True if file is modifiable but should be skipped."""
+        """Returns True if file is modifiable but should be skipped.
+
+        Keyword arguments:
+        name -- file name string
+        """
         return self.__modifiable_exclude_regex.search(name)
 
     def __parse_config_file(self, directory, file_name):
@@ -99,8 +134,9 @@ class Config:
         Checks current directory for config file. If one doesn't exist, try all
         parent directories as well.
 
+        Keyword arguments:
         directory -- current directory from which to start search
-        file_name -- name of config file
+        file_name -- config file name string
 
         Returns dictionary of groups (group name -> list of values).
         """

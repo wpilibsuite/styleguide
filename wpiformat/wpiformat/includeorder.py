@@ -70,7 +70,15 @@ class IncludeOrder(Task):
         return config_file.is_cpp_file(name)
 
     def classify_header(self, config_file, include_line, file_name):
-        """Classify the given header name and return the corresponding index."""
+        """Classify the given header name and return the corresponding index.
+
+        Keyword arguments:
+        config_file -- Config object
+        include_line -- regex Match object for include line
+        file_name -- file name string
+
+        Returns header classification index.
+        """
         # Process override regexes
         for idx in range(5):
             if self.override_regexes[idx].search(include_line.group("name")):
@@ -101,7 +109,15 @@ class IncludeOrder(Task):
             return -1
 
     def include_is_header(self, config_file, file_name, include_name):
-        """Return True if include name has header extension."""
+        """Return True if include name has header extension.
+
+        Keyword arguments:
+        config_file -- Config object
+        file_name -- file name string
+        include_name -- include name string
+
+        Returns true if include name is a header.
+        """
         if not config_file.is_cpp_header_file(include_name):
             print("Error: " + file_name + ": include '" + include_name + \
                 "' has extension not in header list")
@@ -112,6 +128,12 @@ class IncludeOrder(Task):
     def add_brackets(self, name_match, group_number):
         """Adds appropriate brackets around and "#include" before include name
         based on group number.
+
+        Keyword arguments:
+        name_match -- include name's regex Match object
+        group_number -- include classification index
+
+        Returns include name with approriate brackets and "#include" prefix.
         """
         if group_number >= 1 and group_number <= 3:
             return "#include <" + name_match.group("name") + ">" + \
@@ -122,6 +144,10 @@ class IncludeOrder(Task):
 
     def write_headers(self, includes, ifdef_blocks=[[], [], [], [], []]):
         """Write out includes from sets.
+
+        Keyword arguments:
+        includes -- list of include strings
+        ifdef_blocks -- list of list of #ifdef blocks (default empty 2D list)
 
         Returns list of output lines.
         """
@@ -147,11 +173,19 @@ class IncludeOrder(Task):
         """Recursively parses within #ifdef blocks for header includes and sorts
         them.
 
+        Keyword arguments:
+        config_file -- Config object
+        lines_list -- list of file contents delimited by line separator
+        file_name -- file name string
+        start -- starting line for recursion step
+        end -- ending line for recursion step
+        ifdef_level -- current recursion depth of #ifdefs
+
         Returns tuple of the following:
-        sorted output
-        list of flags of instances of header categories within #ifdef block
-        the index of the last line processed
-        whether all header includes had header extension
+          sorted output
+          list of flags of instances of header categories within #ifdef block
+          the index of the last line processed
+          whether all header includes had header extension
         """
         output_list = []
 

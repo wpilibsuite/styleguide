@@ -9,6 +9,12 @@ from wpiformat.task import Task
 class ClangFormat(Task):
 
     def __init__(self, clang_version):
+        """Constructor for ClangFormat task.
+
+        Keyword arguments:
+        clang_version -- version number of clang-format appended to executable
+                         name
+        """
         Task.__init__(self)
 
         if clang_version == "":

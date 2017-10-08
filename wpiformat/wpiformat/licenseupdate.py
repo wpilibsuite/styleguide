@@ -11,6 +11,11 @@ from wpiformat.task import Task
 class LicenseUpdate(Task):
 
     def __init__(self, current_year):
+        """Constructor for LicenseUpdate task.
+
+        Keyword arguments:
+        current_year -- year string
+        """
         Task.__init__(self)
 
         self.__current_year = current_year

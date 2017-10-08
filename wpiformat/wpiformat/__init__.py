@@ -22,7 +22,10 @@ from wpiformat.whitespace import Whitespace
 
 
 def in_git_repo(directory):
-    """Check that the current directory is part of a Git repository.
+    """Returns true if the provided directory is part of a Git repository.
+
+    Keyword arguments:
+    directory -- directory to check
     """
     cmd = ["git", "rev-parse"]
     returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
@@ -30,8 +33,7 @@ def in_git_repo(directory):
 
 
 def get_repo_root():
-    """Get the Git repository root as an absolute path.
-    """
+    """Returns the Git repository root as an absolute path."""
     current_dir = os.path.abspath(os.getcwd())
     while current_dir != os.path.dirname(current_dir):
         if os.path.exists(current_dir + os.sep + ".git"):
@@ -41,6 +43,9 @@ def get_repo_root():
 
 def filter_ignored_files(names):
     """Returns list of files not in .gitignore.
+
+    Keyword arguments:
+    names -- list of files to filter
     """
     cmd = ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"]
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -59,6 +64,13 @@ def filter_ignored_files(names):
 
 
 def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
+    """Common initialization for process pool worker.
+
+    Keyword arguments:
+    task_pipeline_copy -- task pipeline
+    verbose1_copy -- verbose1 flag
+    verbose2_copy -- verbose2 flag
+    """
     global task_pipeline
     global verbose1
     global verbose2
@@ -75,6 +87,9 @@ def proc_pipeline(name):
 
     If the contents were modified at any point, the result is written back out
     to the file.
+
+    Keyword arguments:
+    name -- file name string
     """
     config_file = Config(os.path.dirname(name), ".styleguide")
     if verbose1 or verbose2:
@@ -121,6 +136,11 @@ def proc_batch(files):
 
     These tasks read and write to the files directly. They are given a list of
     all files at once to avoid spawning too many subprocesses.
+
+    Keyword arguments:
+    files -- list of file names
+
+    Returns true if all tasks succeeded.
     """
     all_success = True
 
@@ -144,7 +164,15 @@ def proc_batch(files):
 
 
 def run_pipeline(task_pipeline, args, files):
-    """Spawns process pool for proc_pipeline()."""
+    """Spawns process pool for proc_pipeline().
+
+    Keyword arguments:
+    task_pipeline -- task pipeline
+    args -- command line arguments from argparse
+    files -- list of file names to process
+
+    Calls sys.exit(1) if any task fails.
+    """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
@@ -156,7 +184,14 @@ def run_pipeline(task_pipeline, args, files):
 
 
 def run_batch(task_pipeline, args, file_batches):
-    """Spawns process pool for proc_batch()."""
+    """Spawns process pool for proc_batch().
+
+    Keyword arguments:
+    task_pipeline -- task pipeline
+    args -- command line arguments from argparse
+    file_batches -- list of file names to process
+
+    """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
