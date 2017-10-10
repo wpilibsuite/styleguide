@@ -6,6 +6,7 @@ overlap.
 """
 
 from abc import *
+import os
 
 
 class Task(object):
@@ -28,6 +29,15 @@ class Task(object):
             return "\r\n"
         else:
             return "\n"
+
+    @staticmethod
+    def get_repo_root():
+        """Returns the Git repository root as an absolute path."""
+        current_dir = os.path.abspath(os.getcwd())
+        while current_dir != os.path.dirname(current_dir):
+            if os.path.exists(current_dir + os.sep + ".git"):
+                return current_dir
+            current_dir = os.path.dirname(current_dir)
 
     @abstractmethod
     def should_process_file(self, config_file, name):

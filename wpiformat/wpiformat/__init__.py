@@ -10,6 +10,7 @@ import sys
 
 from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
+from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
@@ -30,15 +31,6 @@ def in_git_repo(directory):
     cmd = ["git", "rev-parse"]
     returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
     return returncode == 0
-
-
-def get_repo_root():
-    """Returns the Git repository root as an absolute path."""
-    current_dir = os.path.abspath(os.getcwd())
-    while current_dir != os.path.dirname(current_dir):
-        if os.path.exists(current_dir + os.sep + ".git"):
-            return current_dir
-        current_dir = os.path.dirname(current_dir)
 
 
 def filter_ignored_files(names):
@@ -332,6 +324,7 @@ def main():
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
     task_pipeline = [
+        IncludeGuard(),
         LicenseUpdate(str(args.year)),
         Namespace(),
         Newline(),
@@ -342,11 +335,7 @@ def main():
     run_pipeline(task_pipeline, args, files)
 
     # Lint is run last since previous tasks can affect its output.
-    task_pipeline = [
-        ClangFormat(args.clang_version),
-        PyFormat(),
-        Lint(get_repo_root())
-    ]
+    task_pipeline = [ClangFormat(args.clang_version), PyFormat(), Lint()]
     run_batch(task_pipeline, args, file_batches)
 
 
