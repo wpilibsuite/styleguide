@@ -17,10 +17,10 @@ from wpiformat.task import Task
 
 class Lint(Task):
 
-    def __init__(self, repo_root):
+    def __init__(self):
         Task.__init__(self)
 
-        self.repo_root = repo_root
+        self.repo_root = Task.get_repo_root()
 
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_file(name)
