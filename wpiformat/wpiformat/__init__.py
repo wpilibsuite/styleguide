@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 
+from wpiformat.bracecomment import BraceComment
 from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
 from wpiformat.includeguard import IncludeGuard
@@ -324,6 +325,7 @@ def main():
     # vice versa are sorted properly. ClangFormat is run after the other tasks
     # so it can clean up their formatting.
     task_pipeline = [
+        BraceComment(),
         IncludeGuard(),
         LicenseUpdate(str(args.year)),
         Newline(),
