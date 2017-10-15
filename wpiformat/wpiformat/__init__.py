@@ -8,6 +8,7 @@ import subprocess
 import sys
 
 from wpiformat.bracecomment import BraceComment
+from wpiformat.bracenewline import BraceNewline
 from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.clangtidy import ClangTidy
@@ -519,6 +520,7 @@ def main():
         # tasks so it can clean up their formatting.
         task_pipeline = [
             BraceComment(),
+            BraceNewline(),
             CIdentList(),
             EofNewline(),
             GTestName(),
