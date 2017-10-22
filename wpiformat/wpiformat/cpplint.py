@@ -3194,7 +3194,7 @@ def CheckCStyleCast(filename, clean_lines, linenum, cast_type, pattern, error):
   # A single unnamed argument for a function tends to look like old style cast.
   # If we see those, don't issue warnings for deprecated casts.
   remainder = line[match.end(0):]
-  if Match(r'^\s*(?:;|const\b|throw\b|final\b|override\b|[=>{),]|->)',
+  if Match(r'^\s*(?:;|const\b|throw\b|noexcept\b|final\b|override\b|[=>{),]|->)',
            remainder):
     return False
 
