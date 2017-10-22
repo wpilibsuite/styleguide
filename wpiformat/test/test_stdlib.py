@@ -53,6 +53,12 @@ def test_stdlib():
         "#define FILE_LOG(level)" + os.linesep + \
         "if (level > FILELog::ReportingLevel())" + os.linesep, False, True))
 
+    # Don't prepend "std::" to function name if it's a function definition
+    inputs.append(
+        ("./Test.cpp",
+         "uint64_t time() const { return m_val.last_change; }" + os.linesep))
+    outputs.append((inputs[len(inputs) - 1][1], False, True))
+
     # Types followed by semicolon should match
     inputs.append(("./Main.cpp", "typedef integer std::uint8_t;"))
     outputs.append(("typedef integer uint8_t;", True, True))

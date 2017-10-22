@@ -36,9 +36,12 @@ class Header(object):
 
         if func_names != []:
             # Matches C standard library function uses. C standard library
-            # function names are alphanumeric and start with a letter.
+            # function names are alphanumeric and start with a letter. If the
+            # function name is preceded by a word character and a space, it's
+            # a function definition instead of a usage.
             self.func_regex = re.compile(
-                "(?: |,|\()" +  # Preceded by space, comma, or "("
+                "(?:[^\w]\s+|,|\()"
+                +  # Preceded by nonword character and spaces, comma, or "("
                 regex_prefix + "([a-z][a-z0-9]*)" +  # C stdlib function name
                 "(?:\()"  # Followed by open parenthesis
             )
