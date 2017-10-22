@@ -51,14 +51,14 @@ class Header(object):
         if type_regexes != []:
             # Type uses are preceded by a left angle bracket (template), a
             # space, a comma, or an open parenthesis. Type names are followed by
-            # a close parenthesis, a comma, a semicolon, a space, or pointer
-            # asterisks.
+            # a right angle bracket, close parenthesis, a comma, a semicolon, a
+            # space, or pointer asterisks.
             # FIXME: Types at the beginning of the line are not matched.
             self.type_regex = re.compile(
                 "(?<=\<| |,|\()" +  #  Preceded by space, comma, or "("
                 regex_prefix + "(" + "|".join(type_regexes) + ")"  # Type names
                 +
-                "(?=\)|,|;| |\*+)"  # Followed by ")", ",", ";", " ", or pointer asterisks
+                "(?=\>|\)|,|;| |\*+)"  # Followed by ">", ")", ",", ";", " ", or pointer asterisks
             )
         else:
             self.type_regex = None

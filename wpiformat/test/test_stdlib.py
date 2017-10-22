@@ -59,6 +59,10 @@ def test_stdlib():
          "uint64_t time() const { return m_val.last_change; }" + os.linesep))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
+    # Test detection of type within static_cast<>
+    inputs.append(("./Test.cpp", "static_cast<std::uint64_t>(x);" + os.linesep))
+    outputs.append(("static_cast<uint64_t>(x);" + os.linesep, True, True))
+
     # Types followed by semicolon should match
     inputs.append(("./Main.cpp", "typedef integer std::uint8_t;"))
     outputs.append(("typedef integer uint8_t;", True, True))
