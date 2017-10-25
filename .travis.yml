@@ -14,4 +14,5 @@ script:
   - python3 setup.py install --optimize=1 --skip-build
   - python3 setup.py test
   - cd .. && python3 -m wpiformat -v
+  - python3 -m wpiformat -f wpiformat/wpiformat/__init__.py -v
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes

@@ -32,12 +32,16 @@ class Task(object):
 
     @staticmethod
     def get_repo_root():
-        """Returns the Git repository root as an absolute path."""
+        """Returns the Git repository root as an absolute path.
+
+        An empty string is returned if no repository root was found.
+        """
         current_dir = os.path.abspath(os.getcwd())
         while current_dir != os.path.dirname(current_dir):
             if os.path.exists(current_dir + os.sep + ".git"):
                 return current_dir
             current_dir = os.path.dirname(current_dir)
+        return ""
 
     @abstractmethod
     def should_process_file(self, config_file, name):

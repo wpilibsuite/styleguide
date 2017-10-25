@@ -17,11 +17,6 @@ from wpiformat.task import Task
 
 class Lint(Task):
 
-    def __init__(self):
-        Task.__init__(self)
-
-        self.repo_root = Task.get_repo_root()
-
     def should_process_file(self, config_file, name):
         return config_file.is_cpp_file(name)
 
@@ -49,10 +44,7 @@ class Lint(Task):
 
         sys.argv = ["cpplint.py",
                     "--srcs=" + srcs,
-                    "--headers=" + headers,
-                    "--repository=" + self.repo_root,
-                    "--includeroots=" + \
-                        ",".join(config_file.group("includeGuardRoots"))] + \
+                    "--headers=" + headers] + \
                    names
 
         # Run cpplint.py
