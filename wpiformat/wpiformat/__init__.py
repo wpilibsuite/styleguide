@@ -18,20 +18,9 @@ from wpiformat.lint import Lint
 from wpiformat.newline import Newline
 from wpiformat.pyformat import PyFormat
 from wpiformat.stdlib import Stdlib
-from wpiformat import task
+from wpiformat.task import Task
 from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.whitespace import Whitespace
-
-
-def in_git_repo(directory):
-    """Returns true if the provided directory is part of a Git repository.
-
-    Keyword arguments:
-    directory -- directory to check
-    """
-    cmd = ["git", "rev-parse"]
-    returncode = subprocess.call(cmd, stderr=subprocess.DEVNULL)
-    return returncode == 0
 
 
 def filter_ignored_files(names):
@@ -196,85 +185,6 @@ def run_batch(task_pipeline, args, file_batches):
 
 
 def main():
-    if not in_git_repo("."):
-        print("Error: not invoked within a Git repository", file=sys.stderr)
-        sys.exit(1)
-
-    # All file paths are relative to Git repo root directory, so find the root.
-    # We can assume the ".git" exists because we already checked we are in a Git
-    # repo. Checking "len(directory) > 0" isn't necessary.
-    root_path = ""
-    git_dir_found = False
-    directory = os.getcwd()
-    while not git_dir_found:
-        git_location = directory + os.sep + ".git"
-
-        # ".git" can be a directory or a file within Git submodules
-        if os.path.exists(git_location):
-            git_dir_found = True
-            if root_path == "":
-                root_path = "."
-        else:
-            directory = directory[:directory.rfind(os.sep)]
-            if root_path == "":
-                root_path += ".."
-            else:
-                root_path += os.sep + ".."
-
-    # Delete temporary files from previous incomplete run
-    files = [
-        os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
-        if f.endswith(".tmp")
-    ]
-    for f in files:
-        os.remove(f)
-
-    # Recursively create list of files in given directory
-    files = [
-        os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
-    ]
-
-    if not files:
-        print("Error: no files found to format", file=sys.stderr)
-        sys.exit(1)
-
-    # Convert relative paths of files to absolute paths
-    files = [os.path.abspath(name) for name in files]
-
-    # Don't run tasks on Git metadata
-    files = [name for name in files if os.sep + ".git" + os.sep not in name]
-
-    # Don't check for changes in or run tasks on ignored files
-    files = filter_ignored_files(files)
-
-    # Create list of all changed files
-    changed_file_list = []
-    proc = subprocess.Popen(
-        ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
-    for line in proc.stdout:
-        changed_file_list.append(root_path + os.sep +
-                                 line.strip().decode("ascii"))
-
-    # Don't run tasks on modifiable or generated files
-    work = []
-    for name in files:
-        config_file = Config(os.path.dirname(name), ".styleguide")
-
-        if config_file.is_modifiable_file(name):
-            continue
-        if config_file.is_generated_file(name):
-            # Emit warning if a generated file was editted
-            if name in changed_file_list:
-                print("Warning: generated file '" + name + "' modified")
-            continue
-
-        work.append(name)
-    files = work
-
-    # If there are no files left, do nothing
-    if len(files) == 0:
-        sys.exit(0)
-
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description=
@@ -313,7 +223,90 @@ def main():
         help=
         "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
     )
+    parser.add_argument(
+        "-f",
+        dest="file",
+        type=str,
+        default="",
+        nargs="+",
+        help=
+        "file or directory names (can be path relative to python invocation directory or absolute path)"
+    )
     args = parser.parse_args()
+
+    # All discovered files are relative to Git repo root directory, so find the
+    # root.
+    root_path = Task.get_repo_root()
+    if root_path == "":
+        print("Error: not invoked within a Git repository", file=sys.stderr)
+        sys.exit(1)
+
+    # If no files explicitly specified
+    if not args.file:
+        # Delete temporary files from previous incomplete run
+        files = [
+            os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
+            if f.endswith(".tmp")
+        ]
+        for f in files:
+            os.remove(f)
+
+        # Recursively create list of files in given directory
+        files = [
+            os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
+        ]
+
+        if not files:
+            print("Error: no files found to format", file=sys.stderr)
+            sys.exit(1)
+    else:
+        files = []
+        # If a directory was specified, recursively expand it
+        for name in args.file:
+            if os.path.isdir(name):
+                files.extend([
+                    os.path.join(dp, f)
+                    for dp, dn, fn in os.walk(name) for f in fn
+                ])
+            else:
+                files.append(name)
+
+    # Convert relative paths of files to absolute paths
+    files = [os.path.abspath(name) for name in files]
+
+    # Don't run tasks on Git metadata
+    files = [name for name in files if os.sep + ".git" + os.sep not in name]
+
+    # Don't check for changes in or run tasks on ignored files
+    files = filter_ignored_files(files)
+
+    # Create list of all changed files
+    changed_file_list = []
+    proc = subprocess.Popen(
+        ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
+    for line in proc.stdout:
+        changed_file_list.append(root_path + os.sep +
+                                 line.strip().decode("ascii"))
+
+    # Don't run tasks on modifiable or generated files
+    work = []
+    for name in files:
+        config_file = Config(os.path.dirname(name), ".styleguide")
+
+        if config_file.is_modifiable_file(name):
+            continue
+        if config_file.is_generated_file(name):
+            # Emit warning if a generated file was editted
+            if name in changed_file_list:
+                print("Warning: generated file '" + name + "' modified")
+            continue
+
+        work.append(name)
+    files = work
+
+    # If there are no files left, do nothing
+    if len(files) == 0:
+        sys.exit(0)
 
     # Prepare file batches for batch tasks
     chunksize = math.ceil(len(files) / args.jobs)

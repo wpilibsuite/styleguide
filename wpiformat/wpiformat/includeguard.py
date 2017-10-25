@@ -90,5 +90,7 @@ class IncludeGuard(Task):
                 if name.startswith(include_root):
                     guard_path += name[len(include_root):]
                     return re.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
+
+        # No include guard roots matched, so append full name
         guard_path += name
         return re.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"

@@ -263,13 +263,6 @@ _regexp_compile_cache = {}
 # on which those errors are expected and should be suppressed.
 _error_suppressions = {}
 
-# The top level repository directory. If set, _root is calculated relative to
-# this directory instead of the directory containing version control artifacts.
-# This is set by the --repository flag.
-_repository = None
-
-_include_roots = None
-
 if sys.version_info < (3,):
   #  -- pylint: disable=no-member
   # BINARY_TYPE = str
@@ -505,51 +498,9 @@ class FileInfo(object):
     """Make Windows paths like Unix."""
     return os.path.abspath(self._filename).replace('\\', '/')
 
-  def RepositoryName(self):
-    r"""FullName after removing the local path to the repository.
-
-    If we have a real absolute path name here we can try to do something smart:
-    detecting the root of the checkout and truncating /path/to/checkout from
-    the name so that we get header guards that don't include things like
-    "C:\Documents and Settings\..." or "/home/username/..." in them and thus
-    people on different computers who have checked the source out to different
-    locations won't see bogus errors.
-    """
-    fullname = self.FullName()
-
-    # If the file exists and the user specified a repository path, use it
-    if os.path.exists(fullname) and _repository:
-      name = os.path.relpath(fullname, _repository).replace("\\", "/")
-      if _include_roots:
-        for include_root in _include_roots:
-          if name.startswith(include_root):
-            return os.path.basename(_repository) + "/" + name[len(include_root):]
-      return os.path.basename(_repository) + "/" + name
-    # Don't know what to do; header guard warnings may be wrong...
-    else:
-      return fullname
-
-  def Split(self):
-    """Splits the file into the directory, basename, and extension.
-
-    For 'chrome/browser/browser.cc', Split() would
-    return ('chrome/browser', 'browser', '.cc')
-
-    Returns:
-      A tuple of (directory, basename, extension).
-    """
-
-    googlename = self.RepositoryName()
-    project, rest = os.path.split(googlename)
-    return (project,) + os.path.splitext(rest)
-
-  def BaseName(self):
-    """File base name - text after the final slash, before the final period."""
-    return self.Split()[1]
-
   def Extension(self):
     """File extension - text following the final period, includes that period."""
-    return self.Split()[2]
+    return os.path.splitext(self.FullName())
 
 
 def Error(filename, linenum, category, confidence, message):
@@ -3732,8 +3683,6 @@ def ParseArguments(args):
   """
   try:
     (opts, filenames) = getopt.getopt(args, '', ['help',
-                                                 'repository=',
-                                                 'includeroots=',
                                                  'srcs=',
                                                  'headers='])
   except getopt.GetoptError:
@@ -3742,15 +3691,6 @@ def ParseArguments(args):
   for (opt, val) in opts:
     if opt == '--help':
       PrintUsage(None)
-    elif opt == '--repository':
-      global _repository
-      _repository = val
-    elif opt == '--includeroots':
-      global _include_roots
-      try:
-        _include_roots = list(val.split(','))
-      except ValueError:
-          PrintUsage('Include roots must be comma separated list.')
     elif opt == '--srcs':
       global _source_regex
       try:
