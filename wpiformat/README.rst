@@ -12,7 +12,9 @@ Dependencies
 - `Python 3.4 or newer <https://www.python.org/downloads/>`_
 - clang-format 3.8 or newer (included with `LLVM <http://llvm.org/releases/download.html>`_)
 
-If you would like to use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project.
+To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
+
+Note: Since wpiformat already handles include ordering, it is recommended to use ``SortIncludes: false`` in ``.clang-format``.
 
 Installation
 ============
