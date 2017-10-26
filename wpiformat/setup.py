@@ -31,14 +31,15 @@ if exists(git_dir):
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    commit_count, err = proc.communicate()
+    output, err = proc.communicate()
     # If there is no master branch, the commit count defaults to 0
     if err:
-        commit_count = 0
+        commit_count = "0"
+    else:
+        commit_count = output.decode("utf-8")
 
     # Version number: <year>.<# commits on master>
-    version = \
-        str(date.today().year) + "." + commit_count.decode("utf-8").strip()
+    version = str(date.today().year) + "." + commit_count.strip()
 
     # Create the version.py file
     with open(version_file, 'w') as fp:
