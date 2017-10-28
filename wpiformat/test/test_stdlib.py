@@ -53,7 +53,28 @@ def test_stdlib():
         "#define FILE_LOG(level)" + os.linesep + \
         "if (level > FILELog::ReportingLevel())" + os.linesep, False, True))
 
+    # Remove "std::" from beginning of line
+    inputs.append(("./Class.cpp",
+                   "/**" + os.linesep + \
+                   " *" + os.linesep + \
+                   " */" + os.linesep + \
+                   "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
+                   "  uint32_t result = 0;" + os.linesep))
+    outputs.append(("/**" + os.linesep + \
+                    " *" + os.linesep + \
+                    " */" + os.linesep + \
+                    "size_t SizeUleb128(uint64_t val) {" + os.linesep + \
+                    "  uint32_t result = 0;" + os.linesep, True, True))
+
+    # Remove "std::" from beginning of file
+    inputs.append(("./Class.cpp",
+                   "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
+                   "  uint32_t result = 0;" + os.linesep))
+    outputs.append(("size_t SizeUleb128(uint64_t val) {" + os.linesep + \
+                    "  uint32_t result = 0;" + os.linesep, True, True))
+
     # Don't prepend "std::" to function name if it's a function definition
+    # "time()" in other contexts is a C standard library function.
     inputs.append(
         ("./Test.cpp",
          "uint64_t time() const { return m_val.last_change; }" + os.linesep))
