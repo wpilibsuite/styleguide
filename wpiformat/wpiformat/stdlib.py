@@ -49,19 +49,26 @@ class Header(object):
             self.func_regex = None
 
         if type_regexes != []:
-            # Type uses are preceded by a left angle bracket (template), a
-            # space, a comma, or an open parenthesis. Type names are followed by
-            # a right angle bracket, close parenthesis, a comma, a semicolon, a
-            # space, or pointer asterisks.
-            # FIXME: Types at the beginning of the line are not matched.
-            self.type_regex = re.compile(
-                "(?<=\<| |,|\()" +  #  Preceded by space, comma, or "("
-                regex_prefix + "(" + "|".join(type_regexes) + ")"  # Type names
-                +
-                "(?=\>|\)|,|;| |\*+)"  # Followed by ">", ")", ",", ";", " ", or pointer asterisks
-            )
+            # Check for type uses
+
+            # Preceded by "<" (template), " ", ",", "(", or line separator and
+            # optional spaces
+            lookbehind = "(?<=\<| |,|\(|\n)"
+
+            type_names = regex_prefix + "(" + "|".join(type_regexes) + ")"
+
+            # Followed by optional spaces and ">", ")", ",", ";", or pointer
+            # asterisks
+            lookahead = "(?=(\s*(\>|\)|,|;|\*+))|\s)"
+
+            # Two regexes are created because matching the start of a string
+            # isn't supported by lookbehind assertions
+            self.type_regexes = [
+                re.compile(lookbehind + type_names + lookahead),
+                re.compile("^" + type_names + lookahead)
+            ]
         else:
-            self.type_regex = None
+            self.type_regexes = [None]
 
 
 class Stdlib(Task):
@@ -174,11 +181,12 @@ class Stdlib(Task):
                 (lines, changed) = self.func_substitute(header, lines)
                 file_changed |= changed
 
-            if header.type_regex:
-                old_length = len(lines)
-                lines = header.type_regex.sub(header.type_sub, lines)
-                if not file_changed and old_length != len(lines):
-                    file_changed = True
+            for regex in header.type_regexes:
+                if regex:
+                    old_length = len(lines)
+                    lines = regex.sub(header.type_sub, lines)
+                    if not file_changed and old_length != len(lines):
+                        file_changed = True
 
         return (lines, file_changed, True)
 
