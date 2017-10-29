@@ -98,6 +98,16 @@ def test_bracecomment():
         "}  // extern \"C\"" + os.linesep))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
+    # Nested brackets on same line
+    inputs.append(("./Test.cpp",
+        "namespace wpi {" + os.linesep + \
+        "{{}}" + os.linesep + \
+        "}  // namespace java" + os.linesep))
+    outputs.append((
+        "namespace wpi {" + os.linesep + \
+        "{{}}" + os.linesep + \
+        "}  // namespace wpi" + os.linesep, True, True))
+
     # Handle single-line statements correctly
     inputs.append(("./Test.cpp",
                    "namespace hal { Type typeName; }" + os.linesep))

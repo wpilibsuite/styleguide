@@ -16,28 +16,32 @@ class BraceComment(Task):
         linesep = Task.get_linesep(lines)
         output = ""
 
-        regex = re.compile(
-            "(((?P<comment>(extern|namespace)\s+[\w\"]*)\s*)?{|\}.*$)",
-            re.ASCII | re.MULTILINE)
+        brace_prefix = "(?P<prefix>(extern|namespace)\s+[\w\"]*)"
+        brace_postfix = "\s*/(/|\*)[^\r\n]*"
+
+        brace_regex = re.compile(
+            "(" + brace_prefix + "\s*)?{|"  # "{" with optional prefix
+            "\}(" + brace_postfix + ")?")  # "}" with optional comment postfix
 
         name_stack = []
         brace_count = 0
         extract_location = 0
-        for match in re.finditer(regex, lines):
+        for match in re.finditer(brace_regex, lines):
             token = match.group(0)
 
-            if match.group("comment"):
+            if match.group("prefix"):
                 brace_count += 1
-                name_stack.append((brace_count,
-                                   match.group("comment").rstrip()))
+                name_stack.append((brace_count, match.group("prefix").rstrip()))
             elif "{" in token:
                 brace_count += 1
             elif token.startswith("}"):
+                output += lines[extract_location:match.start()]
                 if len(name_stack) > 0 and name_stack[len(name_stack) -
                                                       1][0] == brace_count:
-                    output += lines[extract_location:match.start(
-                    )] + "}  // " + name_stack.pop()[1] + linesep
-                    extract_location = match.end() + 1
+                    output += "}  // " + name_stack.pop()[1]
+                else:
+                    output += lines[match.start():match.end()]
+                extract_location = match.end()
                 brace_count -= 1
 
         # If input has unprocessed lines, write them to output
