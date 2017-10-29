@@ -10,7 +10,9 @@ Dependencies
 ============
 
 - `Python 3.4 or newer <https://www.python.org/downloads/>`_
-- clang-format 3.8 or newer (included with `LLVM <http://llvm.org/releases/download.html>`_)
+- clang-format (included with `LLVM <http://llvm.org/releases/download.html>`_)
+
+To obtain newer versions of clang-format on older Debian and Ubuntu releases, either upgrade to one that does or add the appropriate ``deb ... main`` line from `apt.llvm.org <http://apt.llvm.org/>`_ to ``/etc/apt/sources.list``. Then install ``clang-format-#`` where ``#`` is the version number.
 
 To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
 
