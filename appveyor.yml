@@ -14,7 +14,12 @@ init:
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
-  - cd wpiformat
+
+  # Needed for builds on branches instead of PRs
+  - set REPO=%CD%
+  - cd .. && ren %REPO% styleguide
+
+  - cd styleguide\wpiformat
   - py -3 setup.py build
   - py -3 setup.py install --optimize=1 --skip-build
 
@@ -23,7 +28,20 @@ build: false
 test_script:
   - py -3 setup.py test
   - cd .. && py -3 -m wpiformat -v
-  - py -3 -m wpiformat -f wpiformat/wpiformat/__init__.py -v
+  - cd wpiformat
+
+  # One file
+  - py -3 -m wpiformat -f wpiformat\__init__.py -v
+
+  # Absolute path to file
+  - py -3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+
+  # Multiple files
+  - py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
+
+  # Directory
+  - py -3 -m wpiformat -f wpiformat -v
+
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
 
 matrix:

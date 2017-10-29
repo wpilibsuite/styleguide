@@ -15,5 +15,21 @@ script:
   - python3 setup.py install --optimize=1 --skip-build
   - python3 setup.py test
   - cd .. && python3 -m wpiformat -v
-  - python3 -m wpiformat -f wpiformat/wpiformat/__init__.py -v
+  - cd wpiformat
+
+  # One file
+  - python3 -m wpiformat -f wpiformat/__init__.py -v
+
+  # Absolute path to file
+  - python3 -m wpiformat -f $HOME/styleguide/wpiformat/wpiformat/__init__.py -v
+
+  # Multiple files
+  - python3 -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
+
+  # Directory
+  - python3 -m wpiformat -f wpiformat -v
+
+  # Wildcard
+  - python3 -m wpiformat -f wpiformat/* -v
+
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
