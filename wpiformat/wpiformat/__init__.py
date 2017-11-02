@@ -20,6 +20,7 @@ from wpiformat.pyformat import PyFormat
 from wpiformat.stdlib import Stdlib
 from wpiformat.task import Task
 from wpiformat.usingdeclaration import UsingDeclaration
+from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
 
 
@@ -329,6 +330,7 @@ def main():
         Stdlib(),
         IncludeOrder(),
         UsingDeclaration(),
+        UsingNamespaceStd(),
         Whitespace()
     ]
     run_pipeline(task_pipeline, args, files)
