@@ -3,23 +3,16 @@ wpiformat
 
 Provides linters and formatters for ensuring WPILib's C++, Java, and Python code conform to its style guide. WPILib uses a variant of the Google style guides.
 
-Setup
-*****
-
 Dependencies
-============
+************
 
 - `Python 3.4 or newer <https://www.python.org/downloads/>`_
 - clang-format (included with `LLVM <http://llvm.org/releases/download.html>`_)
 
 To obtain newer versions of clang-format on older Debian and Ubuntu releases, either upgrade to one that does or add the appropriate ``deb ... main`` line from `apt.llvm.org <http://apt.llvm.org/>`_ to ``/etc/apt/sources.list``. Then install ``clang-format-#`` where ``#`` is the version number.
 
-To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
-
-Note: Since wpiformat already handles include ordering, it is recommended to use ``SortIncludes: false`` in ``.clang-format``.
-
 Installation
-============
+************
 
 On Windows, execute::
 
@@ -28,6 +21,13 @@ On Windows, execute::
 On Linux/OSX, execute::
 
     pip install wpiformat
+
+Project Setup
+*************
+
+To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
+
+Note: Since wpiformat already handles include ordering, it is recommended to use ``SortIncludes: false`` in ``.clang-format``.
 
 .styleguide
 -----------
