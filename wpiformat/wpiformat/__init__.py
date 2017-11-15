@@ -41,7 +41,8 @@ def filter_ignored_files(names):
     # platforms.
     return [
         name[2:].lstrip().strip("\"").replace("\\\\", "\\")
-        for name in output.decode().split("\n") if name[0:2] == "::"
+        for name in output.decode().split("\n")
+        if name[0:2] == "::"
     ]
 
 
@@ -245,7 +246,9 @@ def main():
     if not args.file:
         # Delete temporary files from previous incomplete run
         files = [
-            os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
+            os.path.join(dp, f)
+            for dp, dn, fn in os.walk(root_path)
+            for f in fn
             if f.endswith(".tmp")
         ]
         for f in files:
@@ -266,7 +269,8 @@ def main():
             if os.path.isdir(name):
                 files.extend([
                     os.path.join(dp, f)
-                    for dp, dn, fn in os.walk(name) for f in fn
+                    for dp, dn, fn in os.walk(name)
+                    for f in fn
                 ])
             else:
                 files.append(name)
@@ -285,8 +289,8 @@ def main():
     proc = subprocess.Popen(
         ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
     for line in proc.stdout:
-        changed_file_list.append(root_path + os.sep +
-                                 line.strip().decode("ascii"))
+        changed_file_list.append(
+            root_path + os.sep + line.strip().decode("ascii"))
 
     # Don't run tasks on modifiable or generated files
     work = []
