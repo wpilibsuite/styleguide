@@ -19,7 +19,7 @@ version_file = join(setup_dir, base_package, "version.py")
 
 # Automatically generate a version.py based on the git version
 if exists(git_dir):
-    proc = subprocess.Popen(
+    proc = subprocess.run(
         [
             "git",
             "rev-list",
@@ -30,13 +30,12 @@ if exists(git_dir):
             "master"
         ],
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE)
-    output, err = proc.communicate()
+        stderr=subprocess.STDOUT)
     # If there is no master branch, the commit count defaults to 0
-    if err:
+    if proc.returncode:
         commit_count = "0"
     else:
-        commit_count = output.decode("utf-8")
+        commit_count = proc.stdout.decode("utf-8")
 
     # Version number: <year>.<# commits on master>
     version = str(date.today().year) + "." + commit_count.strip()

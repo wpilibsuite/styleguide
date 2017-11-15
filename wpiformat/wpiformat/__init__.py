@@ -29,19 +29,21 @@ def filter_ignored_files(names):
     Keyword arguments:
     names -- list of files to filter
     """
-    cmd = ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
-
     # "git check-ignore" misbehaves when the names are separated by "\r\n" on
     # Windows, so os.linesep isn't used here.
-    output = proc.communicate("\n".join(names).encode())[0]
+    encoded_names = "\n".join(names).encode()
+
+    output_list = subprocess.run(
+        ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
+        input=encoded_names,
+        stdout=subprocess.PIPE).stdout.decode().split("\n")
 
     # "git check-ignore" prefixes the names of non-ignored files with "::",
     # wraps names in quotes on Windows, and outputs "\n" line separators on all
     # platforms.
     return [
         name[2:].lstrip().strip("\"").replace("\\\\", "\\")
-        for name in output.decode().split("\n")
+        for name in output_list
         if name[0:2] == "::"
     ]
 
@@ -286,9 +288,11 @@ def main():
 
     # Create list of all changed files
     changed_file_list = []
-    proc = subprocess.Popen(
-        ["git", "diff", "--name-only", "master"], stdout=subprocess.PIPE)
-    for line in proc.stdout:
+
+    output_list = subprocess.run(
+        ["git", "diff", "--name-only", "master"],
+        stdout=subprocess.PIPE).stdout.split()
+    for line in output_list:
         changed_file_list.append(
             root_path + os.sep + line.strip().decode("ascii"))
 
