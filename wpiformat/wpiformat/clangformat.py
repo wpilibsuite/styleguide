@@ -28,7 +28,7 @@ class ClangFormat(Task):
     def run_batch(self, config_file, names):
         args = ["-style=file", "-i"] + names
         try:
-            returncode = subprocess.call([self.exec_name] + args)
+            returncode = subprocess.run([self.exec_name] + args).returncode
         except FileNotFoundError:
             print(
                 "Error: " + self.exec_name +

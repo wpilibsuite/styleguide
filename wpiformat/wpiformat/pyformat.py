@@ -14,11 +14,11 @@ class PyFormat(Task):
     def run_batch(self, config_file, names):
         try:
             args = ["python3", "-m", "yapf", "--style", "google", "-i"]
-            returncode = subprocess.call(args + names)
+            returncode = subprocess.run(args + names).returncode
         except FileNotFoundError:
             try:
                 args = ["py", "-3", "-m", "yapf", "--style", "google", "-i"]
-                returncode = subprocess.call(args + names)
+                returncode = subprocess.run(args + names).returncode
             except FileNotFoundError:
                 print(
                     "Error: yapf not found in PATH. Is it installed?",
