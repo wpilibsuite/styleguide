@@ -51,6 +51,11 @@ def test_usingnamespacestd():
                    "using namespace std::chrono_literals;" + os.linesep))
     outputs.append(("", False, True))
 
+    # Ignore std::placeholders
+    inputs.append(("./Main.cpp",
+                   "using namespace std::placeholders;" + os.linesep))
+    outputs.append(("", False, True))
+
     assert len(inputs) == len(outputs)
 
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
