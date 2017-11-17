@@ -17,11 +17,11 @@ class UsingDeclaration(Task):
         # Tokenize file as brace opens, brace closes, and "using" declarations.
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
-        regex = re.compile("(\{|\}|using .*;)")
+        token_regex = re.compile("\{|\}|using .*;")
 
         brace_count = 0
-        for match in re.finditer(regex, lines):
-            token = match.group(0)
+        for match in token_regex.finditer(lines):
+            token = match.group()
 
             if token == "{":
                 brace_count += 1

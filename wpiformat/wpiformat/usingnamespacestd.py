@@ -18,7 +18,7 @@ class UsingNamespaceStd(Task):
         regex = re.compile(
             "using\s+namespace\s+std(;|::(?!(chrono_)?literals|placeholders))")
 
-        for match in re.finditer(regex, lines):
+        for match in regex.finditer(lines):
             linenum = lines.count(linesep, 0, match.start()) + 1
             print(
                 "Warning: " + name + ": " + str(linenum) +
