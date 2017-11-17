@@ -42,7 +42,7 @@ class LicenseUpdate(Task):
         license_end = 0
 
         # Regex for tokenizing on comment boundaries
-        regex_str = "(^/\*|\*/|^//)"
+        token_regex = re.compile("^/\*|\*/|^//")
 
         in_multiline_comment = False
         for line in stripped_lines:
@@ -51,11 +51,11 @@ class LicenseUpdate(Task):
                 first_comment_is_license = True
 
             line_has_comment = False
-            for match in re.finditer(regex_str, line):
+            for match in token_regex.finditer(line):
                 # If any comment token was matched, the line has a comment
                 line_has_comment = True
 
-                token = match.group(0)
+                token = match.group()
 
                 if token == "/*":
                     in_multiline_comment = True

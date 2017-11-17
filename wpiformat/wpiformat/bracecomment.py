@@ -26,8 +26,8 @@ class BraceComment(Task):
         name_stack = []
         brace_count = 0
         extract_location = 0
-        for match in re.finditer(brace_regex, lines):
-            token = match.group(0)
+        for match in brace_regex.finditer(lines):
+            token = match.group()
 
             if match.group("prefix"):
                 brace_count += 1
