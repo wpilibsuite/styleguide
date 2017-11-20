@@ -67,7 +67,7 @@ class IncludeOrder(Task):
                                        "(?P<postfix>.*)")
 
     def should_process_file(self, config_file, name):
-        return config_file.is_cpp_file(name)
+        return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def classify_header(self, config_file, include_line, file_name):
         """Classify the given header name and return the corresponding index.
@@ -91,7 +91,8 @@ class IncludeOrder(Task):
         # Is related if include has same base name as file name and file has a
         # source extension
         include_is_related = include_base == file_base and \
-            config_file.is_cpp_src_file(file_name)
+            (config_file.is_c_src_file(file_name) or \
+             config_file.is_cpp_src_file(file_name))
 
         if include_is_related:
             return 0
