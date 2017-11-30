@@ -2,14 +2,14 @@
 <code_scheme name="GoogleStyle">
     <option name="JAVA_INDENT_OPTIONS">
         <value>
-          <option name="INDENT_SIZE" value="2" />
-          <option name="CONTINUATION_INDENT_SIZE" value="4" />
-          <option name="TAB_SIZE" value="2" />
-          <option name="USE_TAB_CHARACTER" value="false" />
-          <option name="SMART_TABS" value="false" />
-          <option name="LABEL_INDENT_SIZE" value="0" />
-          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
-          <option name="USE_RELATIVE_INDENTS" value="false" />
+            <option name="INDENT_SIZE" value="2" />
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+            <option name="TAB_SIZE" value="2" />
+            <option name="USE_TAB_CHARACTER" value="false" />
+            <option name="SMART_TABS" value="false" />
+            <option name="LABEL_INDENT_SIZE" value="0" />
+            <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+            <option name="USE_RELATIVE_INDENTS" value="false" />
         </value>
     </option>
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
@@ -287,14 +287,14 @@
     <option name="WHILE_BRACE_FORCE" value="3" />
     <option name="FOR_BRACE_FORCE" value="3" />
     <ADDITIONAL_INDENT_OPTIONS fileType="css">
-        <option name="INDENT_SIZE" value="4" />
-        <option name="CONTINUATION_INDENT_SIZE" value="8" />
-        <option name="TAB_SIZE" value="4" />
-        <option name="USE_TAB_CHARACTER" value="false" />
-        <option name="SMART_TABS" value="false" />
-        <option name="LABEL_INDENT_SIZE" value="0" />
-        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
-        <option name="USE_RELATIVE_INDENTS" value="false" />
+    <option name="INDENT_SIZE" value="4" />
+    <option name="CONTINUATION_INDENT_SIZE" value="8" />
+    <option name="TAB_SIZE" value="4" />
+    <option name="USE_TAB_CHARACTER" value="false" />
+    <option name="SMART_TABS" value="false" />
+    <option name="LABEL_INDENT_SIZE" value="0" />
+    <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+    <option name="USE_RELATIVE_INDENTS" value="false" />
     </ADDITIONAL_INDENT_OPTIONS>
     <ADDITIONAL_INDENT_OPTIONS fileType="haml">
         <option name="INDENT_SIZE" value="2" />
