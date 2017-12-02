@@ -9,6 +9,7 @@ import subprocess
 import sys
 
 from wpiformat.bracecomment import BraceComment
+from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
 from wpiformat.includeguard import IncludeGuard
@@ -329,6 +330,7 @@ def main():
     # so it can clean up their formatting.
     task_pipeline = [
         BraceComment(),
+        CIdentList(),
         IncludeGuard(),
         LicenseUpdate(str(args.year)),
         JavaClass(),
