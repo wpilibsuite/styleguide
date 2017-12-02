@@ -2,9 +2,23 @@
 
 pushd wpiformat
 rm -rf dist
-git checkout master
-if [ $? == 0 ]; then
-  python setup.py sdist bdist_wheel
-  twine upload dist/*
+git checkout master || exit 1
+
+# Ensure no files are untracked, changed, or staged respectively
+if [ `echo -n $(git clean -n) | wc -c` != 0 ]; then
+  echo "Please remove untracked files before publishing (see 'git status')"
+  exit 1
 fi
+if [ `echo -n $(git diff) | wc -c` != 0 ]; then
+  echo "Please remove changed files before publishing (see 'git status')"
+  exit 1
+fi
+if [ `echo -n $(git diff --staged) | wc -c` != 0 ]; then
+  echo "Please remove staged files before publishing (see 'git status')"
+  exit 1
+fi
+
+git pull git://github.com/wpilibsuite/styleguide master || exit 1
+python setup.py sdist bdist_wheel
+twine upload dist/*
 popd
