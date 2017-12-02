@@ -51,9 +51,9 @@ class Task(object):
         config_file -- Config object
         name -- file name string
 
-        Match anything by default.
+        Process any file by default.
         """
-        return [".*"]
+        return True
 
     @abstractmethod
     def run_pipeline(self, config_file, name, lines):
