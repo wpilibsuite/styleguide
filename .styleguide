@@ -20,6 +20,10 @@ licenseUpdateExclude {
   Excluded\.h$
 }
 
+includeGuardRoots {
+  wpiformat/
+}
+
 # Used by unit tests
 includeProject {
   ^ctre/

@@ -17,10 +17,10 @@ def test_includeguard():
         os.linesep + \
         "#endif" + os.linesep))
     outputs.append((
-        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep, True, True))
+        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True))
 
     # Ensure nested preprocessor statements are handled properly for incorrect
     # include guard
@@ -33,20 +33,20 @@ def test_includeguard():
         "#endif" + os.linesep + \
         "#endif" + os.linesep))
     outputs.append((
-        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
         os.linesep + \
         "#if SOMETHING" + os.linesep + \
         "// do something" + os.linesep + \
         "#endif" + os.linesep + \
-        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep, True, True))
+        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True))
 
     # Don't touch correct include guard
     inputs.append(("./Test.h",
-        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep))
+        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
     # Fail on missing include guard
@@ -56,6 +56,18 @@ def test_includeguard():
     # Verify pragma once counts as include guard
     inputs.append(("./Test.h", "#pragma once" + os.linesep))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
+
+    # Ensure include guard roots are processed correctly
+    inputs.append(("./Test.h",
+        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        os.linesep + \
+        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep))
+    outputs.append((
+        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        os.linesep + \
+        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True))
 
     assert len(inputs) == len(outputs)
 

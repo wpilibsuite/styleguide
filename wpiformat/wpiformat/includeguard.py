@@ -58,7 +58,7 @@ class IncludeGuard(Task):
             else:
                 output_list[i] = lines_list[i]
 
-        # if include guard not found
+        # If include guard not found
         if state == State.FINDING_IFNDEF:
             print("Error: " + name +
                   ": doesn't contain include guard or '#pragma once'")
@@ -82,7 +82,7 @@ class IncludeGuard(Task):
         repo_root = Task.get_repo_root()
 
         name = os.path.relpath(name, repo_root)
-        guard_path = os.path.basename(repo_root) + "/"
+        guard_path = os.path.basename(repo_root) + os.sep
         include_roots = config_file.group("includeGuardRoots")
 
         if include_roots:
