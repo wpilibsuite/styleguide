@@ -192,13 +192,16 @@ class Config:
             elif in_group:
                 value = line.strip()
 
-                # header includes still use forward slash on Windows
+                # Header includes still use forward slash on Windows
                 unescaped_groups = [
                     "includeRelated", "includeCSys", "includeCppSys",
                     "includeOtherLibs", "includeProject"
                 ]
-                if group_name not in unescaped_groups and os.sep == "\\":
-                    # On Windows, replace "/" with escaped "\" for regexes
+                if group_name == "includeGuardRoots":
+                    # Include guard roots use native directory separators
+                    value = value.replace("/", os.sep)
+                elif group_name not in unescaped_groups and os.sep == "\\":
+                    # Replace "/" with escaped "\" for regexes on Windows
                     value = value.replace("/", os.sep + os.sep)
 
                 group_elements.append(value)
