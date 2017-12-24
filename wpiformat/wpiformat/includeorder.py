@@ -52,7 +52,8 @@ class IncludeOrder(Task):
             "streambuf", "cstdio", "locale", "clocale", "codecvt", "regex",
             "atomic", "thread", "mutex", "shared_mutex", "future",
             "condition_variable", "ciso646", "ccomplex", "ctgmath", "cstdalign",
-            "cstdbool"
+            "cstdbool", "any", "filesystem", "optional", "string_view",
+            "variant"
         ]
 
         # Header type 3: Other library headers
