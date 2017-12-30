@@ -13,6 +13,7 @@ from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
+from wpiformat.javaclass import JavaClass
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
 from wpiformat.newline import Newline
@@ -330,6 +331,7 @@ def main():
         BraceComment(),
         IncludeGuard(),
         LicenseUpdate(str(args.year)),
+        JavaClass(),
         Newline(),
         Stdlib(),
         IncludeOrder(),
