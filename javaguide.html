@@ -256,7 +256,7 @@
 </tr>
 </table>
 <div><a name="s1-introduction"/>
-    <h2>1 Introduction&nbsp;<a href="#s1-introduction"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>1 Introduction&nbsp;<a href="#s1-introduction"><img height="21" width="21" src="guidelink.png"/></a></h2>
 
 <p><strong>This guide is a work in progress.</strong>
 We are currently working on getting this guide updated to
@@ -274,28 +274,28 @@ a point where it is useful for WPILib developers to use.</p>
  programming practices true in one language will be true in the other
  (although this is not universally true).</p>
 </p><a name="s1.1-terminology"/>
-    <h3>1.1 Terminology notes&nbsp;<a href="#s1.1-terminology"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>1.1 Terminology notes&nbsp;<a href="#s1.1-terminology"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>In this document, unless otherwise clarified:</p><ol><li>The term <em>class</em> is used inclusively to mean an "ordinary" class, enum class,
   interface or annotation type (<code class="prettyprint lang-java">@interface</code>).</li><li>The term <em>comment</em> always refers to <em>implementation</em> comments. We do not
   use the phrase "documentation comments", instead using the common term "Javadoc."</li></ol><p>Other "terminology notes" will appear occasionally throughout the document.</p><a name="s1.2-guide-notes"/>
-    <h3>1.2 Guide notes&nbsp;<a href="#s1.2-guide-notes"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>1.2 Guide notes&nbsp;<a href="#s1.2-guide-notes"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Example code in this document is <strong>non-normative</strong>. That is, while the examples
 are in Google Style, they may not illustrate the <em>only</em> stylish way to represent the
 code. Optional formatting choices made in examples should not be enforced as rules.</p><a name="s2-source-file-basics"/>
-    <h2>2 Source file basics&nbsp;<a href="#s2-source-file-basics"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>2 Source file basics&nbsp;<a href="#s2-source-file-basics"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <a name="s2.1-file-name"/>
-    <h3>2.1 File name&nbsp;<a href="#s2.1-file-name"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>2.1 File name&nbsp;<a href="#s2.1-file-name"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>The source file name consists of the case-sensitive name of the top-level class it contains,
 plus the <code>.java</code> extension.</p><a name="s2.2-file-encoding"/>
-    <h3>2.2 File encoding: UTF-8&nbsp;<a href="#s2.2-file-encoding"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>2.2 File encoding: UTF-8&nbsp;<a href="#s2.2-file-encoding"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Source files are encoded in <strong>UTF-8</strong>.</p><a name="s2.3-special-characters"/>
-    <h3>2.3 Special characters&nbsp;<a href="#s2.3-special-characters"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>2.3 Special characters&nbsp;<a href="#s2.3-special-characters"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s2.3.1-whitespace-characters"/>
-    <h4>2.3.1 Whitespace characters&nbsp;<a href="#s2.3.1-whitespace-characters"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>2.3.1 Whitespace characters&nbsp;<a href="#s2.3.1-whitespace-characters"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Aside from the line terminator sequence, the <strong>ASCII horizontal space
 character</strong> (<strong>0x20</strong>) is the only whitespace character that appears
 anywhere in a source file. This implies that:</p><ol><li>All other whitespace characters in string and character literals are escaped.</li><li>Tab characters are <strong>not</strong> used for indentation.</li></ol><a name="s2.3.2-special-escape-sequences"/>
-    <h4>2.3.2 Special escape sequences&nbsp;<a href="#s2.3.2-special-escape-sequences"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>2.3.2 Special escape sequences&nbsp;<a href="#s2.3.2-special-escape-sequences"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>For any character that has a special escape sequence
 (<code class="prettyprint lang-java">\b</code>,
 <code class="prettyprint lang-java">\t</code>,
@@ -308,7 +308,7 @@ anywhere in a source file. This implies that:</p><ol><li>All other whitespace ch
 is used rather than the corresponding octal
 (e.g. <code class="badcode">\012</code>) or Unicode
 (e.g. <code class="badcode">\u000a</code>) escape.</p><a name="s2.3.3-non-ascii-characters"/>
-    <h4>2.3.3 Non-ASCII characters&nbsp;<a href="#s2.3.3-non-ascii-characters"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>2.3.3 Non-ASCII characters&nbsp;<a href="#s2.3.3-non-ascii-characters"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>For the remaining non-ASCII characters, either the actual Unicode character
 (e.g. <code class="prettyprint lang-java">∞</code>) or the equivalent Unicode escape
 (e.g. <code class="prettyprint lang-java">\u221e</code>) is used, depending only on which
@@ -318,22 +318,22 @@ Unicode characters are used, an explanatory comment can be very helpful.</p><p>E
        // byte order mark</code></td><td>Good: use escapes for non-printable characters, and comment if necessary.</td></tr></table><p class="tip"><strong>Tip:</strong> Never make your code less readable simply out of fear that
 some programs might not handle non-ASCII characters properly. If that should happen, those
 programs are <strong>broken</strong> and they must be <strong>fixed</strong>.</p><a name="filestructure"/><a name="s3-source-file-structure"/>
-    <h2>3 Source file structure&nbsp;<a href="#s3-source-file-structure"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>3 Source file structure&nbsp;<a href="#s3-source-file-structure"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <div><p>A source file consists of, <strong>in order</strong>:</p><ol><li>License or copyright information, if present</li><li>Package statement</li><li>Import statements</li><li>Exactly one top-level class</li></ol></div><p><strong>Exactly one blank line</strong> separates each section that is present.</p><a name="s3.1-copyright-statement"/>
-    <h3>3.1 License or copyright information, if present&nbsp;<a href="#s3.1-copyright-statement"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>3.1 License or copyright information, if present&nbsp;<a href="#s3.1-copyright-statement"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>If license or copyright information belongs in a file, it belongs here.</p><a name="s3.2-package-statement"/>
-    <h3>3.2 Package statement&nbsp;<a href="#s3.2-package-statement"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>3.2 Package statement&nbsp;<a href="#s3.2-package-statement"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>The package statement is <strong>not line-wrapped</strong>. The column limit (Section 4.4,
 <a href="#s4.4-column-limit">Column limit: 80</a>) does not apply to package statements.</p><a name="imports"/><a name="s3.3-import-statements"/>
-    <h3>3.3 Import statements&nbsp;<a href="#s3.3-import-statements"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>3.3 Import statements&nbsp;<a href="#s3.3-import-statements"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s3.3.1-wildcard-imports"/>
-    <h4>3.3.1 No wildcard imports&nbsp;<a href="#s3.3.1-wildcard-imports"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>3.3.1 No wildcard imports&nbsp;<a href="#s3.3.1-wildcard-imports"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p><strong>Wildcard imports</strong>, static or otherwise, <strong>are not used</strong>.</p><a name="s3.3.2-import-line-wrapping"/>
-    <h4>3.3.2 No line-wrapping&nbsp;<a href="#s3.3.2-import-line-wrapping"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>3.3.2 No line-wrapping&nbsp;<a href="#s3.3.2-import-line-wrapping"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Import statements are <strong>not line-wrapped</strong>. The column limit (Section 4.4,
 <a href="#s4.4-column-limit">Column limit: 80</a>) does not apply to import
 statements.</p><a name="s3.3.3-import-ordering-and-spacing"/>
-    <h4>3.3.3 Ordering and spacing&nbsp;<a href="#s3.3.3-import-ordering-and-spacing"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>3.3.3 Ordering and spacing&nbsp;<a href="#s3.3.3-import-ordering-and-spacing"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Import statements are divided into the following groups, in this order, with each group
 separated by a single blank line:</p><ol><li>All static imports in a single group</li><li><code>com.google</code> imports
   (only if this source file is in the <code>com.google</code> package
@@ -342,28 +342,28 @@ separated by a single blank line:</p><ol><li>All static imports in a single grou
     <code>sun</code></li></ul></li><li><code>java</code> imports</li><li><code>javax</code> imports</li></ol><p>Within a group there are no blank lines, and the imported names appear in ASCII sort
 order. (<strong>Note:</strong> this is not the same as the import <em>statements</em> being in
 ASCII sort order; the presence of semicolons warps the result.)</p><a name="s3.4-class-declaration"/>
-    <h3>3.4 Class declaration&nbsp;<a href="#s3.4-class-declaration"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>3.4 Class declaration&nbsp;<a href="#s3.4-class-declaration"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="oneclassperfile"/><a name="s3.4.1-one-top-level-class"/>
-    <h4>3.4.1 Exactly one top-level class declaration&nbsp;<a href="#s3.4.1-one-top-level-class"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>3.4.1 Exactly one top-level class declaration&nbsp;<a href="#s3.4.1-one-top-level-class"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Each top-level class resides in a source file of its own.</p><a name="s3.4.2-class-member-ordering"/>
-    <h4>3.4.2 Class member ordering&nbsp;<a href="#s3.4.2-class-member-ordering"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>3.4.2 Class member ordering&nbsp;<a href="#s3.4.2-class-member-ordering"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>The ordering of the members of a class can have a great effect on learnability, but there is
 no single correct recipe for how to do it. Different classes may order their members
 differently.</p><p>What is important is that each class order its members in <strong><em>some</em> logical
 order</strong>, which its maintainer could explain if asked. For example, new methods are not
 just habitually added to the end of the class, as that would yield "chronological by date
 added" ordering, which is not a logical ordering.</p><a name="overloads"/><a name="s3.4.2.1-overloads-never-split"/>
-    <h5>3.4.2.1 Overloads: never split&nbsp;<a href="#s3.4.2.1-overloads-never-split"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>3.4.2.1 Overloads: never split&nbsp;<a href="#s3.4.2.1-overloads-never-split"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>When a class has multiple constructors, or multiple methods with the same name, these appear
 sequentially, with no intervening members.</p><a name="s4-formatting"/>
-    <h2>4 Formatting&nbsp;<a href="#s4-formatting"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>4 Formatting&nbsp;<a href="#s4-formatting"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <p class="terminology"><strong>Terminology Note:</strong> <em>block-like construct</em> refers to
 the body of a class, method or constructor. Note that, by Section 4.8.3.1 on
 <a href="#s4.8.3.1-array-initializers">array initializers</a>, any array initializer
 <em>may</em> optionally be treated as if it were a block-like construct.</p><a name="braces"/><a name="s4.1-braces"/>
-    <h3>4.1 Braces&nbsp;<a href="#s4.1-braces"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.1 Braces&nbsp;<a href="#s4.1-braces"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s4.1.1-braces-always-used"/>
-    <h4>4.1.1 Braces are used where optional&nbsp;<a href="#s4.1.1-braces-always-used"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.1.1 Braces are used where optional&nbsp;<a href="#s4.1.1-braces-always-used"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Braces are used with
 <code class="prettyprint lang-java">if</code>,
 <code class="prettyprint lang-java">else</code>,
@@ -371,7 +371,7 @@ the body of a class, method or constructor. Note that, by Section 4.8.3.1 on
 <code class="prettyprint lang-java">do</code> and
 <code class="prettyprint lang-java">while</code> statements, even when the
 body is empty or contains only a single statement.</p><a name="s4.1.2-blocks-k-r-style"/>
-    <h4>4.1.2 Nonempty blocks: K &amp; R style&nbsp;<a href="#s4.1.2-blocks-k-r-style"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.1.2 Nonempty blocks: K &amp; R style&nbsp;<a href="#s4.1.2-blocks-k-r-style"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Braces follow the Kernighan and Ritchie style
 ("<a href="http://www.codinghorror.com/blog/2012/07/new-programming-jargon.html">Egyptian brackets</a>")
 for <em>nonempty</em> blocks and block-like constructs:</p><ul><li>No line break before the opening brace.</li><li>Line break after the opening brace.</li><li>Line break before the closing brace.</li><li>Line break after the closing brace <em>if</em> that brace terminates a statement or the body
@@ -391,7 +391,7 @@ return new MyClass() {
 };
 </pre><p>A few exceptions for enum classes are given in Section 4.8.1,
 <a href="#s4.8.1-enum-classes">Enum classes</a>.</p><a name="emptyblocks"/><a name="s4.1.3-braces-empty-blocks"/>
-    <h4>4.1.3 Empty blocks: may be concise&nbsp;<a href="#s4.1.3-braces-empty-blocks"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.1.3 Empty blocks: may be concise&nbsp;<a href="#s4.1.3-braces-empty-blocks"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>An empty block or block-like construct <em>may</em> be closed immediately after it is
 opened, with no characters or line break in between
 (<code class="prettyprint lang-java">{}</code>), <strong>unless</strong> it is part of a
@@ -400,14 +400,14 @@ opened, with no characters or line break in between
 <code class="prettyprint lang-java">try/catch/finally</code>).</p><p>Example:</p><pre class="prettyprint lang-java">
   void doNothing() {}
 </pre><a name="s4.2-block-indentation"/>
-    <h3>4.2 Block indentation: +2 spaces&nbsp;<a href="#s4.2-block-indentation"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.2 Block indentation: +2 spaces&nbsp;<a href="#s4.2-block-indentation"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Each time a new block or block-like construct is opened, the indent increases by two
 spaces. When the block ends, the indent returns to the previous indent level. The indent level
 applies to both code and comments throughout the block. (See the example in Section 4.1.2,
 <a href="#s4.1.2-blocks-k-r-style">Nonempty blocks: K &amp; R Style</a>.)</p><a name="s4.3-one-statement-per-line"/>
-    <h3>4.3 One statement per line&nbsp;<a href="#s4.3-one-statement-per-line"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.3 One statement per line&nbsp;<a href="#s4.3-one-statement-per-line"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Each statement is followed by a line-break.</p><a name="columnlimit"/><a name="s4.4-column-limit"/>
-    <h3>4.4 Column limit: 80&nbsp;<a href="#s4.4-column-limit"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.4 Column limit: 80&nbsp;<a href="#s4.4-column-limit"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>
   Projects should have a column limit of 80 characters.
 
@@ -418,14 +418,14 @@ Section 4.5, <a href="#s4.5-line-wrapping">Line-wrapping</a>.
   <code class="prettyprint lang-java">import</code> statements (see Sections
   3.2 <a href="#s3.2-package-statement">Package statement</a> and
   3.3 <a href="#s3.3-import-statements">Import statements</a>).</li><li>Command lines in a comment that may be cut-and-pasted into a shell.</li></ol><a name="s4.5-line-wrapping"/>
-    <h3>4.5 Line-wrapping&nbsp;<a href="#s4.5-line-wrapping"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.5 Line-wrapping&nbsp;<a href="#s4.5-line-wrapping"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p class="terminology"><strong>Terminology Note:</strong> When code that might otherwise legally
 occupy a single line is divided into multiple lines, typically to avoid overflowing the column
 limit, this activity is called
 <em>line-wrapping</em>.</p><p>There is no comprehensive, deterministic formula showing <em>exactly</em> how to line-wrap in
 every situation. Very often there are several valid ways to line-wrap the same piece of code.</p><p class="tip"><strong>Tip:</strong> Extracting a method or local variable may solve the problem
 without the need to line-wrap.</p><a name="s4.5.1-line-wrapping-where-to-break"/>
-    <h4>4.5.1 Where to break&nbsp;<a href="#s4.5.1-line-wrapping-where-to-break"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.5.1 Where to break&nbsp;<a href="#s4.5.1-line-wrapping-where-to-break"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>The prime directive of line-wrapping is: prefer to break at a
 <strong>higher syntactic level</strong>. Also:</p><ol><li>When a line is broken at a <em>non-assignment</em> operator the break comes <em>before</em>
   the symbol. (Note that this is not the same practice used in Google style for other languages,
@@ -440,16 +440,16 @@ without the need to line-wrap.</p><a name="s4.5.1-line-wrapping-where-to-break"/
       <code class="prettyprint lang-java">for</code> ("foreach") statement.</li></ul></li><li>A method or constructor name stays attached to the open parenthesis
   (<code class="prettyprint lang-java">(</code>) that follows it.</li><li>A comma (<code class="prettyprint lang-java">,</code>) stays attached to the token that
   precedes it.</li></ol><a name="indentation"/><a name="s4.5.2-line-wrapping-indent"/>
-    <h4>4.5.2 Indent continuation lines at least +4 spaces&nbsp;<a href="#s4.5.2-line-wrapping-indent"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.5.2 Indent continuation lines at least +4 spaces&nbsp;<a href="#s4.5.2-line-wrapping-indent"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>When line-wrapping, each line after the first (each <em>continuation line</em>) is indented
 at least +4 from the original line.</p><p>When there are multiple continuation lines, indentation may be varied beyond +4 as
 desired. In general, two continuation lines use the same indentation level if and only if they
 begin with syntactically parallel elements.</p><p>Section 4.6.3 on <a href="#s4.6.3-horizontal-alignment">Horizontal alignment</a> addresses
 the discouraged practice of using a variable number of spaces to align certain tokens with
 previous lines.</p><a name="s4.6-whitespace"/>
-    <h3>4.6 Whitespace&nbsp;<a href="#s4.6-whitespace"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.6 Whitespace&nbsp;<a href="#s4.6-whitespace"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s4.6.1-vertical-whitespace"/>
-    <h4>4.6.1 Vertical Whitespace&nbsp;<a href="#s4.6.1-vertical-whitespace"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.6.1 Vertical Whitespace&nbsp;<a href="#s4.6.1-vertical-whitespace"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>A single blank line appears:</p><ol><li><em>Between</em> consecutive members (or initializers) of a class: fields, constructors,
   methods, nested classes, static initializers, instance initializers.
   <ul><li><span class="exception"><strong>Exception:</strong> A blank line between two consecutive
@@ -457,7 +457,7 @@ previous lines.</p><a name="s4.6-whitespace"/>
     create <em>logical groupings</em> of fields.</span></li></ul></li><li>Within method bodies, as needed to create <em>logical groupings</em> of statements.</li><li><em>Optionally</em> before the first member or after the last member of the class (neither
   encouraged nor discouraged).</li><li>As required by other sections of this document (such as Section 3.3,
   <a href="#s3.3-import-statements">Import statements</a>).</li></ol><p><em>Multiple</em> consecutive blank lines are permitted, but never required (or encouraged).</p><a name="s4.6.2-horizontal-whitespace"/>
-    <h4>4.6.2 Horizontal whitespace&nbsp;<a href="#s4.6.2-horizontal-whitespace"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.6.2 Horizontal whitespace&nbsp;<a href="#s4.6.2-horizontal-whitespace"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Beyond where required by the language or other style rules, and apart from literals, comments and
 Javadoc, a single ASCII space also appears in the following places <strong>only</strong>.</p><ol><li>Separating any reserved word, such as
   <code class="prettyprint lang-java">if</code>,
@@ -482,7 +482,7 @@ Javadoc, a single ASCII space also appears in the following places <strong>only<
   <ul><li><code class="prettyprint lang-java">new int[] {5, 6}</code> and
     <code class="prettyprint lang-java">new int[] { 5, 6 }</code> are both valid</li></ul></li></ol><p class="note"><strong>Note:</strong> This rule never requires or forbids additional space at the
 start or end of a line, only <em>interior</em> space.</p><a name="s4.6.3-horizontal-alignment"/>
-    <h4>4.6.3 Horizontal alignment: never required&nbsp;<a href="#s4.6.3-horizontal-alignment"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.6.3 Horizontal alignment: never required&nbsp;<a href="#s4.6.3-horizontal-alignment"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p class="terminology"><strong>Terminology Note:</strong> <em>Horizontal alignment</em> is the
 practice of adding a variable number of additional spaces in your code with the goal of making
 certain tokens appear directly below certain other tokens on previous lines.</p><p>This practice is permitted, but is <strong>never required</strong> by Google Style. It is not
@@ -499,33 +499,33 @@ it prompts the coder (perhaps you) to adjust whitespace on nearby lines as well,
 triggering a cascading series of reformattings. That one-line change now has a "blast radius."
 This can at worst result in pointless busywork, but at best it still corrupts version history
 information, slows down reviewers and exacerbates merge conflicts.</p><a name="parentheses"/><a name="s4.7-grouping-parentheses"/>
-    <h3>4.7 Grouping parentheses: recommended&nbsp;<a href="#s4.7-grouping-parentheses"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.7 Grouping parentheses: recommended&nbsp;<a href="#s4.7-grouping-parentheses"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Optional grouping parentheses are omitted only when author and reviewer agree that there is no
 reasonable chance the code will be misinterpreted without them, nor would they have made the code
 easier to read. It is <em>not</em> reasonable to assume that every reader has the entire Java
 operator precedence table memorized.</p><a name="s4.8-specific-constructs"/>
-    <h3>4.8 Specific constructs&nbsp;<a href="#s4.8-specific-constructs"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>4.8 Specific constructs&nbsp;<a href="#s4.8-specific-constructs"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s4.8.1-enum-classes"/>
-    <h4>4.8.1 Enum classes&nbsp;<a href="#s4.8.1-enum-classes"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.1 Enum classes&nbsp;<a href="#s4.8.1-enum-classes"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>After each comma that follows an enum constant, a line-break is optional.</p><p>An enum class with no methods and no documentation on its constants may optionally be formatted
 as if it were an array initializer (see Section 4.8.3.1 on
 <a href="#s4.8.3.1-array-initializers">array initializers</a>).</p><pre class="prettyprint lang-java">
 private enum Suit { CLUBS, HEARTS, SPADES, DIAMONDS }
 </pre><p>Since enum classes <em>are classes</em>, all other rules for formatting classes apply.</p><a name="localvariables"/><a name="s4.8.2-variable-declarations"/>
-    <h4>4.8.2 Variable declarations&nbsp;<a href="#s4.8.2-variable-declarations"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.2 Variable declarations&nbsp;<a href="#s4.8.2-variable-declarations"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <a name="s4.8.2.1-variables-per-declaration"/>
-    <h5>4.8.2.1 One variable per declaration&nbsp;<a href="#s4.8.2.1-variables-per-declaration"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.2.1 One variable per declaration&nbsp;<a href="#s4.8.2.1-variables-per-declaration"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Every variable declaration (field or local) declares only one variable: declarations such as
 <code class="badcode">int a, b;</code> are not used.</p><a name="s4.8.2.2-variables-limited-scope"/>
     <h5>4.8.2.2 Declared when needed, initialized as soon as
-possible&nbsp;<a href="#s4.8.2.2-variables-limited-scope"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+possible&nbsp;<a href="#s4.8.2.2-variables-limited-scope"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Local variables are <strong>not</strong> habitually declared at the start of their containing
 block or block-like construct. Instead, local variables are declared close to the point they are
 first used (within reason), to minimize their scope. Local variable declarations typically have
 initializers, or are initialized immediately after declaration.</p><a name="s4.8.3-arrays"/>
-    <h4>4.8.3 Arrays&nbsp;<a href="#s4.8.3-arrays"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.3 Arrays&nbsp;<a href="#s4.8.3-arrays"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <a name="s4.8.3.1-array-initializers"/>
-    <h5>4.8.3.1 Array initializers: can be "block-like"&nbsp;<a href="#s4.8.3.1-array-initializers"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.3.1 Array initializers: can be "block-like"&nbsp;<a href="#s4.8.3.1-array-initializers"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Any array initializer may <em>optionally</em> be formatted as if it were a "block-like
 construct." For example, the following are all valid (<strong>not</strong> an exhaustive
 list):</p><pre class="prettyprint lang-java">
@@ -539,20 +539,20 @@ new int[] {             3,
 }                     new int[]
                           {0, 1, 2, 3}
 </pre><a name="s4.8.3.2-array-declarations"/>
-    <h5>4.8.3.2 No C-style array declarations&nbsp;<a href="#s4.8.3.2-array-declarations"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.3.2 No C-style array declarations&nbsp;<a href="#s4.8.3.2-array-declarations"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>The square brackets form a part of the <em>type</em>, not the variable:
 <code class="prettyprint lang-java">String[] args</code>, not
 <code class="badcode">String args[]</code>.</p><a name="s4.8.4-switch"/>
-    <h4>4.8.4 Switch statements&nbsp;<a href="#s4.8.4-switch"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.4 Switch statements&nbsp;<a href="#s4.8.4-switch"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p class="terminology"><strong>Terminology Note:</strong> Inside the braces of a
 <em>switch block</em> are one or more <em>statement groups</em>. Each statement group consists of
 one or more <em>switch labels</em> (either <code class="prettyprint lang-java">case FOO:</code> or
 <code class="prettyprint lang-java">default:</code>), followed by one or more statements.</p><a name="s4.8.4.1-switch-indentation"/>
-    <h5>4.8.4.1 Indentation&nbsp;<a href="#s4.8.4.1-switch-indentation"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.4.1 Indentation&nbsp;<a href="#s4.8.4.1-switch-indentation"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>As with any other block, the contents of a switch block are indented +2.</p><p>After a switch label, a newline appears, and the indentation level is increased +2, exactly as
 if a block were being opened. The following switch label returns to the previous indentation
 level, as if a block had been closed.</p><a name="fallthrough"/><a name="s4.8.4.2-switch-fall-through"/>
-    <h5>4.8.4.2 Fall-through: commented&nbsp;<a href="#s4.8.4.2-switch-fall-through"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.4.2 Fall-through: commented&nbsp;<a href="#s4.8.4.2-switch-fall-through"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Within a switch block, each statement group either terminates abruptly (with a
 <code class="prettyprint lang-java">break</code>,
 <code class="prettyprint lang-java">continue</code>,
@@ -573,10 +573,10 @@ switch (input) {
     handleLargeNumber(input);
 }
 </pre><a name="s4.8.4.3-switch-default"/>
-    <h5>4.8.4.3 The default case is present&nbsp;<a href="#s4.8.4.3-switch-default"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.4.3 The default case is present&nbsp;<a href="#s4.8.4.3-switch-default"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Each switch statement includes a <code class="prettyprint lang-java">default</code> statement
 group, even if it contains no code.</p><a name="annotations"/><a name="s4.8.5-annotations"/>
-    <h4>4.8.5 Annotations&nbsp;<a href="#s4.8.5-annotations"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.5 Annotations&nbsp;<a href="#s4.8.5-annotations"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Annotations applying to a class, method or constructor appear immediately after the
 documentation block, and each annotation is listed on a line of its own (that is, one annotation
 per line). These line breaks do not constitute line-wrapping (Section
@@ -593,9 +593,9 @@ this case, <em>multiple</em> annotations (possibly parameterized) may be listed 
 for example:</p><pre class="prettyprint lang-java">
 @Partial @Mock DataLoader loader;
 </pre><p>There are no specific rules for formatting parameter and local variable annotations.</p><a name="comments"/><a name="s4.8.6-comments"/>
-    <h4>4.8.6 Comments&nbsp;<a href="#s4.8.6-comments"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.6 Comments&nbsp;<a href="#s4.8.6-comments"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <a name="s4.8.6.1-block-comment-style"/>
-    <h5>4.8.6.1 Block comment style&nbsp;<a href="#s4.8.6.1-block-comment-style"><img height="21" width="21" src="javaguidelink.png"/></a></h5>
+    <h5>4.8.6.1 Block comment style&nbsp;<a href="#s4.8.6.1-block-comment-style"><img height="21" width="21" src="guidelink.png"/></a></h5>
     <p>Block comments are indented at the same level as the surrounding code. They may be in
 <code class="prettyprint lang-java">/* ... */</code> style or
 <code class="prettyprint lang-java">// ...</code> style. For multi-line
@@ -609,33 +609,33 @@ for example:</p><pre class="prettyprint lang-java">
 <code class="prettyprint lang-java">/* ... */</code> style if you want automatic code formatters to
 re-wrap the lines when necessary (paragraph-style). Most formatters don't re-wrap lines in
 <code class="prettyprint lang-java">// ...</code> style comment blocks.</p><a name="modifiers"/><a name="s4.8.7-modifiers"/>
-    <h4>4.8.7 Modifiers&nbsp;<a href="#s4.8.7-modifiers"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.7 Modifiers&nbsp;<a href="#s4.8.7-modifiers"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Class and member modifiers, when present, appear in the order
 recommended by the Java Language Specification:
 </p><pre>
 public protected private abstract static final transient volatile synchronized native strictfp
 </pre><a name="s4.8.8-numeric-literals"/>
-    <h4>4.8.8 Numeric Literals&nbsp;<a href="#s4.8.8-numeric-literals"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>4.8.8 Numeric Literals&nbsp;<a href="#s4.8.8-numeric-literals"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p><code>long</code>-valued integer literals use an uppercase <code>L</code> suffix, never
 lowercase (to avoid confusion with the digit <code>1</code>). For example, <code>3000000000L</code>
 rather than <code class="badcode">3000000000l</code>.</p><a name="naming"/><a name="s5-naming"/>
-    <h2>5 Naming&nbsp;<a href="#s5-naming"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>5 Naming&nbsp;<a href="#s5-naming"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <a name="s5.1-identifier-names"/>
-    <h3>5.1 Rules common to all identifiers&nbsp;<a href="#s5.1-identifier-names"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>5.1 Rules common to all identifiers&nbsp;<a href="#s5.1-identifier-names"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Identifiers use only ASCII letters and digits, and in two cases noted below, underscores. Thus
 each valid identifier name is matched by the regular expression <code>\w+</code> .</p><p> In Google Style special prefixes or
 suffixes, like those seen in the examples <code class="badcode">name_</code>,
 <code class="badcode">mName</code>, <code class="badcode">s_name</code> and
 <code class="badcode">kName</code>, are <strong>not</strong> used.
 For WPILib, we do make one exception to this rule for non-constant field name.</p><a name="s5.2-specific-identifier-names"/>
-    <h3>5.2 Rules by identifier type&nbsp;<a href="#s5.2-specific-identifier-names"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>5.2 Rules by identifier type&nbsp;<a href="#s5.2-specific-identifier-names"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s5.2.1-package-names"/>
-    <h4>5.2.1 Package names&nbsp;<a href="#s5.2.1-package-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.1 Package names&nbsp;<a href="#s5.2.1-package-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Package names are all lowercase, with consecutive words simply concatenated together (no
 underscores). For example, <code>com.example.deepspace</code>, not
 <code class="badcode">com.example.deepSpace</code> or
 <code class="badcode">com.example.deep_space</code>.</p><a name="s5.2.2-class-names"/>
-    <h4>5.2.2 Class names&nbsp;<a href="#s5.2.2-class-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.2 Class names&nbsp;<a href="#s5.2.2-class-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Class names are written in <a href="#s5.3-camel-case">UpperCamelCase</a>.</p><p>Class names are typically nouns or noun phrases. For example,
 <code class="prettyprint lang-java">Character</code> or
 <code class="prettyprint lang-java">ImmutableList</code>. Interface names may also be nouns or
@@ -645,14 +645,14 @@ adjectives or adjective phrases instead (for example,
 with <code class="prettyprint lang-java">Test</code>. For example,
 <code class="prettyprint lang-java">HashTest</code> or
 <code class="prettyprint lang-java">HashIntegrationTest</code>.</p><a name="s5.2.3-method-names"/>
-    <h4>5.2.3 Method names&nbsp;<a href="#s5.2.3-method-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.3 Method names&nbsp;<a href="#s5.2.3-method-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Method names are written in <a href="#s5.3-camel-case">lowerCamelCase</a>.</p><p>Method names are typically verbs or verb phrases. For example,
 <code class="prettyprint lang-java">sendMessage</code> or
 <code class="prettyprint lang-java">stop</code>.</p><p>Underscores may appear in JUnit <em>test</em> method names to separate logical components of the
 name. One typical pattern is <code>test<i>&lt;MethodUnderTest&gt;</i>_<i>&lt;state&gt;</i></code>,
 for example <code class="prettyprint lang-java">testPop_emptyStack</code>. There is no One Correct
 Way to name test methods.</p><a name="constants"/><a name="s5.2.4-constant-names"/>
-    <h4>5.2.4 Constant names&nbsp;<a href="#s5.2.4-constant-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.4 Constant names&nbsp;<a href="#s5.2.4-constant-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Constant names use <code class="prettyprint lang-java">kConstantCase</code>: camel case
 prefixed by a lowercase k. But what <em>is</em> a constant, exactly?</p><p>Every constant is a
 static final field, but not all static final fields are constants. Before choosing constant case,
@@ -674,19 +674,19 @@ static final ImmutableSet&lt;SomeMutableType&gt; mutableElements = ImmutableSet.
 static final Logger logger = Logger.getLogger(MyClass.getName());
 static final String[] nonEmptyArray = {"these", "can", "change"};
 </pre><p>These names are typically nouns or noun phrases.</p><a name="s5.2.5-non-constant-field-names"/>
-    <h4>5.2.5 Non-constant field names&nbsp;<a href="#s5.2.5-non-constant-field-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.5 Non-constant field names&nbsp;<a href="#s5.2.5-non-constant-field-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Non-constant field names (static or otherwise) are written
 in <a href="#s5.3-camel-case">lowerCamelCase</a> with a preceding <code class="prettyprint lang-java">m_</code>.</p>
 <p>These names are typically nouns or noun phrases.  For example,
 <code class="prettyprint lang-java">m_computedValues</code> or
 <code class="prettyprint lang-java">m_index</code>.</p><a name="s5.2.6-parameter-names"/>
-    <h4>5.2.6 Parameter names&nbsp;<a href="#s5.2.6-parameter-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.6 Parameter names&nbsp;<a href="#s5.2.6-parameter-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Parameter names are written in <a href="#s5.3-camel-case">lowerCamelCase</a>.</p><p>One-character parameter names should be avoided.</p><a name="s5.2.7-local-variable-names"/>
-    <h4>5.2.7 Local variable names&nbsp;<a href="#s5.2.7-local-variable-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.7 Local variable names&nbsp;<a href="#s5.2.7-local-variable-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Local variable names are written in <a href="#s5.3-camel-case">lowerCamelCase</a>, and can be
 abbreviated more liberally than other types of names.</p><p>However, one-character names should be avoided, except for temporary and looping variables.</p><p>Even when final and immutable, local variables are not considered to be constants, and should not
 be styled as constants.</p><a name="s5.2.8-type-variable-names"/>
-    <h4>5.2.8 Type variable names&nbsp;<a href="#s5.2.8-type-variable-names"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>5.2.8 Type variable names&nbsp;<a href="#s5.2.8-type-variable-names"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Each type variable is named in one of two styles:</p><ul><li>A single capital letter, optionally followed by a single numeral (such as
   <code class="prettyprint lang-java">E</code>, <code class="prettyprint lang-java">T</code>,
   <code class="prettyprint lang-java">X</code>, <code class="prettyprint lang-java">T2</code>)
@@ -695,7 +695,7 @@ be styled as constants.</p><a name="s5.2.8-type-variable-names"/>
   <code class="prettyprint lang-java">T</code> (examples:
   <code class="prettyprint lang-java">RequestT</code>,
   <code class="prettyprint lang-java">FooBarT</code>).</li></ul><a name="acronyms"/><a name="camelcase"/><a name="s5.3-camel-case"/>
-    <h3>5.3 Camel case: defined&nbsp;<a href="#s5.3-camel-case"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>5.3 Camel case: defined&nbsp;<a href="#s5.3-camel-case"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Sometimes there is more than one reasonable way to convert an English phrase into camel case,
 such as when acronyms or unusual constructs like "IPv6" or "iOS" are present. To improve
 predictability, Google Style specifies the following (nearly) deterministic scheme.</p><p>Beginning with the prose form of the name:</p><ol><li>Convert the phrase to plain ASCII and remove any apostrophes. For example, "Müller's
@@ -711,15 +711,15 @@ predictability, Google Style specifies the following (nearly) deterministic sche
 language: for example "nonempty" and "non-empty" are both correct, so the method names
 <code class="prettyprint lang-java">checkNonempty</code> and
 <code class="prettyprint lang-java">checkNonEmpty</code> are likewise both correct.</p><a name="s6-programming-practices"/>
-    <h2>6 Programming Practices&nbsp;<a href="#s6-programming-practices"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>6 Programming Practices&nbsp;<a href="#s6-programming-practices"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <a name="s6.1-override-annotation"/>
-    <h3>6.1 @Override: always used&nbsp;<a href="#s6.1-override-annotation"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.1 @Override: always used&nbsp;<a href="#s6.1-override-annotation"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>A method is marked with the <code class="prettyprint lang-java">@Override</code> annotation
 whenever it is legal.  This includes a class method overriding a superclass method, a class method
 implementing an interface method, and an interface method respecifying a superinterface
 method.</p><p class="exception"><strong>Exception:</strong><code class="prettyprint lang-java">@Override</code> may be omitted when the parent method is
 <code class="prettyprint lang-java">@Deprecated</code>.</p><a name="caughtexceptions"/><a name="s6.2-caught-exceptions"/>
-    <h3>6.2 Caught exceptions: not ignored&nbsp;<a href="#s6.2-caught-exceptions"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.2 Caught exceptions: not ignored&nbsp;<a href="#s6.2-caught-exceptions"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Except as noted below, it is very rarely correct to do nothing in response to a caught
 exception. (Typical responses are to log it, or if it is considered "impossible", rethrow it as an
 <code class="prettyprint lang-java">AssertionError</code>.)</p><p>When it truly is appropriate to take no action whatsoever in a catch block, the reason this is
@@ -741,7 +741,7 @@ try {
 } catch (NoSuchElementException expected) {
 }
 </pre><a name="s6.3-static-members"/>
-    <h3>6.3 Static members: qualified using class&nbsp;<a href="#s6.3-static-members"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.3 Static members: qualified using class&nbsp;<a href="#s6.3-static-members"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>When a reference to a static class member must be qualified, it is qualified with that class's
 name, not with a reference or expression of that class's type.</p><pre class="prettyprint lang-java">
 Foo aFoo = ...;
@@ -749,31 +749,31 @@ Foo.aStaticMethod(); // good
 <span class="badcode">aFoo.aStaticMethod();</span> // bad
 <span class="badcode">somethingThatYieldsAFoo().aStaticMethod();</span> // very bad
 </pre><a name="s6.4-finalizers"/><a name="s6.4-finalizers"/>
-    <h3>6.4 Finalizers: not used&nbsp;<a href="#s6.4-finalizers"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.4 Finalizers: not used&nbsp;<a href="#s6.4-finalizers"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>It is <strong>extremely rare</strong> to override <code class="prettyprint lang-java">Object.finalize</code>.</p><p class="tip"><strong>Tip:</strong> Don't do it. If you absolutely must, first read and understand
 <a href="http://books.google.com/books?isbn=8131726592"><em>Effective Java</em></a>
 Item 7, "Avoid Finalizers," very carefully, and <em>then</em> don't do it.</p><a name="javadoc"/><a name="s7-javadoc"/>
-    <h3>6.5 Built-in Types&nbsp;<a name="s6.5-built-in-types"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.5 Built-in Types&nbsp;<a name="s6.5-built-in-types"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>The JNI uses stdint.h typedefs for integral types. wpilibj uses
     <code>int</code> for user-facing interfaces instead of <code>byte</code> to
     avoid needing casts.</p>
     <p>doubles are used everywhere instead of floats for consistency.</p>
-    <h3>6.6 Error Handling&nbsp;<a name="s6.6-error-handling"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.6 Error Handling&nbsp;<a name="s6.6-error-handling"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Exceptions should only be thrown for programming (i.e., user) errors.
     Runtime errors should be handled internally to avoid crashing the
     application.</p>
-    <h3>6.7 Generated Files&nbsp;<a name="s6.7-generated-files"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>6.7 Generated Files&nbsp;<a name="s6.7-generated-files"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>Since changes would be overwritten upon regeneration, generated files
     should not be modified under any circumstances, including for formatting
     changes. The generator for those files should be modified instead. The
     current list of generated files is represented by regular expressions in the
     <code>.styleguide</code> file in the root directory of the generated file's
     repository.</p>
-    <h2>7 Javadoc&nbsp;<a href="#s7-javadoc"><img height="21" width="21" src="javaguidelink.png"/></a></h2>
+    <h2>7 Javadoc&nbsp;<a href="#s7-javadoc"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <a name="s7.1-javadoc-formatting"/>
-    <h3>7.1 Formatting&nbsp;<a href="#s7.1-javadoc-formatting"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>7.1 Formatting&nbsp;<a href="#s7.1-javadoc-formatting"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <a name="s7.1.1-javadoc-multi-line"/>
-    <h4>7.1.1 General form&nbsp;<a href="#s7.1.1-javadoc-multi-line"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>7.1.1 General form&nbsp;<a href="#s7.1.1-javadoc-multi-line"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>The <em>basic</em> formatting of Javadoc blocks is as seen in this example:</p><pre class="prettyprint lang-java">
 /**
  * Multiple lines of Javadoc text are written here,
@@ -785,18 +785,18 @@ public int method(String p1) { ... }
 </pre><p>The basic form is always acceptable. The single-line form may be substituted when there are no
 at-clauses present, and the entirety of the Javadoc block (including comment markers) can fit on a
 single line.</p><a name="s7.1.2-javadoc-paragraphs"/>
-    <h4>7.1.2 Paragraphs&nbsp;<a href="#s7.1.2-javadoc-paragraphs"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>7.1.2 Paragraphs&nbsp;<a href="#s7.1.2-javadoc-paragraphs"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>One blank line—that is, a line containing only the aligned leading asterisk
 (<code>*</code>)—appears between paragraphs, and before the group of "at-clauses" if
 present. Each paragraph but the first has <code>&lt;p&gt;</code> immediately before the first word,
 with no space after.</p><a name="s7.1.3-javadoc-at-clauses"/>
-    <h4>7.1.3 At-clauses&nbsp;<a href="#s7.1.3-javadoc-at-clauses"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>7.1.3 At-clauses&nbsp;<a href="#s7.1.3-javadoc-at-clauses"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Any of the standard "at-clauses" that are used appear in the order <code>@param</code>,
 <code>@return</code>, <code>@throws</code>, <code>@deprecated</code>, and these four types never
 appear with an empty description. When an at-clause doesn't fit on a single line, continuation lines
 are indented four (or more) spaces from the position of the <code>@</code>.
 </p><a name="s7.2-summary-fragment"/>
-    <h3>7.2 The summary fragment&nbsp;<a href="#s7.2-summary-fragment"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>7.2 The summary fragment&nbsp;<a href="#s7.2-summary-fragment"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>The Javadoc for each class and member begins with a brief <strong>summary fragment</strong>. This
 fragment is very important: it is the only part of the text that appears in certain contexts such as
 class and method indexes.</p><p>This is a fragment—a noun phrase or verb phrase, not a complete sentence. It does
@@ -806,7 +806,7 @@ like <code class="badcode">Save the record.</code>. However, the fragment is cap
 punctuated as if it were a complete sentence.</p><p class="tip"><strong>Tip:</strong> A common mistake is to write simple Javadoc in the form
 <code class="badcode">/** @return the customer ID */</code>. This is incorrect, and should be
 changed to <code class="prettyprint lang-java">/** Returns the customer ID. */</code>.</p><a name="s7.3.3-javadoc-optional"/><a name="s7.3-javadoc-where-required"/>
-    <h3>7.3 Where Javadoc is used&nbsp;<a href="#s7.3-javadoc-where-required"><img height="21" width="21" src="javaguidelink.png"/></a></h3>
+    <h3>7.3 Where Javadoc is used&nbsp;<a href="#s7.3-javadoc-where-required"><img height="21" width="21" src="guidelink.png"/></a></h3>
     <p>At the <em>minimum</em>, Javadoc is present for every
 <code class="prettyprint lang-java">public</code> class, and every
 <code class="prettyprint lang-java">public</code> or
@@ -814,7 +814,7 @@ changed to <code class="prettyprint lang-java">/** Returns the customer ID. */</
 noted below.</p><p>Other classes and members still have Javadoc <em>as needed</em>.  Whenever an implementation
 comment would be used to define the overall purpose or behavior of a class, method or field, that
 comment is written as Javadoc instead. (It's more uniform, and more tool-friendly.)</p><a name="s7.3.1-javadoc-exception-self-explanatory"/>
-    <h4>7.3.1 Exception: self-explanatory methods&nbsp;<a href="#s7.3.1-javadoc-exception-self-explanatory"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>7.3.1 Exception: self-explanatory methods&nbsp;<a href="#s7.3.1-javadoc-exception-self-explanatory"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Javadoc is optional for "simple, obvious" methods like
 <code class="prettyprint lang-java">getFoo</code>, in cases where there <em>really and truly</em> is
 nothing else worthwhile to say but "Returns the foo".</p><p class="note"><strong>Important:</strong> it is not appropriate to cite this exception to justify
@@ -823,7 +823,7 @@ named <code class="prettyprint lang-java">getCanonicalName</code>, don't omit it
 (with the rationale that it would say only
 <code class="badcode">/** Returns the canonical name. */</code>) if a typical reader may have no idea
 what the term "canonical name" means!</p><a name="s7.3.2-javadoc-exception-overrides"/>
-    <h4>7.3.2 Exception: overrides&nbsp;<a href="#s7.3.2-javadoc-exception-overrides"><img height="21" width="21" src="javaguidelink.png"/></a></h4>
+    <h4>7.3.2 Exception: overrides&nbsp;<a href="#s7.3.2-javadoc-exception-overrides"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p>Javadoc is not always present on a method that overrides a supertype method.
 </p></div>  <hr/>
   <div class="change">Last changed: March 21, 2014</div>

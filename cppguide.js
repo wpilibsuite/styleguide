@@ -247,7 +247,7 @@ function LinkifyHeader(header, fileName, sizePixels) {
   link.href = '#' + header.id;
   link.alt = 'link to ' + header.id;
   link.innerHTML =
-      '<img src="include/' + fileName + '"' +
+      '<img src="' + fileName + '"' +
       ' width=' + sizePixels +
       ' height=' + sizePixels +
       ' style="float:left;position:relative;bottom:5px;">';
@@ -263,7 +263,7 @@ function LinkifyHeadersForTag(tagName) {
     header = headers[j];
     if (!hasClass(header, 'ignoreLink') && ('id' in header)) {
       if (header.id != '') {
-        LinkifyHeader(header, 'link.png', 21);
+        LinkifyHeader(header, 'guidelink.png', 21);
         header.style.left = '-46px';
         header.style.position = 'relative';
       }
