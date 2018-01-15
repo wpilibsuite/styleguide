@@ -18,8 +18,8 @@ class JavaClass(Task):
         pos = 0
 
         # Match two or more line separators
-        token_str = r"/\*|\*/|//|" + linesep + r"|class\s[\w\d\s]*{" + \
-            linesep + r"(?P<extra>(" + linesep + r")+)"
+        token_str = r"/\*|\*/|//|" + linesep + r"|{" + linesep + \
+            r"(?P<extra>(" + linesep + r")+)"
         token_regex = regex.compile(token_str)
 
         in_multicomment = False
