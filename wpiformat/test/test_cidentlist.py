@@ -171,6 +171,43 @@ def test_cidentlist():
         "#endif" + os.linesep))
     outputs.append((inputs[len(inputs) - 1][1], False, True))
 
+    inputs.append(("./Timer.hpp",
+        "extern \"C\" void Timer1IntHandler();" + os.linesep + \
+        os.linesep + \
+        "class Timer {" + os.linesep + \
+        "public:" + os.linesep + \
+        "    void Set(uint32_t newTime);" + os.linesep + \
+        os.linesep + \
+        "    void Start();" + os.linesep + \
+        os.linesep + \
+        "    void Stop();" + os.linesep + \
+        os.linesep + \
+        "    uint16_t GetID() const;" + os.linesep + \
+        os.linesep + \
+        "    static uint32_t GetTime();" + os.linesep + \
+        os.linesep + \
+        "private:" + os.linesep + \
+        "    friend void Timer1IntHandler();" + os.linesep + \
+        "};" + os.linesep))
+    outputs.append((
+        "extern \"C\" void Timer1IntHandler(void);" + os.linesep + \
+        os.linesep + \
+        "class Timer {" + os.linesep + \
+        "public:" + os.linesep + \
+        "    void Set(uint32_t newTime);" + os.linesep + \
+        os.linesep + \
+        "    void Start();" + os.linesep + \
+        os.linesep + \
+        "    void Stop();" + os.linesep + \
+        os.linesep + \
+        "    uint16_t GetID() const;" + os.linesep + \
+        os.linesep + \
+        "    static uint32_t GetTime();" + os.linesep + \
+        os.linesep + \
+        "private:" + os.linesep + \
+        "    friend void Timer1IntHandler();" + os.linesep + \
+        "};" + os.linesep, True, True))
+
     assert len(inputs) == len(outputs)
 
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
