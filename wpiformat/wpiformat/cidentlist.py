@@ -32,7 +32,7 @@ class CIdentList(Task):
         # "def\\s+\w+" matches preprocessor directives "#ifdef" and "#ifndef" so
         # their contents aren't used as a return type.
         extern_str = "(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
-        braces_str = "\{|\}|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
+        braces_str = "\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
         postfix_str = "(?=\s*(;|\{))"
         token_regex = re.compile(extern_str + braces_str + postfix_str)
 
@@ -59,6 +59,12 @@ class CIdentList(Task):
                 if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
                     is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
                     extern_brace_indices.pop()
+            elif token == ";":
+                # If the next stack frame is from an extern without braces, pop
+                # it.
+                if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
+                    is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
+                    extern_brace_indices.pop()
             elif token.startswith("extern"):
                 # Back up language setting first
                 if match.group("ext_brace"):
@@ -66,7 +72,7 @@ class CIdentList(Task):
                 else:
                     # Handling an extern without braces changing the language
                     # type is done by treating it as a pseudo-brace that gets
-                    # popped as well when the next "}" is encountered.
+                    # popped as well when the next "}" or ";" is encountered.
                     # The "extra pop" offset is used as a flag on the top stack
                     # value that is checked whenever a pop is performed.
                     extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
