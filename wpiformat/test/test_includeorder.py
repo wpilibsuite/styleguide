@@ -444,6 +444,47 @@ def test_includeorder():
         "#include \"Stuff.cpp\"" + os.linesep, False, False))
     outputs.append((inputs[len(inputs) - 1][1], False, False))
 
+    # Ensure commented-out includes are still sorted
+    inputs.append(("./Test.h",
+        "#include \"stdio.h\"" + os.linesep + \
+        "#include \"iostream\"" + os.linesep + \
+        "// #include \"memory\"" + os.linesep + \
+        "#include \"signal.h\"" + os.linesep))
+    outputs.append((
+        "#include <signal.h>" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "// #include <memory>" + os.linesep, True, True))
+
+    # Ensure commented-out includes with space before them are still sorted
+    inputs.append(("./Test.h",
+        " //#include <signal.h>" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "#include <memory>" + os.linesep))
+    outputs.append((
+        "//#include <signal.h>" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "#include <memory>" + os.linesep, True, True))
+
+    # Ensure includes with no space between #include and bracket are sorted
+    inputs.append(("./Test.h",
+        "#include<signal.h>" + os.linesep + \
+        "#include<stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include<iostream>" + os.linesep + \
+        "#include<memory>" + os.linesep))
+    outputs.append((
+        "#include <signal.h>" + os.linesep + \
+        "#include <stdio.h>" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep + \
+        "#include <memory>" + os.linesep, True, True))
+
     assert len(inputs) == len(outputs)
 
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
