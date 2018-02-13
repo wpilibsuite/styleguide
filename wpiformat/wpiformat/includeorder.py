@@ -61,7 +61,9 @@ class IncludeOrder(Task):
         #
         # Header type 4: Project headers
         # They use double quotes (all other headers)
-        self.header_regex = re.compile("(?P<header>"
+        self.header_regex = re.compile("(?P<comment>//\s*)?"
+                                       "\#include\s*"
+                                       "(?P<header>"
                                        "(?P<open_bracket><|\")"
                                        "(?P<name>.*)"
                                        "(?P<close_bracket>>|\"))"
@@ -127,9 +129,9 @@ class IncludeOrder(Task):
         else:
             return True
 
-    def add_brackets(self, name_match, group_number):
-        """Adds appropriate brackets around and "#include" before include name
-        based on group number.
+    def rebuild_include(self, name_match, group_number):
+        """Adds appropriate brackets around include name and "#include" before
+        that based on group number.
 
         Keyword arguments:
         name_match -- include name's regex Match object
@@ -138,11 +140,28 @@ class IncludeOrder(Task):
         Returns include name with approriate brackets and "#include" prefix.
         """
         if group_number >= 1 and group_number <= 3:
-            return "#include <" + name_match.group("name") + ">" + \
+            output = "#include <" + name_match.group("name") + ">" + \
                 name_match.group("postfix")
         else:
-            return "#include \"" + name_match.group("name") + "\"" + \
+            output = "#include \"" + name_match.group("name") + "\"" + \
                 name_match.group("postfix")
+
+        if name_match.group("comment"):
+            return name_match.group("comment") + output
+        else:
+            return output
+
+    def dedup_list(self, seq):
+        """Remove duplicates from list while preserving order.
+
+        Keyword arguments:
+        seq -- list from which to deduplicate entries
+
+        Returns deduplicated list.
+        """
+        seen = set()
+        seen_add = seen.add
+        return [x for x in seq if not (x in seen or seen_add(x))]
 
     def write_headers(self, includes, ifdef_blocks=[[], [], [], [], []]):
         """Write out includes from sets.
@@ -157,8 +176,10 @@ class IncludeOrder(Task):
 
         for i in range(5):
             if includes[i]:
-                sublist = sorted(list(includes[i]))
-                output_list.extend(sublist)
+                sublist = sorted(
+                    includes[i], key=lambda include: include.group("name"))
+                str_list = [self.rebuild_include(x, i) for x in sublist]
+                output_list.extend(self.dedup_list(str_list))
                 output_list.append("")  # Delimits groups of includes
 
             # #ifdef blocks go after other includes
@@ -192,7 +213,7 @@ class IncludeOrder(Task):
         output_list = []
 
         # Using sets here eliminates duplicate includes
-        includes = [set(), set(), set(), set(), set()]
+        includes = [[], [], [], [], []]
 
         # List of bools indicating header category presence within #ifdef block
         includes_present = [False, False, False, False, False]
@@ -248,7 +269,7 @@ class IncludeOrder(Task):
                             # Treat #ifdef as barrier and flush includes
                             output_list.extend(self.write_headers(includes))
                             output_list.append("")
-                            includes = [set(), set(), set(), set(), set()]
+                            includes = [[], [], [], [], []]
 
                             output_list.append(ifdef)
                         break
@@ -258,7 +279,7 @@ class IncludeOrder(Task):
                     written = self.write_headers(includes)
                     if written:
                         output_list.append(self.linesep.join(written))
-                        includes = [set(), set(), set(), set(), set()]
+                        includes = [[], [], [], [], []]
 
                     # NOLINT line will have newlines above and below, unless it
                     # is the first line being processed.
@@ -275,7 +296,10 @@ class IncludeOrder(Task):
 
                 idx = self.classify_header(config_file, include_line, file_name)
                 if idx != -1:
-                    includes[idx].add(self.add_brackets(include_line, idx))
+                    if include_line.group("comment"):
+                        print("Warning: " + file_name + ": include '" +
+                              include_line.group("name") + "' is commented out")
+                    includes[idx].append(include_line)
                     includes_present[idx] = True
                 else:
                     # If header failed to classify, return failure
@@ -291,7 +315,7 @@ class IncludeOrder(Task):
                 written = self.write_headers(includes)
                 if written:
                     output_list.append(self.linesep.join(written))
-                    includes = [set(), set(), set(), set(), set()]
+                    includes = [[], [], [], [], []]
 
                 output_list.append(lines_list[i])
             elif lines_list[i].strip() != "":
