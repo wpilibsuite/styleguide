@@ -48,16 +48,16 @@ import glob
 import itertools
 import math  # for log
 import os
-import re
+import regex
 import sre_compile
 import string
 import sys
 
 # if empty, use defaults
-_header_regex = re.compile("a^")
+_header_regex = regex.compile("a^")
 
 # if empty, use defaults
-_source_regex = re.compile("a^")
+_source_regex = regex.compile("a^")
 
 
 # Files which match the regex are considered to be header
@@ -191,7 +191,7 @@ _DEFAULT_C_SUPPRESSED_CATEGORIES = [
 # hard-coded international strings, which belong in a separate i18n file.
 
 # Type names
-_TYPES = re.compile(
+_TYPES = regex.compile(
     r'^(?:'
     # [dcl.type.simple]
     r'(char(16_t|32_t)?)|wchar_t|'
@@ -208,11 +208,11 @@ _TYPES = re.compile(
 # - Anything not following google file name conventions (containing an
 #   uppercase character, such as Python.h or nsStringAPI.h, for example).
 # - Lua headers.
-_THIRD_PARTY_HEADERS_PATTERN = re.compile(
+_THIRD_PARTY_HEADERS_PATTERN = regex.compile(
     r'^(?:[^/]*[A-Z][^/]*\.h|lua\.h|lauxlib\.h|lualib\.h)$')
 
 # Pattern that matches only complete whitespace, possibly across multiple lines.
-_EMPTY_CONDITIONAL_BODY_PATTERN = re.compile(r'^\s*$', re.DOTALL)
+_EMPTY_CONDITIONAL_BODY_PATTERN = regex.compile(r'^\s*$', regex.DOTALL)
 
 # Alternative tokens and their replacements.  For full list, see section 2.5
 # Alternative tokens [lex.digraph] in the C++ standard.
@@ -238,7 +238,7 @@ _ALT_TOKEN_REPLACEMENT = {
 #
 # False positives include C-style multi-line comments and multi-line strings
 # but those have always been troublesome for cpplint.
-_ALT_TOKEN_REPLACEMENT_PATTERN = re.compile(
+_ALT_TOKEN_REPLACEMENT_PATTERN = regex.compile(
     r'[ =()](' + ('|'.join(_ALT_TOKEN_REPLACEMENT.keys())) + r')(?=[ (]|$)')
 
 
@@ -249,12 +249,12 @@ _END_ASM = 2      # Last line of inline assembly block
 _BLOCK_ASM = 3    # The whole block is an inline assembly block
 
 # Match start of assembly blocks
-_MATCH_ASM = re.compile(r'^\s*(?:asm|_asm|__asm|__asm__)'
+_MATCH_ASM = regex.compile(r'^\s*(?:asm|_asm|__asm|__asm__)'
                         r'(?:\s+(volatile|__volatile__))?'
                         r'\s*[{(]')
 
 # Match strings that indicate we're working on a C (not C++) file.
-_SEARCH_C_FILE = re.compile(r'\b(?:LINT_C_FILE|'
+_SEARCH_C_FILE = regex.compile(r'\b(?:LINT_C_FILE|'
                             r'vim?:\s*.*(\s*|:)filetype=c(\s*|:|$))')
 
 _regexp_compile_cache = {}
@@ -532,7 +532,7 @@ def Error(filename, linenum, category, confidence, message):
     sys.stderr.write(final_message)
 
 # Matches standard C++ escape sequences per 2.13.2.3 of the C++ standard.
-_RE_PATTERN_CLEANSE_LINE_ESCAPES = re.compile(
+_RE_PATTERN_CLEANSE_LINE_ESCAPES = regex.compile(
     r'\\([abfnrtv?"\\\']|\d+|x[0-9a-fA-F]+)')
 # Match a single C style comment on the same line.
 _RE_PATTERN_C_COMMENTS = r'/\*(?:[^*]|\*(?!/))*\*/'
@@ -544,7 +544,7 @@ _RE_PATTERN_C_COMMENTS = r'/\*(?:[^*]|\*(?!/))*\*/'
 # end of the line. Otherwise, we try to remove spaces from the right side,
 # if this doesn't work we try on left side but only if there's a non-character
 # on the right.
-_RE_PATTERN_CLEANSE_LINE_C_COMMENTS = re.compile(
+_RE_PATTERN_CLEANSE_LINE_C_COMMENTS = regex.compile(
     r'(\s*' + _RE_PATTERN_C_COMMENTS + r'\s*$|' +
     _RE_PATTERN_C_COMMENTS + r'\s+|' +
     r'\s+' + _RE_PATTERN_C_COMMENTS + r'(?=\W)|' +
@@ -1117,7 +1117,7 @@ def CheckForMultilineCommentsAndStrings(filename, clean_lines, linenum, error):
 
 # Matches invalid increment: *count++, which moves pointer instead of
 # incrementing a value.
-_RE_PATTERN_INVALID_INCREMENT = re.compile(
+_RE_PATTERN_INVALID_INCREMENT = regex.compile(
     r'^\s*\*\w+(\+\+|--);')
 
 
@@ -1309,7 +1309,7 @@ class _NamespaceInfo(_BlockInfo):
     if self.name:
       # Named namespace
       if not Match((r'^\s*};*\s*(//|/\*).*\bnamespace\s+' +
-                    re.escape(self.name) + r'[\*/\.\\\s]*$'),
+                    regex.escape(self.name) + r'[\*/\.\\\s]*$'),
                    line):
         error(filename, linenum, 'readability/namespace', 5,
               'Namespace should be terminated with "// namespace %s"' %
@@ -1766,7 +1766,7 @@ def CheckForNonStandardConstructs(filename, clean_lines, linenum,
   explicit_constructor_match = Match(
       r'\s+(?:inline\s+)?(explicit\s+)?(?:inline\s+)?%s\s*'
       r'\(((?:[^()]|\([^()]*\))*)\)'
-      % re.escape(base_classname),
+      % regex.escape(base_classname),
       line)
 
   if explicit_constructor_match:
@@ -1810,7 +1810,7 @@ def CheckForNonStandardConstructs(filename, clean_lines, linenum,
     copy_constructor = bool(
         onearg_constructor and
         Match(r'(const\s+)?%s(\s*<[^>]*>)?(\s+const)?\s*(?:<\w+>\s*)?&'
-              % re.escape(base_classname), constructor_args[0].strip()))
+              % regex.escape(base_classname), constructor_args[0].strip()))
 
     if (not is_marked_explicit and
         onearg_constructor and
@@ -1912,7 +1912,7 @@ def CheckForFunctionLengths(filename, clean_lines, linenum,
     function_state.Count()  # Count non-blank/non-comment lines.
 
 
-_RE_PATTERN_TODO = re.compile(r'^//(\s*)TODO(\(.+?\))?:?(\s|$)?')
+_RE_PATTERN_TODO = regex.compile(r'^//(\s*)TODO(\(.+?\))?:?(\s|$)?')
 
 
 def CheckComment(line, filename, linenum, next_line_start, error):
@@ -1928,7 +1928,7 @@ def CheckComment(line, filename, linenum, next_line_start, error):
   commentpos = line.find('//')
   if commentpos != -1:
     # Check if the // may be in quotes.  If so, ignore it
-    if re.sub(r'\\.', '', line[0:commentpos]).count('"') % 2 == 0:
+    if regex.sub(r'\\.', '', line[0:commentpos]).count('"') % 2 == 0:
       # Checks for common mistakes in TODO comments.
       comment = line[commentpos:]
       match = _RE_PATTERN_TODO.match(comment)
@@ -2088,7 +2088,7 @@ def _IsType(clean_lines, nesting_state, expr):
   # Try a bit harder to match templated types.  Walk up the nesting
   # stack until we find something that resembles a typename
   # declaration for what we are looking for.
-  typename_pattern = (r'\b(?:typename|class|struct)\s+' + re.escape(token) +
+  typename_pattern = (r'\b(?:typename|class|struct)\s+' + regex.escape(token) +
                       r'\b')
   block_index = len(nesting_state.stack) - 1
   while block_index >= 0:
@@ -2664,13 +2664,13 @@ def CheckStyle(filename, clean_lines, linenum, is_header, nesting_state,
     CheckSectionSpacing(filename, clean_lines, classinfo, linenum, error)
 
 
-_RE_PATTERN_INCLUDE = re.compile(r'^\s*#\s*include\s*([<"])([^>"]*)[>"].*$')
+_RE_PATTERN_INCLUDE = regex.compile(r'^\s*#\s*include\s*([<"])([^>"]*)[>"].*$')
 # Matches the first component of a filename delimited by -s and _s. That is:
 #  _RE_FIRST_COMPONENT.match('foo').group(0) == 'foo'
 #  _RE_FIRST_COMPONENT.match('foo.cc').group(0) == 'foo'
 #  _RE_FIRST_COMPONENT.match('foo-bar_baz.cc').group(0) == 'foo'
 #  _RE_FIRST_COMPONENT.match('foo_bar-baz.cc').group(0) == 'foo'
-_RE_FIRST_COMPONENT = re.compile(r'^[^-_.]+')
+_RE_FIRST_COMPONENT = regex.compile(r'^[^-_.]+')
 
 
 def CheckIncludeLine(filename, clean_lines, linenum, include_state, error):
@@ -2730,7 +2730,7 @@ def _GetTextInside(text, start_pattern):
   closing_punctuation = set(itervalues(matching_punctuation))
 
   # Find the position to start extracting text.
-  match = re.search(start_pattern, text, re.M)
+  match = regex.search(start_pattern, text, regex.M)
   if not match:  # start_pattern not found in text.
     return None
   start_position = match.end(0)
@@ -2774,7 +2774,7 @@ _RE_PATTERN_TYPE = (
     r'\s*<(?:<(?:<[^<>]*>|[^<>])*>|[^<>])*>|'
     r'::)+')
 # A call-by-reference parameter ends with '& identifier'.
-_RE_PATTERN_REF_PARAM = re.compile(
+_RE_PATTERN_REF_PARAM = regex.compile(
     r'(' + _RE_PATTERN_TYPE + r'(?:\s*(?:\bconst\b|[*]))*\s*'
     r'&\s*' + _RE_PATTERN_IDENT + r')\s*(?:=[^,()]+)?[,)]')
 # A call-by-const-reference parameter either ends with 'const& identifier'
@@ -2868,8 +2868,8 @@ def CheckLanguage(filename, clean_lines, linenum, is_header,
   if printf_args:
     match = Match(r'([\w.\->()]+)$', printf_args)
     if match and match.group(1) != '__VA_ARGS__':
-      function_name = re.search(r'\b((?:string)?printf)\s*\(',
-                                line, re.I).group(1)
+      function_name = regex.search(r'\b((?:string)?printf)\s*\(',
+                                line, regex.I).group(1)
       error(filename, linenum, 'runtime/printf', 4,
             'Potential format string bug. Do %s("%%s", %s) instead.'
             % (function_name, match.group(1)))
@@ -2888,7 +2888,7 @@ def CheckLanguage(filename, clean_lines, linenum, is_header,
     # Split the size using space and arithmetic operators as delimiters.
     # If any of the resulting tokens are not compile time constants then
     # report the error.
-    tokens = re.split(r'\s|\+|\-|\*|\/|<<|>>]', match.group(3))
+    tokens = regex.split(r'\s|\+|\-|\*|\/|<<|>>]', match.group(3))
     is_const = True
     skip_next = False
     for tok in tokens:
@@ -3227,7 +3227,7 @@ _HEADERS_MAYBE_TEMPLATES = (
     ('<utility>', ('forward', 'make_pair', 'move', 'swap')),
     )
 
-_RE_PATTERN_STRING = re.compile(r'\bstring\b')
+_RE_PATTERN_STRING = regex.compile(r'\bstring\b')
 
 _re_pattern_headers_maybe_templates = []
 for _header, _templates in _HEADERS_MAYBE_TEMPLATES:
@@ -3235,7 +3235,7 @@ for _header, _templates in _HEADERS_MAYBE_TEMPLATES:
     # Match max<type>(..., ...), max(..., ...), but not foo->max, foo.max or
     # type::max().
     _re_pattern_headers_maybe_templates.append(
-        (re.compile(r'[^>.]\b' + _template + r'(<.*?>)?\([^\)]'),
+        (regex.compile(r'[^>.]\b' + _template + r'(<.*?>)?\([^\)]'),
             _template,
             _header))
 
@@ -3244,7 +3244,7 @@ _re_pattern_templates = []
 for _header, _templates in _HEADERS_CONTAINING_TEMPLATES:
   for _template in _templates:
     _re_pattern_templates.append(
-        (re.compile(r'(\<|\b)' + _template + r'\s*\<'),
+        (regex.compile(r'(\<|\b)' + _template + r'\s*\<'),
          _template + '<>',
          _header))
 
@@ -3422,7 +3422,7 @@ def CheckForIncludeWhatYouUse(filename, clean_lines, include_state, error,
             'Add #include ' + required_header_unstripped + ' for ' + template)
 
 
-_RE_PATTERN_EXPLICIT_MAKEPAIR = re.compile(r'\bmake_pair\s*<')
+_RE_PATTERN_EXPLICIT_MAKEPAIR = regex.compile(r'\bmake_pair\s*<')
 
 
 def CheckMakePairUsesDeduction(filename, clean_lines, linenum, error):
@@ -3694,13 +3694,13 @@ def ParseArguments(args):
     elif opt == '--srcs':
       global _source_regex
       try:
-        _source_regex = re.compile(val)
+        _source_regex = regex.compile(val)
       except ValueError:
           PrintUsage('Extensions must be comma seperated list.')
     elif opt == '--headers':
       global _header_regex
       try:
-          _header_regex = re.compile(val)
+          _header_regex = regex.compile(val)
       except ValueError:
         PrintUsage('Extensions must be comma seperated list.')
 

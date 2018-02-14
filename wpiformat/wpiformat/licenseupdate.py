@@ -1,7 +1,7 @@
 """This task updates the license header at the top of the file."""
 
 import os
-import re
+import regex
 import sys
 
 from wpiformat.config import Config
@@ -42,7 +42,7 @@ class LicenseUpdate(Task):
         license_end = 0
 
         # Regex for tokenizing on comment boundaries
-        token_regex = re.compile("^/\*|\*/|^//")
+        token_regex = regex.compile("^/\*|\*/|^//")
 
         in_multiline_comment = False
         for line in stripped_lines:
@@ -77,7 +77,7 @@ class LicenseUpdate(Task):
         # Default year when none is found is current one
         year = self.__current_year
 
-        year_regex = re.compile("Copyright \(c\).*\s(20..)")
+        year_regex = regex.compile("Copyright \(c\)(?>.*?\s(20..))")
         modify_copyright = False
         for line in file_parts[0].split(linesep):
             match = year_regex.search(line)

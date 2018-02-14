@@ -1,7 +1,7 @@
 """This task sorts C/C++ includes."""
 
 import os
-import re
+import regex
 
 from wpiformat.task import Task
 
@@ -34,7 +34,7 @@ class IncludeOrder(Task):
         ]
 
         # Header type 1: C system headers
-        self.c_sys_regex = re.compile("<[a-z][A-Za-z0-9/_-]*\.h>")
+        self.c_sys_regex = regex.compile("<[a-z][A-Za-z0-9/_-]*\.h>")
 
         # Header type 2: C++ standard library headers
         self.cpp_std = [
@@ -61,13 +61,13 @@ class IncludeOrder(Task):
         #
         # Header type 4: Project headers
         # They use double quotes (all other headers)
-        self.header_regex = re.compile("(?P<comment>//\s*)?"
-                                       "\#include\s*"
-                                       "(?P<header>"
-                                       "(?P<open_bracket><|\")"
-                                       "(?P<name>.*)"
-                                       "(?P<close_bracket>>|\"))"
-                                       "(?P<postfix>.*)")
+        self.header_regex = regex.compile("(?P<comment>//\s*)?"
+                                          "\#include\s*"
+                                          "(?P<header>"
+                                          "(?P<open_bracket><|\")"
+                                          "(?P<name>[^>\"]*)"
+                                          "(?P<close_bracket>>|\"))"
+                                          "(?P<postfix>.*)$")
 
     def should_process_file(self, config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
@@ -343,7 +343,7 @@ class IncludeOrder(Task):
                 "includeOtherLibs", "includeProject"
         ]:
             regex_str = config_file.regex(group)
-            self.override_regexes.append(re.compile(regex_str))
+            self.override_regexes.append(regex.compile(regex_str))
 
         self.linesep = Task.get_linesep(lines)
 

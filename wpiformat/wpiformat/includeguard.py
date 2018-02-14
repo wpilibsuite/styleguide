@@ -3,7 +3,7 @@ style guide.
 """
 
 import os
-import re
+import regex
 
 from enum import Enum
 from wpiformat.task import Task
@@ -26,8 +26,8 @@ class IncludeGuard(Task):
         output_list = lines_list
 
         state = State.FINDING_IFNDEF
-        ifndef_regex = re.compile("#ifndef \w+", re.ASCII)
-        define_regex = re.compile("#define \w+", re.ASCII)
+        ifndef_regex = regex.compile("#ifndef \w+", regex.ASCII)
+        define_regex = regex.compile("#define \w+", regex.ASCII)
 
         if_preproc_count = 0
         for i in range(len(lines_list)):
@@ -89,8 +89,9 @@ class IncludeGuard(Task):
             for include_root in include_roots:
                 if name.startswith(include_root):
                     guard_path += name[len(include_root):]
-                    return re.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
+                    return regex.sub("[^a-zA-Z0-9]", "_",
+                                     guard_path).upper() + "_"
 
         # No include guard roots matched, so append full name
         guard_path += name
-        return re.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
+        return regex.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"

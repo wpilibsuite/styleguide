@@ -2,7 +2,7 @@
 and assert.h are exceptions.
 """
 
-import re
+import regex
 
 from wpiformat.task import Task
 
@@ -39,7 +39,7 @@ class Header(object):
             # function names are alphanumeric and start with a letter. If the
             # function name is preceded by a word character and a space, it's
             # a function definition instead of a usage.
-            self.func_regex = re.compile(
+            self.func_regex = regex.compile(
                 "(?:[^\w]\s+|,|\()"
                 +  # Preceded by nonword character and spaces, comma, or "("
                 regex_prefix + "([a-z][a-z0-9]*)" +  # C stdlib function name
@@ -51,9 +51,9 @@ class Header(object):
         if type_regexes != []:
             # Check for type uses
 
-            # Preceded by "<" (template), " ", ",", "(", or line separator and
-            # optional spaces
-            lookbehind = "(?<=\<| |,|\(|\n)"
+            # Preceded by beginning of file, "<" (template), " ", ",", "(", or
+            # line separator and optional spaces
+            lookbehind = "(?<=^|\<| |,|\(|\n)"
 
             type_names = regex_prefix + "(" + "|".join(type_regexes) + ")"
 
@@ -61,14 +61,9 @@ class Header(object):
             # asterisks
             lookahead = "(?=(\s*(\>|\)|,|;|\*+))|\s)"
 
-            # Two regexes are created because matching the start of a string
-            # isn't supported by lookbehind assertions
-            self.type_regexes = [
-                re.compile(lookbehind + type_names + lookahead),
-                re.compile("^" + type_names + lookahead)
-            ]
+            self.type_regex = regex.compile(lookbehind + type_names + lookahead)
         else:
-            self.type_regexes = [None]
+            self.type_regex = None
 
 
 class Stdlib(Task):
@@ -190,12 +185,11 @@ class Stdlib(Task):
                 (lines, changed) = self.func_substitute(header, lines)
                 file_changed |= changed
 
-            for regex in header.type_regexes:
-                if regex:
-                    old_length = len(lines)
-                    lines = regex.sub(header.type_sub, lines)
-                    if not file_changed and old_length != len(lines):
-                        file_changed = True
+            if header.type_regex:
+                old_length = len(lines)
+                lines = header.type_regex.sub(header.type_sub, lines)
+                if not file_changed and old_length != len(lines):
+                    file_changed = True
 
         return (lines, file_changed, True)
 
