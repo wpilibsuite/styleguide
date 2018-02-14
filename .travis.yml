@@ -1,9 +1,15 @@
-sudo: false
+sudo: true
 dist: trusty
 language: python
 python:
   - 3.5
   - 3.6
+
+before_install:
+  - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
+  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+  - sudo apt-get update -q || true
+  - sudo apt-get install clang-format-5.0 -y
 
 install:
   - git fetch --unshallow
@@ -32,3 +38,28 @@ script:
   - python3 -m wpiformat -f wpiformat/* -v
 
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - cd ../..  # Back to home directory
+
+  - git clone --depth 1 git://github.com/wpilibsuite/wpiutil
+  - cd wpiutil
+  - python3 -m wpiformat -y 2018 -clang 5.0
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - cd ..
+
+  - git clone --depth 1 git://github.com/wpilibsuite/ntcore
+  - cd ntcore
+  - python3 -m wpiformat -y 2018 -clang 5.0
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - cd ..
+
+  - git clone --depth 1 git://github.com/wpilibsuite/cscore
+  - cd cscore
+  - python3 -m wpiformat -y 2018 -clang 5.0
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - cd ..
+
+  - git clone --depth 1 git://github.com/wpilibsuite/allwpilib
+  - cd allwpilib
+  - python3 -m wpiformat -y 2018 -clang 5.0
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - cd ..
