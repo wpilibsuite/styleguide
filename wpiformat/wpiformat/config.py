@@ -1,7 +1,7 @@
 """This class is for handling wpiformat config files."""
 
 import os
-import re
+import regex
 import sys
 
 
@@ -76,9 +76,9 @@ class Config:
 
         if len(group_contents) == 0:
             # If regex string is empty, make regex match nothing
-            return re.compile("a^")
+            return regex.compile("a^")
         else:
-            return re.compile("|".join(group_contents))
+            return regex.compile("|".join(group_contents))
 
     def is_c_file(self, name):
         """Returns True if file is either C header or C source file.

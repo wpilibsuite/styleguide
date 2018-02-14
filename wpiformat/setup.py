@@ -70,7 +70,7 @@ setup(
     zip_safe=True,
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    install_requires=["yapf"],
+    install_requires=["regex", "yapf"],
     license="BSD License",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

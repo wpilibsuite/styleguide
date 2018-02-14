@@ -1,6 +1,6 @@
 """This task removes extra newlines after the line containing "class"."""
 
-import re
+import regex
 
 from wpiformat.task import Task
 
@@ -14,24 +14,36 @@ class JavaClass(Task):
         linesep = Task.get_linesep(lines)
         file_changed = False
 
-        if linesep == "\r\n":
-            regex_linesep = r"\r\n"
-        else:
-            regex_linesep = r"\n"
-
         output = ""
         pos = 0
 
         # Match two or more line separators
-        token_str = "class\s.*{" + regex_linesep + "(?P<extra>(" + regex_linesep + ")+)"
-        token_regex = re.compile(token_str, re.MULTILINE)
+        token_str = "/\*|\*/|//|" + linesep + "|class\s[^{]*{" + linesep + "(?P<extra>(" + linesep + ")+)"
+        token_regex = regex.compile(token_str)
+
+        in_multicomment = False
+        in_comment = False
 
         for match in token_regex.finditer(lines):
-            # Removes extra line separators
-            output += lines[pos:match.span("extra")[0]]
-            pos = match.span()[1]
+            token = match.group()
 
-            file_changed = True
+            if token == "/*":
+                in_multicomment = True
+            elif token == "*/":
+                in_multicomment = False
+                in_comment = False
+            elif token == "//":
+                in_comment = True
+            elif token == linesep:
+                in_comment = False
+            elif not in_multicomment and not in_comment:
+                # Otherwise, the token is a class
+
+                # Removes extra line separators
+                output += lines[pos:match.span("extra")[0]]
+                pos = match.span()[1]
+
+                file_changed = True
 
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
