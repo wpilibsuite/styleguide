@@ -185,7 +185,7 @@ class IncludeOrder(Task):
 
         Returns tuple of the following:
           sorted output
-          list of flags of instances of header categories within #ifdef block
+          list of bools indicating header category presence within #ifdef block
           the index of the last line processed
           whether all header includes had header extension
         """
@@ -193,7 +193,9 @@ class IncludeOrder(Task):
 
         # Using sets here eliminates duplicate includes
         includes = [set(), set(), set(), set(), set()]
-        include_flags = [0, 0, 0, 0, 0]
+
+        # List of bools indicating header category presence within #ifdef block
+        includes_present = [False, False, False, False, False]
 
         ifdef_blocks = [[], [], [], [], []]
 
@@ -210,14 +212,14 @@ class IncludeOrder(Task):
                         # Add #ifdef or #else line
                         ifdef = lines_list[i] + self.linesep
 
-                        suboutput, flags, idx, valid_headers = self.header_sort(
+                        suboutput, inc_present, idx, valid_headers = self.header_sort(
                             config_file, lines_list, file_name, i + 1, j,
                             ifdef_level + 1)
                         i = j
 
                         # If header failed to classify, return failure
                         if not valid_headers:
-                            return (output_list, flags, i, False)
+                            return (output_list, inc_present, i, False)
 
                         if suboutput:
                             ifdef += self.linesep.join(suboutput) + self.linesep
@@ -229,13 +231,14 @@ class IncludeOrder(Task):
                         if "#endif" in lines_list[j]:
                             ifdef += self.linesep
 
-                        for k in range(len(include_flags)):
-                            include_flags[k] |= flags[k]
+                        for k in range(len(includes_present)):
+                            includes_present[k] |= inc_present[k]
 
-                        if sum(flags) == 1:
+                        # If there is only one type of include present
+                        if sum(inc_present) == 1:
                             ifdef_idx = 0
-                            for k in range(len(flags)):
-                                if flags[k] == 1:
+                            for k in range(len(inc_present)):
+                                if inc_present[k]:
                                     ifdef_idx = k
                                     break
 
@@ -273,17 +276,17 @@ class IncludeOrder(Task):
                 idx = self.classify_header(config_file, include_line, file_name)
                 if idx != -1:
                     includes[idx].add(self.add_brackets(include_line, idx))
-                    include_flags[idx] = 1
+                    includes_present[idx] = True
                 else:
                     # If header failed to classify, return failure
-                    return (output_list, include_flags, i, False)
+                    return (output_list, includes_present, i, False)
             elif ifdef_level > 0 and lines_list[i] != "":
                 # Non-preprocessor statements within a #ifdef block don't mark
                 # the end of header include processing, but act as barrier for
                 # sorting.
 
                 # Dump currently collected header includes to file.
-                # include_flags isn't reset as well here because that info is
+                # includes_present isn't reset as well here because that info is
                 # still valid and necessary for sorting.
                 written = self.write_headers(includes)
                 if written:
@@ -297,7 +300,7 @@ class IncludeOrder(Task):
                 if written:
                     output_list.extend(written)
 
-                return (output_list, include_flags, i, True)
+                return (output_list, includes_present, i, True)
             i += 1
 
         # Write headers and #ifdef blocks if found
@@ -305,7 +308,7 @@ class IncludeOrder(Task):
         if written:
             output_list.extend(written)
 
-        return (output_list, include_flags, i, True)
+        return (output_list, includes_present, i, True)
 
     def run_pipeline(self, config_file, name, lines):
         self.override_regexes = []
@@ -331,7 +334,7 @@ class IncludeOrder(Task):
             i += 1
         output_list = lines_list[0:i]
 
-        suboutput, flags, idx, valid_headers = self.header_sort(
+        suboutput, inc_present, idx, valid_headers = self.header_sort(
             config_file, lines_list, file_name, i, len(lines_list), 0)
         i = idx
 
