@@ -7,28 +7,45 @@ python:
 
 install:
   - git fetch --unshallow
-
-script:
   - cd wpiformat
   - python3 setup.py build
   - python3 setup.py install --optimize=1 --skip-build
   - python3 setup.py test
-  - cd .. && python3 -m wpiformat -v
-  - cd wpiformat
+  - cd ..
 
+script:
+  - python3 -m wpiformat -v
+  - cd wpiformat
   # One file
   - python3 -m wpiformat -f wpiformat/__init__.py -v
-
   # Absolute path to file
   - python3 -m wpiformat -f $HOME/styleguide/wpiformat/wpiformat/__init__.py -v
-
   # Multiple files
   - python3 -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
-
   # Directory
   - python3 -m wpiformat -f wpiformat -v
-
   # Wildcard
   - python3 -m wpiformat -f wpiformat/* -v
-
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+
+jobs:
+  include:
+    - &suite-test
+      stage: suite test
+      sudo: true
+      before_install:
+        - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
+        - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+        - sudo apt-get update -q || true
+        - sudo apt-get install clang-format-5.0 -y
+      script:
+        - git clone --depth 1 git://github.com/wpilibsuite/$PROJECT && cd $PROJECT
+        - python3 -m wpiformat -y 2018 -clang 5.0
+        - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+      env: PROJECT=wpiutil
+    - <<: *suite-test
+      env: PROJECT=ntcore
+    - <<: *suite-test
+      env: PROJECT=cscore
+    - <<: *suite-test
+      env: PROJECT=allwpilib
