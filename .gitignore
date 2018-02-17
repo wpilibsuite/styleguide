@@ -137,8 +137,8 @@ local.properties
 .loadpath
 
 ### Python ###
-.cache
 .eggs/
+.pytest_cache/
 __pycache__
 *.egg-info/
 *.egg
