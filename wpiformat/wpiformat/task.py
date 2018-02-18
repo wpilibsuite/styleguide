@@ -9,7 +9,7 @@ from abc import *
 import os
 
 
-class Task(object):
+class Task:
     __metaclass__ = ABCMeta
 
     @staticmethod

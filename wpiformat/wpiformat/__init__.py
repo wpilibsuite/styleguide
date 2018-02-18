@@ -290,8 +290,8 @@ def main():
             sys.exit(1)
     else:
         files = []
-        # If a directory was specified, recursively expand it
         for name in args.file:
+            # If a directory was specified, recursively expand it
             if os.path.isdir(name):
                 files.extend([
                     os.path.join(dp, f)

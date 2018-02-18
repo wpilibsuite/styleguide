@@ -7,7 +7,7 @@ import regex
 from wpiformat.task import Task
 
 
-class Header(object):
+class Header:
 
     def __init__(self, name, func_names=set(), type_regexes=[],
                  add_prefix=True):
