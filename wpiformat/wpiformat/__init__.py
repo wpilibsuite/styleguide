@@ -12,6 +12,7 @@ from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.clangtidy import ClangTidy
 from wpiformat.cmakeformat import CMakeFormat
+from wpiformat.commentformat import CommentFormat
 from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
 from wpiformat.gtestname import GTestName
@@ -506,6 +507,7 @@ def main():
         task_pipeline = [
             BraceComment(),
             CIdentList(),
+            CommentFormat(),
             EofNewline(),
             GTestName(),
             IncludeGuard(),
