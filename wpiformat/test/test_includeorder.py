@@ -485,6 +485,10 @@ def test_includeorder():
         "#include <iostream>" + os.linesep + \
         "#include <memory>" + os.linesep, True, True))
 
+    # Ensure lines containing #include that aren't includes are not processed
+    inputs.append(("./Test.h", "// #included here" + os.linesep))
+    outputs.append(("// #included here" + os.linesep, False, True))
+
     assert len(inputs) == len(outputs)
 
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
