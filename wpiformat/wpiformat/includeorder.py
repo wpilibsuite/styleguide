@@ -274,6 +274,14 @@ class IncludeOrder(Task):
                             output_list.append(ifdef)
                         break
             elif "#include" in lines_list[i]:
+                include_line = self.header_regex.search(lines_list[i])
+                if not include_line:
+                    # Write headers and #ifdef blocks if found
+                    written = self.write_headers(includes, ifdef_blocks)
+                    if written:
+                        output_list.extend(written)
+                    return (output_list, includes_present, i, True)
+
                 if "NOLINT" in lines_list[i]:
                     # NOLINT is a barrier, so flush includes
                     written = self.write_headers(includes)
@@ -292,8 +300,6 @@ class IncludeOrder(Task):
                     continue
 
                 # Insert header into appropriate list
-                include_line = self.header_regex.search(lines_list[i])
-
                 idx = self.classify_header(config_file, include_line, file_name)
                 if idx != -1:
                     if include_line.group("comment"):
@@ -370,10 +376,11 @@ class IncludeOrder(Task):
             output_list.extend(suboutput)
 
         # Remove possible extra newline from #endif
-        output_list[-1] = output_list[-1].rstrip()
+        if len(output_list) > 0:
+            output_list[-1] = output_list[-1].rstrip()
+            output_list.append("")
 
         # Write rest of file
-        output_list.append("")
         output_list.extend(lines_list[i:])
 
         output = self.linesep.join(output_list).rstrip() + self.linesep
