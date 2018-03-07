@@ -158,6 +158,9 @@
 <dd class="toc3">
 <a href="#s4.8.8-numeric-literals">4.8.8 Numeric Literals</a>
 </dd>
+<dd class="toc3">
+<a href="#s4.8.9-ternary-operator">4.8.9 Ternary Operator</a>
+</dd>
 </dl>
 </td><td>
 <dl>
@@ -618,7 +621,11 @@ public protected private abstract static final transient volatile synchronized n
     <h4>4.8.8 Numeric Literals&nbsp;<a href="#s4.8.8-numeric-literals"><img height="21" width="21" src="guidelink.png"/></a></h4>
     <p><code>long</code>-valued integer literals use an uppercase <code>L</code> suffix, never
 lowercase (to avoid confusion with the digit <code>1</code>). For example, <code>3000000000L</code>
-rather than <code class="badcode">3000000000l</code>.</p><a name="naming"/><a name="s5-naming"/>
+rather than <code class="badcode">3000000000l</code>.</p>
+<a name="s4.8.9-ternary-operator"/>
+    <h4>4.8.9 Ternary Operator&nbsp;<a href="#s4.8.9-ternary-operator"><img height="21" width="21" src="guidelink.png"/></a></h4>
+    <p><p>The ternary operator is useful for condensing branching assignments into single lines. It should only be used when all parts of the ternary are simple expressions (only addition/subtraction/etc., no object allocation). Ternary operator usage may not be nested.</p>
+<a name="naming"/><a name="s5-naming"/>
     <h2>5 Naming&nbsp;<a href="#s5-naming"><img height="21" width="21" src="guidelink.png"/></a></h2>
     <a name="s5.1-identifier-names"/>
     <h3>5.1 Rules common to all identifiers&nbsp;<a href="#s5.1-identifier-names"><img height="21" width="21" src="guidelink.png"/></a></h3>
