@@ -1,59 +1,56 @@
 import os
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.bracecomment import BraceComment
 
 
 def test_bracecomment():
-    task = BraceComment()
-
-    inputs = []
-    outputs = []
+    test = TaskTest(BraceComment())
 
     # Empty anonymous namespace
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace {" + os.linesep + \
-        "}// comment" + os.linesep))
-    outputs.append((
+        "}// comment" + os.linesep)
+    test.add_output(
         "namespace {" + os.linesep + \
-        "}  // namespace" + os.linesep, True, True))
+        "}  // namespace" + os.linesep, True, True)
 
     # Anonymous namespace containing comment
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}// comment" + os.linesep))
-    outputs.append((
+        "}// comment" + os.linesep)
+    test.add_output(
         "namespace {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}  // namespace" + os.linesep, True, True))
+        "}  // namespace" + os.linesep, True, True)
 
     # namespace
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}// comment" + os.linesep))
-    outputs.append((
+        "}// comment" + os.linesep)
+    test.add_output(
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}  // namespace hal" + os.linesep, True, True))
+        "}  // namespace hal" + os.linesep, True, True)
 
     # namespace with leftover input
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "// comment before namespace" + os.linesep + \
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
         "}// comment" + os.linesep + \
-        "// comment after namespace" + os.linesep))
-    outputs.append((
+        "// comment after namespace" + os.linesep)
+    test.add_output(
         "// comment before namespace" + os.linesep + \
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
         "}  // namespace hal" + os.linesep + \
-        "// comment after namespace" + os.linesep, True, True))
+        "// comment after namespace" + os.linesep, True, True)
 
     # Braces within namespace
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace {" + os.linesep + \
         os.linesep + \
         "struct AnalogGyro {" + os.linesep + \
@@ -63,8 +60,8 @@ def test_bracecomment():
         "  int32_t center;" + os.linesep + \
         "}" + os.linesep + \
         os.linesep + \
-        "}" + os.linesep))
-    outputs.append((
+        "}" + os.linesep)
+    test.add_output(
         "namespace {" + os.linesep + \
         os.linesep + \
         "struct AnalogGyro {" + os.linesep + \
@@ -74,20 +71,20 @@ def test_bracecomment():
         "  int32_t center;" + os.linesep + \
         "}" + os.linesep + \
         os.linesep + \
-        "}  // namespace" + os.linesep, True, True))
+        "}  // namespace" + os.linesep, True, True)
 
     # extern "C"
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "extern \"C\" {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}// comment" + os.linesep))
-    outputs.append((
+        "}// comment" + os.linesep)
+    test.add_output(
         "extern \"C\" {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}  // extern \"C\"" + os.linesep, True, True))
+        "}  // extern \"C\"" + os.linesep, True, True)
 
     # Nested brackets should be handled properly
-    inputs.append(("./Test.cpp",
+    test.add_input("./Test.cpp",
         "extern \"C\" {" + os.linesep + \
         "void func() {" + os.linesep + \
         "  if (1) {" + os.linesep + \
@@ -95,55 +92,47 @@ def test_bracecomment():
         "  } else {" + os.linesep + \
         "  }" + os.linesep + \
         "}" + os.linesep + \
-        "}  // extern \"C\"" + os.linesep))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+        "}  // extern \"C\"" + os.linesep)
+    test.add_latest_input_as_output(True)
 
     # Nested brackets on same line
-    inputs.append(("./Test.cpp",
+    test.add_input("./Test.cpp",
         "namespace wpi {" + os.linesep + \
         "{{}}" + os.linesep + \
-        "}  // namespace java" + os.linesep))
-    outputs.append((
+        "}  // namespace java" + os.linesep)
+    test.add_output(
         "namespace wpi {" + os.linesep + \
         "{{}}" + os.linesep + \
-        "}  // namespace wpi" + os.linesep, True, True))
+        "}  // namespace wpi" + os.linesep, True, True)
 
     # Handle single-line statements correctly
-    inputs.append(("./Test.cpp",
-                   "namespace hal { Type typeName; }" + os.linesep))
-    outputs.append(
-        ("namespace hal { Type typeName; }  // namespace hal" + os.linesep,
-         True, True))
+    test.add_input("./Test.cpp",
+                   "namespace hal { Type typeName; }" + os.linesep)
+    test.add_output(
+        "namespace hal { Type typeName; }  // namespace hal" + os.linesep, True,
+        True)
 
     # Two incorrect comments
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace {" + os.linesep + \
         "    // nothing" + os.linesep + \
         "}// comment" + os.linesep + \
         "namespace Name {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append((
+        "}" + os.linesep)
+    test.add_output(
         "namespace {" + os.linesep + \
         "    // nothing" + os.linesep + \
         "}  // namespace" + os.linesep + \
         "namespace Name {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}  // namespace Name" + os.linesep, True, True))
+        "}  // namespace Name" + os.linesep, True, True)
 
     # Don't touch correct comment
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "namespace {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}  // namespace" + os.linesep))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+        "}  // namespace" + os.linesep)
+    test.add_latest_input_as_output(True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.FILE)

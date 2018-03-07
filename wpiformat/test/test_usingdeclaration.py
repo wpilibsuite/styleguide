@@ -2,58 +2,41 @@ import io
 import os
 import sys
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.usingdeclaration import UsingDeclaration
 
 
 def test_usingdeclaration():
-    task = UsingDeclaration()
-
-    inputs = []
-    outputs = []
+    test = TaskTest(UsingDeclaration())
 
     # Before class block
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "using std::chrono;" + os.linesep + \
         "class Test {" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append(("./Test.h: 1: 'using std::chrono;' in global namespace\n",
-                    False, False))
+        "}" + os.linesep)
+    test.add_output("./Test.h: 1: 'using std::chrono;' in global namespace\n",
+                    False, False)
 
     # Inside enum block
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "enum Test {" + os.linesep + \
         "  using std::chrono;" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append(("", False, True))
+        "}" + os.linesep)
+    test.add_output("", False, True)
 
     # After { block
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "{" + os.linesep + \
         "}" + os.linesep + \
-        "using std::chrono;" + os.linesep))
-    outputs.append(("./Test.h: 3: 'using std::chrono;' in global namespace\n",
-                    False, False))
+        "using std::chrono;" + os.linesep)
+    test.add_output("./Test.h: 3: 'using std::chrono;' in global namespace\n",
+                    False, False)
 
     # Before class block with NOLINT
-    inputs.append(("./Test.h",
+    test.add_input("./Test.h",
         "using std::chrono;  // NOLINT" + os.linesep + \
         "class Test {" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append(("", False, True))
+        "}" + os.linesep)
+    test.add_output("", False, True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    saved_stdout = sys.stdout
-    for i in range(len(inputs)):
-        new_stdout = io.StringIO()
-        sys.stdout = new_stdout
-        unused_output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        sys.stdout = saved_stdout
-        new_stdout.seek(0)
-        output = new_stdout.read()
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.STDOUT)

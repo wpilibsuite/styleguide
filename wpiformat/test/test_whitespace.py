@@ -1,14 +1,11 @@
 import os
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.whitespace import Whitespace
 
 
 def test_whitespace():
-    task = Whitespace()
-
-    inputs = []
-    outputs = []
+    test = TaskTest(Whitespace())
 
     file_appendix = \
         "#pragma once" + os.linesep + \
@@ -20,35 +17,27 @@ def test_whitespace():
         "}" + os.linesep
 
     # Empty file
-    inputs.append(("./Test.h", ""))
-    outputs.append(("", False, True))
+    test.add_input("./Test.h", "")
+    test.add_output("", False, True)
 
     # No trailing whitespace
-    inputs.append(("./Test.h", file_appendix))
-    outputs.append((file_appendix, False, True))
+    test.add_input("./Test.h", file_appendix)
+    test.add_output(file_appendix, False, True)
 
     # Two spaces trailing
-    inputs.append(
-        ("./Test.h",
-         "#pragma once" + os.linesep + os.linesep + "#include <iostream>" +
-         os.linesep + os.linesep + "int main() {  " + os.linesep +
-         "  std::cout << \"Hello World!\";  " + os.linesep + "}" + os.linesep))
-    outputs.append((file_appendix, True, True))
+    test.add_input(
+        "./Test.h",
+        "#pragma once" + os.linesep + os.linesep + "#include <iostream>" +
+        os.linesep + os.linesep + "int main() {  " + os.linesep +
+        "  std::cout << \"Hello World!\";  " + os.linesep + "}" + os.linesep)
+    test.add_output(file_appendix, True, True)
 
     # Two tabs trailing
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "#pragma once" + os.linesep + os.linesep + "#include <iostream>" +
         os.linesep + os.linesep + "int main() {\t\t" + os.linesep +
-        "  std::cout << \"Hello World!\";\t\t" + os.linesep + "}" + os.linesep))
-    outputs.append((file_appendix, True, True))
+        "  std::cout << \"Hello World!\";\t\t" + os.linesep + "}" + os.linesep)
+    test.add_output(file_appendix, True, True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.FILE)

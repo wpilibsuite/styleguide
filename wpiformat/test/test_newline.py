@@ -1,14 +1,11 @@
 import os
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.newline import Newline
 
 
 def test_newline():
-    task = Newline()
-
-    inputs = []
-    outputs = []
+    test = TaskTest(Newline())
 
     file_appendix = \
         "#pragma once" + os.linesep + \
@@ -20,31 +17,25 @@ def test_newline():
         "}"
 
     # Empty file
-    inputs.append(("./Test.h", ""))
-    outputs.append(("\n", True, True))
+    test.add_input("./Test.h", "")
+    test.add_output("\n", True, True)
+
+    test_output = file_appendix + os.linesep
 
     # No newline
-    inputs.append(("./Test.h", file_appendix))
-    outputs.append((file_appendix + os.linesep, True, True))
+    test.add_input("./Test.h", file_appendix)
+    test.add_output(test_output, True, True)
 
     # One newline
-    inputs.append((inputs[1][0], inputs[1][1] + os.linesep))
-    outputs.append((outputs[1][0], False, True))
+    test.add_input("./Test.h", test_output)
+    test.add_latest_input_as_output(True)
 
     # Two newlines
-    inputs.append((inputs[1][0], inputs[1][1] + os.linesep + os.linesep))
-    outputs.append((outputs[1][0], True, True))
+    test.add_input("./Test.h", test_output + os.linesep)
+    test.add_output(test_output, True, True)
 
     # .bat file with no "./" prefix
-    inputs.append(("test.bat", inputs[1][1].replace(os.linesep, "\r\n")))
-    outputs.append((outputs[1][0].replace(os.linesep, "\r\n"), True, True))
+    test.add_input("test.bat", file_appendix.replace(os.linesep, "\r\n"))
+    test.add_output(test_output.replace(os.linesep, "\r\n"), True, True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.FILE)

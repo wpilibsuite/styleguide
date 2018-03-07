@@ -1,6 +1,7 @@
 from datetime import date
 import os
 
+from test.tasktest import *
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
 
@@ -9,9 +10,7 @@ def test_licenseupdate():
     year = str(date.today().year)
 
     task = LicenseUpdate(year)
-
-    inputs = []
-    outputs = []
+    test = TaskTest(task)
 
     file_appendix = \
         "#pragma once" + os.linesep + \
@@ -23,117 +22,125 @@ def test_licenseupdate():
         "}"
 
     # pragma once at top of file
-    inputs.append(("./Test.h", file_appendix))
-    outputs.append((
+    test.add_input("./Test.h", file_appendix)
+    test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True))
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # pragma once at top of file preceded by newline
-    temp = (inputs[len(inputs) - 1][0], os.linesep + inputs[len(inputs) - 1][1])
-    inputs.append(temp)
-    outputs.append(outputs[len(outputs) - 1])
+    test.add_input("./Test.h", os.linesep + file_appendix)
+    test.add_output(
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date license preceded by newline
-    inputs.append((
+    test.add_input(
         "./Test.h", os.linesep +
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix))
-    outputs.append((inputs[len(inputs) - 1][1].lstrip(), True, True))
+        format(year) + os.linesep + os.linesep + file_appendix)
+    test.add_output(
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date range license
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
         "// Copyright (c) 2011-{} Company Name. All Rights Reserved.".format(
-            year) + os.linesep + os.linesep + file_appendix))
-    outputs.append((
+            year) + os.linesep + os.linesep + file_appendix)
+    test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True))
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date license with one year
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+        format(year) + os.linesep + os.linesep + file_appendix)
+    test.add_latest_input_as_output(True)
 
     # File with three newlines between license and include guard
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + os.linesep + file_appendix))
-    outputs.append((outputs[len(outputs) - 1][0], True, True))
+        format(year) + os.linesep + os.linesep + os.linesep + file_appendix)
+    test.add_output(
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File with only one newline between license and include guard
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + file_appendix))
-    outputs.append((outputs[len(outputs) - 1][0], True, True))
+        format(year) + os.linesep + file_appendix)
+    test.add_output(
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File with multiline comment spanning multiple lines of license header
-    inputs.append((
+    test.add_input(
         "./Test.h", "/*" + os.linesep +
         " * Autogenerated file! Do not manually edit this file. This version is regenerated"
         + os.linesep +
         " * any time the publish task is run, or when this file is deleted." +
         os.linesep + " */" + os.linesep + os.linesep +
-        "const char* WPILibVersion = \"\";"))
-    outputs.append((
+        "const char* WPILibVersion = \"\";")
+    test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + inputs[len(inputs) - 1][1],
-        True, True))
+        format(year) + os.linesep + os.linesep + "/*" + os.linesep +
+        " * Autogenerated file! Do not manually edit this file. This version is regenerated"
+        + os.linesep +
+        " * any time the publish task is run, or when this file is deleted." +
+        os.linesep + " */" + os.linesep + os.linesep +
+        "const char* WPILibVersion = \"\";", True, True)
 
     # File containing license year range in different postion than template
     # (If the year isn't extracted, the range will be replaced with one year and
     # the test will fail.)
-    inputs.append((
+    test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix))
-    outputs.append((
+        format(year) + os.linesep + os.linesep + file_appendix)
+    test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
         "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True))
+        format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File excluded from license update isn't modified
-    inputs.append(("./Excluded.h",
+    test.add_input("./Excluded.h",
                    "/* Copyright (c) Company Name 2011-{}. */".format(year) +
-                   os.linesep + os.linesep + file_appendix))
-    outputs.append(("/* Copyright (c) Company Name 2011-{}. */".format(year) +
-                    os.linesep + os.linesep + file_appendix, False, True))
+                   os.linesep + os.linesep + file_appendix)
+    test.add_output("/* Copyright (c) Company Name 2011-{}. */".format(year) +
+                    os.linesep + os.linesep + file_appendix, False, True)
 
-    assert len(inputs) == len(outputs)
-
+    # Ensure excluded files won't be processed
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        # Ensure files excluded from license update won't be processed
-        if inputs[i][0] == "./Excluded.h":
-            assert not task.should_process_file(config_file, inputs[i][0])
-        else:
-            assert task.should_process_file(config_file, inputs[i][0])
+    assert not task.should_process_file(config_file, "./Excluded.h")
 
-        if task.should_process_file(config_file, inputs[i][0]):
-            output, file_changed, success = task.run_pipeline(
-                config_file, inputs[i][0], inputs[i][1])
-            assert output == outputs[i][0]
-            assert file_changed == outputs[i][1]
-            assert success == outputs[i][2]
+    test.run(OutputType.FILE)

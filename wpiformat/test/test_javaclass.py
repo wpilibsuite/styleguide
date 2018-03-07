@@ -1,57 +1,46 @@
 import os
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.javaclass import JavaClass
 
 
 def test_javaclass():
-    task = JavaClass()
-
-    inputs = []
-    outputs = []
+    test = TaskTest(JavaClass())
 
     # No line separators at beginning of class
-    inputs.append(
-        ("./Test.java",
-         "public class ExampleCommand extends Command {}" + os.linesep))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+    test.add_input(
+        "./Test.java",
+        "public class ExampleCommand extends Command {}" + os.linesep)
+    test.add_latest_input_as_output(True)
 
     # One line separator at beginning of class
-    inputs.append(("./Test.java",
+    test.add_input("./Test.java",
         "public class ExampleCommand extends Command {" + os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+        "}" + os.linesep)
+    test.add_latest_input_as_output(True)
 
     # Two line separators at beginning of class
-    inputs.append(("./Test.java",
+    test.add_input("./Test.java",
         "public class ExampleCommand extends Command {" + os.linesep + \
         os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append((
+        "}" + os.linesep)
+    test.add_output(
         "public class ExampleCommand extends Command {" + os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep, True, True))
+        "}" + os.linesep, True, True)
 
     # Three line separators at beginning of class
-    inputs.append(("./Test.java",
+    test.add_input("./Test.java",
         "public class ExampleCommand extends Command {" + os.linesep + \
         os.linesep + \
         os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append((
+        "}" + os.linesep)
+    test.add_output(
         "public class ExampleCommand extends Command {" + os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep, True, True))
+        "}" + os.linesep, True, True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.FILE)
