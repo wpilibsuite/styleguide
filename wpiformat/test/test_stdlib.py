@@ -1,16 +1,13 @@
 import os
 
-from wpiformat.config import Config
+from test.tasktest import *
 from wpiformat.stdlib import Stdlib
 
 
 def test_stdlib():
-    task = Stdlib()
+    test = TaskTest(Stdlib())
 
-    inputs = []
-    outputs = []
-
-    inputs.append(("./Main.cpp",
+    test.add_input("./Main.cpp",
         "#include <cstdint>" + os.linesep + \
         "#include <stdlib.h>" + os.linesep + \
         os.linesep + \
@@ -23,8 +20,8 @@ def test_stdlib():
         "  std::uint_fast16_t** l = &k;" + os.linesep + \
         "  std::uint_fast16_t ** m = l;" + os.linesep + \
         "  free(mem);" + os.linesep + \
-        "}" + os.linesep))
-    outputs.append((
+        "}" + os.linesep)
+    test.add_output(
         "#include <stdint.h>" + os.linesep + \
         "#include <cstdlib>" + os.linesep + \
         os.linesep + \
@@ -37,63 +34,55 @@ def test_stdlib():
         "  uint_fast16_t** l = &k;" + os.linesep + \
         "  uint_fast16_t ** m = l;" + os.linesep + \
         "  std::free(mem);" + os.linesep + \
-        "}" + os.linesep, True, True))
+        "}" + os.linesep, True, True)
 
     # FILE should be recognized as type here
-    inputs.append(("./Class.cpp", "static FILE* Class::file = nullptr;"))
-    outputs.append(("static std::FILE* Class::file = nullptr;", True, True))
+    test.add_input("./Class.cpp", "static FILE* Class::file = nullptr;")
+    test.add_output("static std::FILE* Class::file = nullptr;", True, True)
 
     # FILE should not be recognized as type here
-    inputs.append(("./Class.cpp",
+    test.add_input("./Class.cpp",
         "static int Class::error1 = ERR_FILE;" + os.linesep + \
         "#define FILE_LOG(level)" + os.linesep + \
-        "if (level > FILELog::ReportingLevel())" + os.linesep))
-    outputs.append((
+        "if (level > FILELog::ReportingLevel())" + os.linesep)
+    test.add_output(
         "static int Class::error1 = ERR_FILE;" + os.linesep + \
         "#define FILE_LOG(level)" + os.linesep + \
-        "if (level > FILELog::ReportingLevel())" + os.linesep, False, True))
+        "if (level > FILELog::ReportingLevel())" + os.linesep, False, True)
 
     # Remove "std::" from beginning of line
-    inputs.append(("./Class.cpp",
+    test.add_input("./Class.cpp",
                    "/**" + os.linesep + \
                    " *" + os.linesep + \
                    " */" + os.linesep + \
                    "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                   "  uint32_t result = 0;" + os.linesep))
-    outputs.append(("/**" + os.linesep + \
+                   "  uint32_t result = 0;" + os.linesep)
+    test.add_output("/**" + os.linesep + \
                     " *" + os.linesep + \
                     " */" + os.linesep + \
                     "size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                    "  uint32_t result = 0;" + os.linesep, True, True))
+                    "  uint32_t result = 0;" + os.linesep, True, True)
 
     # Remove "std::" from beginning of file
-    inputs.append(("./Class.cpp",
+    test.add_input("./Class.cpp",
                    "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                   "  uint32_t result = 0;" + os.linesep))
-    outputs.append(("size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                    "  uint32_t result = 0;" + os.linesep, True, True))
+                   "  uint32_t result = 0;" + os.linesep)
+    test.add_output("size_t SizeUleb128(uint64_t val) {" + os.linesep + \
+                    "  uint32_t result = 0;" + os.linesep, True, True)
 
     # Don't prepend "std::" to function name if it's a function definition
     # "time()" in other contexts is a C standard library function.
-    inputs.append(
-        ("./Test.cpp",
-         "uint64_t time() const { return m_val.last_change; }" + os.linesep))
-    outputs.append((inputs[len(inputs) - 1][1], False, True))
+    test.add_input(
+        "./Test.cpp",
+        "uint64_t time() const { return m_val.last_change; }" + os.linesep)
+    test.add_latest_input_as_output(True)
 
     # Test detection of type within static_cast<>
-    inputs.append(("./Test.cpp", "static_cast<std::uint64_t>(x);" + os.linesep))
-    outputs.append(("static_cast<uint64_t>(x);" + os.linesep, True, True))
+    test.add_input("./Test.cpp", "static_cast<std::uint64_t>(x);" + os.linesep)
+    test.add_output("static_cast<uint64_t>(x);" + os.linesep, True, True)
 
     # Types followed by semicolon should match
-    inputs.append(("./Main.cpp", "typedef integer std::uint8_t;"))
-    outputs.append(("typedef integer uint8_t;", True, True))
+    test.add_input("./Main.cpp", "typedef integer std::uint8_t;")
+    test.add_output("typedef integer uint8_t;", True, True)
 
-    assert len(inputs) == len(outputs)
-
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    for i in range(len(inputs)):
-        output, file_changed, success = task.run_pipeline(
-            config_file, inputs[i][0], inputs[i][1])
-        assert output == outputs[i][0]
-        assert file_changed == outputs[i][1]
-        assert success == outputs[i][2]
+    test.run(OutputType.FILE)
