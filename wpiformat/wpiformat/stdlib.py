@@ -40,9 +40,10 @@ class Header(object):
             # function name is preceded by a word character and a space, it's
             # a function definition instead of a usage.
             self.func_regex = regex.compile(
-                "(?:[^\w]\s+|,|\()"
-                +  # Preceded by nonword character and spaces, comma, or "("
-                regex_prefix + "([a-z][a-z0-9]*)" +  # C stdlib function name
+                # Preceded by nonword character and spaces, comma, arithmetic
+                # operators, or "("
+                "(?:[^\w]\s+|,|\(|\+|-|\*|/)" + regex_prefix +
+                "([a-z][a-z0-9]*)" +  # C stdlib function name
                 "(?:\()"  # Followed by open parenthesis
             )
         else:

@@ -81,6 +81,10 @@ def test_stdlib():
     test.add_input("./Test.cpp", "static_cast<std::uint64_t>(x);" + os.linesep)
     test.add_output("static_cast<uint64_t>(x);" + os.linesep, True, True)
 
+    # Test detection of type with "-" prefix
+    test.add_input("./Test.cpp", "-atan(140 / 76.44);" + os.linesep)
+    test.add_output("-std::atan(140 / 76.44);" + os.linesep, True, True)
+
     # Types followed by semicolon should match
     test.add_input("./Main.cpp", "typedef integer std::uint8_t;")
     test.add_output("typedef integer uint8_t;", True, True)
