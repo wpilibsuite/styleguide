@@ -52,6 +52,9 @@ class Config:
         Keyword arguments:
         group_name -- config group name
         """
+        if not self.__config_dict:
+            return []
+
         try:
             return self.__config_dict[group_name]
         except KeyError:
