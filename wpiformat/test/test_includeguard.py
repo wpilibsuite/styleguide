@@ -66,4 +66,17 @@ def test_includeguard():
         os.linesep + \
         "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
 
+    # Ensure leading underscores are removed (this occurs if the user doesn't
+    # include a trailing "/" in the include guard root)
+    test.add_input("./Test/Test.h",
+        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
+        os.linesep + \
+        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep)
+    test.add_output(
+        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        os.linesep + \
+        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
+
     test.run(OutputType.FILE)

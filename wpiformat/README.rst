@@ -45,7 +45,9 @@ File names matching regexes in the group ``licenseUpdateExclude`` will be skippe
 
 Empty config groups can be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 
-Valid include guard patterns use capital letters, start with the repository name, include the path to the file and the file name itself, and have directory separators and hyphens replaced with underscores. The path to the file starts from the repository root by default. Other paths, such as include directories, can be specified in the group ``includeGuardRoots``. If a path matches, that string will be truncated from the include guard pattern.
+Valid include guard patterns use capital letters, start with the repository name, include the path to the file and the file name itself, have directory separators and hyphens replaced with underscores, and have a trailing underscore. The path to the file starts from the repository root by default. Other paths, such as include directories, can be specified in the group ``includeGuardRoots``. If a path matches, that string will be truncated from the include guard pattern.
+
+For example, given a file at `allwpilib/src/main/native/include/wpiutil/support/ConcurrentQueue.h` and an include path of `src/main/native/include/`, the resulting include guard would be `ALLWPILIB_WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_`.
 
 The group ``repoRootNameOverride`` allows one to override the repository name used in include guards. This is useful for giving subprojects within one repository different repository roots in their include guards. Only specify one name in this group because subsequent names will be ignored.
 

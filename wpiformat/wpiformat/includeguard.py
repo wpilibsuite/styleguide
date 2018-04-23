@@ -90,11 +90,14 @@ class IncludeGuard(Task):
         include_roots = config_file.group("includeGuardRoots")
 
         if include_roots:
+            prefix = ""
             for include_root in include_roots:
-                if guard_root.startswith(include_root):
-                    guard_path += guard_root[len(include_root):]
-                    return regex.sub("[^a-zA-Z0-9]", "_",
-                                     guard_path).upper() + "_"
+                if guard_root.startswith(
+                        include_root) and len(include_root) > len(prefix):
+                    prefix = include_root
+            guard_path += guard_root[len(prefix):]
+            return (regex.sub("[^a-zA-Z0-9]", "_", guard_path).upper() +
+                    "_").lstrip("_")
 
         # No include guard roots matched, so append full name
         guard_path += guard_root

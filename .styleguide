@@ -20,8 +20,10 @@ licenseUpdateExclude {
   Excluded\.h$
 }
 
+# Ordered this way to ensure tests find longest match
 includeGuardRoots {
   wpiformat/
+  wpiformat/Test/
 }
 
 # Used by unit tests
