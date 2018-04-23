@@ -205,4 +205,11 @@ def test_cidentlist():
         "    friend void Timer1IntHandler();" + os.linesep + \
         "};" + os.linesep, True, True)
 
+    # Ensure comments with } in them don't mess up brace stack
+    test.add_input("./Test.cpp",
+        "void func() {" + os.linesep + \
+        "  // closing }" + os.linesep + \
+        "}" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     test.run(OutputType.FILE)

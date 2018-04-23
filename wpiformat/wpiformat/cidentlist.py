@@ -31,10 +31,12 @@ class CIdentList(Task):
         #
         # "def\\s+\w+" matches preprocessor directives "#ifdef" and "#ifndef" so
         # their contents aren't used as a return type.
+        comment_str = "/\*|\*/|//|" + linesep + "|"
         extern_str = "(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
         braces_str = "\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
         postfix_str = "(?=\s*(;|\{))"
-        token_regex = regex.compile(extern_str + braces_str + postfix_str)
+        token_regex = regex.compile(
+            comment_str + extern_str + braces_str + postfix_str)
 
         EXTRA_POP_OFFSET = 2
 
@@ -46,49 +48,64 @@ class CIdentList(Task):
         # is_c + pop offset == 3: C++ lang restore that needs extra brace pop
         extern_brace_indices = [is_c]
 
+        in_multicomment = False
+        in_comment = False
         for match in token_regex.finditer(lines):
             token = match.group()
 
-            if token == "{":
-                extern_brace_indices.append(is_c)
-            elif token == "}":
-                is_c = extern_brace_indices.pop()
-
-                # If the next stack frame is from an extern without braces, pop
-                # it.
-                if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
-                    is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
-                    extern_brace_indices.pop()
-            elif token == ";":
-                # If the next stack frame is from an extern without braces, pop
-                # it.
-                if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
-                    is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
-                    extern_brace_indices.pop()
-            elif token.startswith("extern"):
-                # Back up language setting first
-                if match.group("ext_brace"):
+            if token == "/*":
+                in_multicomment = True
+            elif token == "*/":
+                in_multicomment = False
+                in_comment = False
+            elif token == "//":
+                print("into comment")
+                in_comment = True
+            elif token == linesep:
+                print("out of comment")
+                in_comment = False
+            elif not in_multicomment and not in_comment:
+                if token == "{":
                     extern_brace_indices.append(is_c)
-                else:
-                    # Handling an extern without braces changing the language
-                    # type is done by treating it as a pseudo-brace that gets
-                    # popped as well when the next "}" or ";" is encountered.
-                    # The "extra pop" offset is used as a flag on the top stack
-                    # value that is checked whenever a pop is performed.
-                    extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
+                elif token == "}":
+                    is_c = extern_brace_indices.pop()
 
-                # Change language based on extern declaration
-                if match.group("ext_decl") == "extern \"C\"":
-                    is_c = True
-                else:
-                    is_c = False
-            elif match.group(
-                    "paren") and "return " not in match.group() and is_c:
-                # Replaces () with (void)
-                output += lines[pos:match.span("paren")[0]] + "(void)"
-                pos = match.span("paren")[0] + len("()")
+                    # If the next stack frame is from an extern without braces,
+                    # pop it.
+                    if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
+                        is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
+                        extern_brace_indices.pop()
+                elif token == ";":
+                    # If the next stack frame is from an extern without braces,
+                    # pop it.
+                    if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
+                        is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
+                        extern_brace_indices.pop()
+                elif token.startswith("extern"):
+                    # Back up language setting first
+                    if match.group("ext_brace"):
+                        extern_brace_indices.append(is_c)
+                    else:
+                        # Handling an extern without braces changing the
+                        # language type is done by treating it as a pseudo-brace
+                        # that gets popped as well when the next "}" or ";" is
+                        # encountered. The "extra pop" offset is used as a flag
+                        # on the top stack value that is checked whenever a pop
+                        # is performed.
+                        extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
 
-                file_changed = True
+                    # Change language based on extern declaration
+                    if match.group("ext_decl") == "extern \"C\"":
+                        is_c = True
+                    else:
+                        is_c = False
+                elif match.group(
+                        "paren") and "return " not in match.group() and is_c:
+                    # Replaces () with (void)
+                    output += lines[pos:match.span("paren")[0]] + "(void)"
+                    pos = match.span("paren")[0] + len("()")
+
+                    file_changed = True
 
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
