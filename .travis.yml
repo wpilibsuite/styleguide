@@ -42,10 +42,4 @@ jobs:
         - git clone --depth 1 git://github.com/wpilibsuite/$PROJECT && cd $PROJECT
         - python3 -m wpiformat -y 2018 -clang 5.0
         - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-      env: PROJECT=wpiutil
-    - <<: *suite-test
-      env: PROJECT=ntcore
-    - <<: *suite-test
-      env: PROJECT=cscore
-    - <<: *suite-test
       env: PROJECT=allwpilib
