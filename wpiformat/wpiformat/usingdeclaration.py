@@ -17,35 +17,57 @@ class UsingDeclaration(Task):
         # Tokenize file as brace opens, brace closes, and "using" declarations.
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
-        token_regex = regex.compile(
-            "/\*|\*/|//|" + linesep + "|\{|\}|using\s[^;]*;")
+        token_regex = regex.compile(r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" +
+                                    linesep + "|\{|\}|using\s[^;]*;")
 
         brace_count = 0
         in_multicomment = False
-        in_comment = False
+        in_singlecomment = False
+        in_string = False
+        in_char = False
         for match in token_regex.finditer(lines):
             token = match.group()
 
             if token == "/*":
-                in_multicomment = True
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = True
             elif token == "*/":
-                in_multicomment = False
-                in_comment = False
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = False
             elif token == "//":
-                in_comment = True
+                if not in_multicomment and not in_string and not in_char:
+                    in_singlecomment = True
             elif token == linesep:
-                in_comment = False
-            elif not in_multicomment and not in_comment:
-                if token == "{":
-                    brace_count += 1
-                elif token == "}":
-                    brace_count -= 1
-                elif token.startswith("using"):
-                    if brace_count == 0:
-                        linenum = lines.count(linesep, 0, match.start()) + 1
-                        if "NOLINT" not in lines.splitlines()[linenum - 1]:
-                            format_succeeded = False
-                            print(name + ": " + str(linenum) + ": '" + token + \
-                                  "' in global namespace")
+                if not in_multicomment:
+                    in_singlecomment = False
+            elif in_multicomment or in_singlecomment:
+                # Tokens processed after this branch are ignored if they are in
+                # comments
+                continue
+            elif token == "\\\"":
+                continue
+            elif token == "\"":
+                if not in_char:
+                    in_string = not in_string
+            elif token == "\\'":
+                continue
+            elif token == "'":
+                if not in_string:
+                    in_char = not in_char
+            elif in_string or in_char:
+                # Tokens processed after this branch are ignored if they are in
+                # double or single quotes
+                continue
+            elif token == "{":
+                brace_count += 1
+            elif token == "}":
+                brace_count -= 1
+            elif token.startswith("using"):
+                if brace_count == 0:
+                    linenum = lines.count(linesep, 0, match.start()) + 1
+                    if "NOLINT" not in lines.splitlines()[linenum - 1]:
+                        format_succeeded = False
+                        print(name + ": " + str(linenum) + ": '" + token + \
+                              "' in global namespace")
 
         return (lines, False, format_succeeded)

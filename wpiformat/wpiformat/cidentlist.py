@@ -7,6 +7,10 @@ from wpiformat.task import Task
 
 class CIdentList(Task):
 
+    def __print_failure(self, name):
+        print("Error: " + name + ": unmatched curly braces when scanning for "
+              "C identifier lists")
+
     def should_process_file(self, config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
@@ -31,12 +35,16 @@ class CIdentList(Task):
         #
         # "def\\s+\w+" matches preprocessor directives "#ifdef" and "#ifndef" so
         # their contents aren't used as a return type.
+        preproc_str = "#else|#endif|"
         comment_str = "/\*|\*/|//|" + linesep + "|"
+        string_str = r"\\\\|\\\"|\"|"
+        char_str = r"\\'|'|"
         extern_str = "(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
         braces_str = "\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
         postfix_str = "(?=\s*(;|\{))"
         token_regex = regex.compile(
-            comment_str + extern_str + braces_str + postfix_str)
+            preproc_str + comment_str + string_str + char_str + extern_str +
+            braces_str + postfix_str)
 
         EXTRA_POP_OFFSET = 2
 
@@ -48,70 +56,115 @@ class CIdentList(Task):
         # is_c + pop offset == 3: C++ lang restore that needs extra brace pop
         extern_brace_indices = [is_c]
 
+        in_preproc_else = False
         in_multicomment = False
-        in_comment = False
+        in_singlecomment = False
+        in_string = False
+        in_char = False
         for match in token_regex.finditer(lines):
             token = match.group()
 
+            # Skip #else to #endif in case they have braces in them. This
+            # assumes preprocessor directives are only used for conditional
+            # compilation for different platforms and have the same amount of
+            # braces in both branches. Nested preprocessor directives are also
+            # not handled.
+            if token == "#else":
+                in_preproc_else = True
+            elif token == "#endif":
+                in_preproc_else = False
+            if in_preproc_else:
+                continue
+
             if token == "/*":
-                in_multicomment = True
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = True
             elif token == "*/":
-                in_multicomment = False
-                in_comment = False
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = False
             elif token == "//":
-                print("into comment")
-                in_comment = True
+                if not in_multicomment and not in_string and not in_char:
+                    in_singlecomment = True
             elif token == linesep:
-                print("out of comment")
-                in_comment = False
-            elif not in_multicomment and not in_comment:
-                if token == "{":
+                if not in_multicomment:
+                    in_singlecomment = False
+            elif in_multicomment or in_singlecomment:
+                # Tokens processed after this branch are ignored if they are in
+                # comments
+                continue
+            elif token == "\\\"":
+                continue
+            elif token == "\"":
+                if not in_char:
+                    in_string = not in_string
+            elif token == "\\'":
+                continue
+            elif token == "'":
+                if not in_string:
+                    in_char = not in_char
+            elif in_string or in_char:
+                # Tokens processed after this branch are ignored if they are in
+                # double or single quotes
+                continue
+            elif token == "{":
+                extern_brace_indices.append(is_c)
+            elif token == "}":
+                is_c = extern_brace_indices.pop()
+
+                if len(extern_brace_indices) == 0:
+                    self.__print_failure(name)
+                    return (lines, False, False)
+
+                # If the next stack frame is from an extern without braces, pop
+                # it.
+                if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
+                    is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
+                    extern_brace_indices.pop()
+            elif token == ";":
+                if len(extern_brace_indices) == 0:
+                    self.__print_failure(name)
+                    return (lines, False, False)
+
+                # If the next stack frame is from an extern without braces, pop
+                # it.
+                if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
+                    is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
+                    extern_brace_indices.pop()
+            elif token.startswith("extern"):
+                # Back up language setting first
+                if match.group("ext_brace"):
                     extern_brace_indices.append(is_c)
-                elif token == "}":
-                    is_c = extern_brace_indices.pop()
+                else:
+                    # Handling an extern without braces changing the language
+                    # type is done by treating it as a pseudo-brace that gets
+                    # popped as well when the next "}" or ";" is encountered.
+                    # The "extra pop" offset is used as a flag on the top stack
+                    # value that is checked whenever a pop is performed.
+                    extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
 
-                    # If the next stack frame is from an extern without braces,
-                    # pop it.
-                    if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
-                        is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
-                        extern_brace_indices.pop()
-                elif token == ";":
-                    # If the next stack frame is from an extern without braces,
-                    # pop it.
-                    if extern_brace_indices[-1] >= EXTRA_POP_OFFSET:
-                        is_c = extern_brace_indices[-1] - EXTRA_POP_OFFSET
-                        extern_brace_indices.pop()
-                elif token.startswith("extern"):
-                    # Back up language setting first
-                    if match.group("ext_brace"):
-                        extern_brace_indices.append(is_c)
-                    else:
-                        # Handling an extern without braces changing the
-                        # language type is done by treating it as a pseudo-brace
-                        # that gets popped as well when the next "}" or ";" is
-                        # encountered. The "extra pop" offset is used as a flag
-                        # on the top stack value that is checked whenever a pop
-                        # is performed.
-                        extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
+                # Change language based on extern declaration
+                if match.group("ext_decl") == "extern \"C\"":
+                    is_c = True
+                else:
+                    is_c = False
+            elif match.group(
+                    "paren") and "return " not in match.group() and is_c:
+                # Replaces () with (void)
+                output += lines[pos:match.span("paren")[0]] + "(void)"
+                pos = match.span("paren")[0] + len("()")
 
-                    # Change language based on extern declaration
-                    if match.group("ext_decl") == "extern \"C\"":
-                        is_c = True
-                    else:
-                        is_c = False
-                elif match.group(
-                        "paren") and "return " not in match.group() and is_c:
-                    # Replaces () with (void)
-                    output += lines[pos:match.span("paren")[0]] + "(void)"
-                    pos = match.span("paren")[0] + len("()")
-
-                    file_changed = True
+                file_changed = True
 
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
             output += lines[pos:]
 
+        # Invariant: extern_brace_indices has one entry
+        success = len(extern_brace_indices) == 1
+        if not success:
+            self.__print_failure(name)
+
         if file_changed:
-            return (output, file_changed, True)
+            return (output, file_changed, success)
         else:
-            return (lines, file_changed, True)
+            return (lines, file_changed, success)
