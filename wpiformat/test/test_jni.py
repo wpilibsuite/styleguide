@@ -113,6 +113,63 @@ def test_jni():
         "{" + os.linesep)
     test.add_latest_input_as_output(True)
 
+    # Check signature that breaks verbose regexes
+    test.add_input("./NetworkTablesJNI.cpp",
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    getEntry" + os.linesep + \
+        " * Signature: (ILjava/lang/String;)I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jint JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry(JNIEnv* env, jclass," + os.linesep + \
+        "                                                           jint inst," + os.linesep + \
+        "                                                           jstring key) {" + os.linesep)
+    test.add_output("/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    getEntry" + os.linesep + \
+        " * Signature: (ILjava/lang/String;)I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jint JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry" + os.linesep + \
+        "  (JNIEnv* env, jclass, jint inst, jstring key)" + os.linesep + \
+        "{" + os.linesep, True, True)
+
+    # Function with array type as argument
+    test.add_input("./NetworkTablesJNI.cpp",
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    getEntries" + os.linesep + \
+        " * Signature: (ILjava/lang/String;I)[I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jintArray JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries(JNIEnv* env," + os.linesep + \
+        "                                                             jclass, jint inst," + os.linesep + \
+        "                                                             jstring prefix," + os.linesep + \
+        "                                                             jint types) {" + os.linesep)
+    test.add_output("/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    getEntries" + os.linesep + \
+        " * Signature: (ILjava/lang/String;I)[I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jintArray JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries" + os.linesep + \
+        "  (JNIEnv* env, jclass, jint inst, jstring prefix, jint types)" + os.linesep + \
+        "{" + os.linesep, True, True)
+
+    # Ensure functions with overloads are handled correctly
+    test.add_input("./NetworkTablesJNI.cpp",
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    setRaw" + os.linesep + \
+        " * Signature: (IJ[BZ)Z" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jboolean JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ" + os.linesep + \
+        "  (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value," + os.linesep + \
+        "   jboolean force)" + os.linesep + \
+        "{" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     # Ensure text before JNIEXPORT and after args and ")" is handled correctly
     # as well as two JNI functions in a row
     test.add_input("./TestJNI.cpp",
