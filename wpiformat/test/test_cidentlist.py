@@ -165,7 +165,8 @@ def test_cidentlist():
         "ES_Event Elevator_Service_Run(ES_Event event) {" + os.linesep + \
         "#ifdef USE_TATTLETALE" + os.linesep + \
         "    ES_Tail(); // trace call stack end" + os.linesep + \
-        "#endif" + os.linesep)
+        "#endif" + os.linesep + \
+        "}" + os.linesep)
     test.add_latest_input_as_output(True)
 
     test.add_input("./Timer.hpp",
@@ -209,6 +210,72 @@ def test_cidentlist():
     test.add_input("./Test.cpp",
         "void func() {" + os.linesep + \
         "  // closing }" + os.linesep + \
+        "}" + os.linesep)
+    test.add_latest_input_as_output(True)
+
+    # Ensure nested comments don't mess up brace stack
+    test.add_input("./Test.cpp", "// { /* */ }" + os.linesep)
+    test.add_latest_input_as_output(True)
+    test.add_input("./Test.cpp", "{ // /* */ }" + os.linesep)
+    test.add_latest_input_as_output(False)
+    test.add_input("./Test.cpp", "{ /* // */ }" + os.linesep)
+    test.add_latest_input_as_output(True)
+    test.add_input("./Test.cpp", "{ /* */ // }" + os.linesep)
+    test.add_latest_input_as_output(False)
+    test.add_input("./Test.cpp", "{ // /* // */ }" + os.linesep)
+    test.add_latest_input_as_output(False)
+
+    # Ensure popping too many braces doesn't crash
+    test.add_input("./Test.cpp", "}" + os.linesep)
+    test.add_latest_input_as_output(False)
+
+    # Ensure comments inside quoted string don't mess up brace stack
+    test.add_input("./Test.cpp",
+        "void func() {" + os.linesep + \
+        "  // \"//\"" + os.linesep + \
+        "  if (!query.startswith(\"//\")) {" + os.linesep + \
+        "    return;" + os.linesep + \
+        "  }" + os.linesep + \
+        "}" + os.linesep)
+    test.add_latest_input_as_output(True)
+
+    # Ensure braces in double quotes don't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << '{'; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure braces in single quotes don't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << \"{\"; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure single quote within double quotes doesn't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << \"'\"; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure double quote within single quotes doesn't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << '\"'; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure escaped double quote doesn't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << \"\\\"\"; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure escaped single quote doesn't mess up brace stack
+    test.add_input("./Test.cpp", "void func() { std::cout << '\\''; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure escaped backslash isn't considered as an escaped single quote
+    test.add_input("./Test.cpp", "void func() { std::cout << '\\\\'; }")
+    test.add_latest_input_as_output(True)
+
+    # Test logic for deduplicating braces within #ifdef
+    test.add_input("./Test.cpp",
+        "void func() {" + os.linesep + \
+        "#ifdef _WIN32" + os.linesep + \
+        "  if (errno == WSAEWOULDBLOCK) {" + os.linesep + \
+        "#else" + os.linesep + \
+        "  if (errno == EWOULDBLOCK) {" + os.linesep + \
+        "#endif" + os.linesep + \
+        "  }" + os.linesep + \
         "}" + os.linesep)
     test.add_latest_input_as_output(True)
 
