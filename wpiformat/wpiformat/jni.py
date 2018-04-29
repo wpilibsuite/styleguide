@@ -31,30 +31,30 @@ class Jni(Task):
 
     def map_jni_type(self, type_name):
         ret = ""
-        if type_name.endswith("*"):
+        if type_name.endswith("*") or type_name.endswith("Array"):
             ret += "["
 
-        if type_name == "jboolean":
+        if type_name.startswith("jboolean"):
             return ret + "Z"
-        elif type_name == "jbyte":
+        elif type_name.startswith("jbyte"):
             return ret + "B"
-        elif type_name == "jchar":
+        elif type_name.startswith("jchar"):
             return ret + "C"
-        elif type_name == "jshort":
+        elif type_name.startswith("jshort"):
             return ret + "S"
-        elif type_name == "jint":
+        elif type_name.startswith("jint"):
             return ret + "I"
-        elif type_name == "jlong":
+        elif type_name.startswith("jlong"):
             return ret + "J"
-        elif type_name == "jfloat":
+        elif type_name.startswith("jfloat"):
             return ret + "F"
-        elif type_name == "jdouble":
+        elif type_name.startswith("jdouble"):
             return ret + "D"
-        elif type_name == "void":
+        elif type_name.startswith("void"):
             return ret + "V"
-        elif type_name == "jstring":
+        elif type_name.startswith("jstring"):
             return ret + "Ljava/lang/String;"
-        elif type_name == "jobject":
+        elif type_name.startswith("jobject"):
             return ret + "Ljava/lang/Object;"
         else:
             return ret + "?"
@@ -62,12 +62,12 @@ class Jni(Task):
     def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
 
-        regex_str_sig = "(/\*[\w\*:\s\(\)]+\*/\s+)?" + \
-            "JNIEXPORT\s+ (?P<ret>\w+)\s+ JNICALL\s+ " + \
-            "(?P<func>Java_\w+)\s* \(\s* " + \
+        regex_str_sig = "(/\*(?>(.|\n)*?\*/)\s+)?" + \
+            "JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
+            "(?P<func>Java_\w+)\s*\(\s*" + \
             "(?P<env_type>JNIEnv\s*\*\s*)" + \
-            "(?P<env_name>\w+)?,\s* jclass\s*(?P<jclass_name>\w*)?"
-        regex_sig = regex.compile(regex_str_sig, regex.VERBOSE)
+            "(?P<env_name>\w+)?,\s*jclass\s*(?P<jclass_name>\w*)?"
+        regex_sig = regex.compile(regex_str_sig)
 
         regex_str_func = "Java_(?P<class>\w+)_(?P<method>[^_]+)$"
         regex_func = regex.compile(regex_str_func)
@@ -94,8 +94,9 @@ class Jni(Task):
             if match_sig.group("jclass_name"):
                 jni_args += " " + match_sig.group("jclass_name")
 
-            # Write JNI function comment
-            match = regex_func.search(match_sig.group("func"))
+            # Write JNI function comment. Splitting at "__" removes overload
+            # annotation from method comment
+            match = regex_func.search(match_sig.group("func").split("__")[0])
             comment += "/*" + linesep + \
                 " * Class:     " + match.group("class") + linesep + \
                 " * Method:    " + match.group("method") + linesep + \
