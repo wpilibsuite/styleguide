@@ -37,9 +37,10 @@ class UsingDeclaration(Task):
             elif token == "//":
                 if not in_multicomment and not in_string and not in_char:
                     in_singlecomment = True
-            elif token == linesep:
-                if not in_multicomment:
-                    in_singlecomment = False
+            elif in_singlecomment and linesep in token:
+                # Ignore token if it's in a singleline comment. Only check it
+                # for newlines to end the comment.
+                in_singlecomment = False
             elif in_multicomment or in_singlecomment:
                 # Tokens processed after this branch are ignored if they are in
                 # comments

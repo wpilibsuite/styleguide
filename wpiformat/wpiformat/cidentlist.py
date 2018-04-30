@@ -9,7 +9,8 @@ class CIdentList(Task):
 
     def __print_failure(self, name):
         print("Error: " + name + ": unmatched curly braces when scanning for "
-              "C identifier lists")
+              "C identifier lists. If the code compiles, this is a bug in "
+              "wpiformat.")
 
     def should_process_file(self, config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
@@ -85,9 +86,10 @@ class CIdentList(Task):
             elif token == "//":
                 if not in_multicomment and not in_string and not in_char:
                     in_singlecomment = True
-            elif token == linesep:
-                if not in_multicomment:
-                    in_singlecomment = False
+            elif in_singlecomment and linesep in token:
+                # Ignore token if it's in a singleline comment. Only check it
+                # for newlines to end the comment.
+                in_singlecomment = False
             elif in_multicomment or in_singlecomment:
                 # Tokens processed after this branch are ignored if they are in
                 # comments

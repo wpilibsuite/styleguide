@@ -267,6 +267,26 @@ def test_cidentlist():
     test.add_input("./Test.cpp", "void func() { std::cout << '\\\\'; }")
     test.add_latest_input_as_output(True)
 
+    # Ensure extern "C" match containing a linesep within a singleline comment
+    # still ends the comment
+    test.add_input("./Test.cpp",
+        "extern \"C\" {}  // extern \"C\"" + os.linesep + \
+        "namespace {" + os.linesep + \
+        "}  // namespace" + os.linesep)
+    test.add_latest_input_as_output(True)
+
+    # Ensure extern "C" with brace on next line gets matched
+    test.add_input("./Test.cpp",
+        "extern \"C\"" + os.linesep + \
+        "{" + os.linesep + \
+        "  void func() {}" + os.linesep + \
+        "}  // extern \"C\"" + os.linesep)
+    test.add_output(
+        "extern \"C\"" + os.linesep + \
+        "{" + os.linesep + \
+        "  void func(void) {}" + os.linesep + \
+        "}  // extern \"C\"" + os.linesep, True, True)
+
     # Test logic for deduplicating braces within #ifdef
     test.add_input("./Test.cpp",
         "void func() {" + os.linesep + \
