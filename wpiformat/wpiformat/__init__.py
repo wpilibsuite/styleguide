@@ -120,6 +120,21 @@ def proc_pipeline(name):
     return all_success
 
 
+def chunks(l, max_len):
+    """Yield successive chunks from l whose content lengths sum to less than
+    max_len.
+    """
+    out = []
+    size = 0
+    for i, arg in enumerate(l):
+        out.append(arg)
+        size += len(arg) + len(" ")
+        if i == len(l) - 1 or size + len(l[i + 1]) > max_len:
+            yield out
+            out = []
+            size = 0
+
+
 def proc_batch(files):
     """Runs each task in the pipeline on batches of files.
 
@@ -141,13 +156,18 @@ def proc_batch(files):
                 work.append(name)
 
         if work:
-            if verbose1 or verbose2:
-                print("Running", type(subtask).__name__)
-                if verbose2:
-                    for name in work:
-                        print("  on", name)
+            # Conservative estimate for max argument length. 32767 is from the
+            # Win32 docs for CreateProcessA(), but the limit appears to be lower
+            # than that in practice.
+            MAX_WIN32_ARGS_LEN = 32767 * 7 / 8
 
-            all_success &= subtask.run_batch(config_file, work)
+            for subwork in chunks(work, MAX_WIN32_ARGS_LEN):
+                if verbose1 or verbose2:
+                    print("Running", type(subtask).__name__)
+                    if verbose2:
+                        for name in subwork:
+                            print("  on", name)
+                all_success &= subtask.run_batch(config_file, subwork)
 
     return all_success
 
