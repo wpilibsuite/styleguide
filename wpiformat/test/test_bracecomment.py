@@ -135,4 +135,36 @@ def test_bracecomment():
         "}  // namespace" + os.linesep)
     test.add_latest_input_as_output(True)
 
+    # Handle braces in comments properly
+    test.add_input("./Path.h",
+        "#ifndef ALLWPILIB_WPI_PATH_H_" + os.linesep + \
+        "#define ALLWPILIB_WPI_PATH_H_" + os.linesep + \
+        os.linesep + \
+        "namespace wpi {" + os.linesep + \
+        "namespace sys {" + os.linesep + \
+        "namespace path {" + os.linesep + \
+        os.linesep + \
+        "/// @{" + os.linesep + \
+        os.linesep + \
+        "}  // end namespace path" + os.linesep + \
+        "}  // namespace sys" + os.linesep + \
+        "}  // namespace wpi" + os.linesep + \
+        os.linesep + \
+        "#endif  // ALLWPILIB_WPI_PATH_H_" + os.linesep)
+    test.add_output(
+        "#ifndef ALLWPILIB_WPI_PATH_H_" + os.linesep + \
+        "#define ALLWPILIB_WPI_PATH_H_" + os.linesep + \
+        os.linesep + \
+        "namespace wpi {" + os.linesep + \
+        "namespace sys {" + os.linesep + \
+        "namespace path {" + os.linesep + \
+        os.linesep + \
+        "/// @{" + os.linesep + \
+        os.linesep + \
+        "}  // namespace path" + os.linesep + \
+        "}  // namespace sys" + os.linesep + \
+        "}  // namespace wpi" + os.linesep + \
+        os.linesep + \
+        "#endif  // ALLWPILIB_WPI_PATH_H_" + os.linesep, True, True)
+
     test.run(OutputType.FILE)

@@ -17,19 +17,55 @@ class BraceComment(Task):
         output = ""
 
         brace_prefix = "(?P<prefix>(extern|namespace)\s+[\w\"]*)"
-        brace_postfix = "\s*/(/|\*)[^\r\n]*"
+        brace_postfix = "[ \t]*/(/|\*)[^\r\n]*"
 
         brace_regex = regex.compile(
+            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + "|" + \
             "(" + brace_prefix + "\s*)?{|"  # "{" with optional prefix
-            "\}(" + brace_postfix + ")?")  # "}" with optional comment postfix
+            "}(" + brace_postfix + ")?")  # "}" with optional comment postfix
 
         name_stack = []
         brace_count = 0
         extract_location = 0
+        in_multicomment = False
+        in_singlecomment = False
+        in_string = False
+        in_char = False
         for match in brace_regex.finditer(lines):
             token = match.group()
 
-            if match.group("prefix"):
+            if token == "/*":
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = True
+            elif token == "*/":
+                if not in_singlecomment and not in_string and not in_char:
+                    in_multicomment = False
+            elif token == "//":
+                if not in_multicomment and not in_string and not in_char:
+                    in_singlecomment = True
+            elif in_singlecomment and linesep in token:
+                # Ignore token if it's in a singleline comment. Only check it
+                # for newlines to end the comment.
+                in_singlecomment = False
+            elif in_multicomment or in_singlecomment:
+                # Tokens processed after this branch are ignored if they are in
+                # comments
+                continue
+            elif token == "\\\"":
+                continue
+            elif token == "\"":
+                if not in_char:
+                    in_string = not in_string
+            elif token == "\\'":
+                continue
+            elif token == "'":
+                if not in_string:
+                    in_char = not in_char
+            elif in_string or in_char:
+                # Tokens processed after this branch are ignored if they are in
+                # double or single quotes
+                continue
+            elif match.group("prefix"):
                 brace_count += 1
                 name_stack.append((brace_count, match.group("prefix").rstrip()))
             elif "{" in token:
