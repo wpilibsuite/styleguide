@@ -79,19 +79,23 @@ class IncludeGuard(Task):
         config_file -- Config object
         name -- file name string
         """
-        repo_root = Task.get_repo_root()
+        repo_root_name_override = config_file.group("repoRootNameOverride")
 
-        name = os.path.relpath(name, repo_root)
-        guard_path = os.path.basename(repo_root) + os.sep
+        repo_root = Task.get_repo_root()
+        guard_root = os.path.relpath(name, repo_root)
+        if not repo_root_name_override:
+            guard_path = os.path.basename(repo_root) + os.sep
+        else:
+            guard_path = repo_root_name_override[0] + os.sep
         include_roots = config_file.group("includeGuardRoots")
 
         if include_roots:
             for include_root in include_roots:
-                if name.startswith(include_root):
-                    guard_path += name[len(include_root):]
+                if guard_root.startswith(include_root):
+                    guard_path += guard_root[len(include_root):]
                     return regex.sub("[^a-zA-Z0-9]", "_",
                                      guard_path).upper() + "_"
 
         # No include guard roots matched, so append full name
-        guard_path += name
+        guard_path += guard_root
         return regex.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
