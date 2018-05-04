@@ -499,4 +499,12 @@ def test_includeorder():
     test.add_input("./Test.h", "// #included here" + os.linesep)
     test.add_output("// #included here" + os.linesep, False, True)
 
+    # Ensure extra newline isn't inserted between #pragma and #ifdef
+    test.add_input("./Test.h",
+        "#pragma once" + os.linesep + \
+        os.linesep + \
+        "#ifdef _MSC_VER" + os.linesep + \
+        "#endif" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     test.run(OutputType.FILE)
