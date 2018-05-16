@@ -317,8 +317,8 @@ def main():
         ["git", "diff", "--name-only", "master"],
         stdout=subprocess.PIPE).stdout.split()
     for line in output_list:
-        changed_file_list.append(
-            root_path + os.sep + line.strip().decode("ascii"))
+        changed_file_list.append(root_path + os.sep +
+                                 line.strip().decode("ascii"))
 
     # Don't run tasks on modifiable or generated files
     work = []

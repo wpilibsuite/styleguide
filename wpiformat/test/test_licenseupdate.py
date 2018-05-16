@@ -133,11 +133,12 @@ def test_licenseupdate():
         format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File excluded from license update isn't modified
-    test.add_input("./Excluded.h",
-                   "/* Copyright (c) Company Name 2011-{}. */".format(year) +
-                   os.linesep + os.linesep + file_appendix)
-    test.add_output("/* Copyright (c) Company Name 2011-{}. */".format(year) +
-                    os.linesep + os.linesep + file_appendix, False, True)
+    test.add_input(
+        "./Excluded.h", "/* Copyright (c) Company Name 2011-{}. */".format(year)
+        + os.linesep + os.linesep + file_appendix)
+    test.add_output(
+        "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
+        os.linesep + file_appendix, False, True)
 
     # Ensure excluded files won't be processed
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
