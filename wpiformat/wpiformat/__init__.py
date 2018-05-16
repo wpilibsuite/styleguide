@@ -364,12 +364,16 @@ def main():
     ]
     run_pipeline(task_pipeline, args, files)
 
-    # Lint is run last since previous tasks can affect its output.
-    task_pipeline = [ClangFormat(args.clang_version), PyFormat(), Lint()]
+    task_pipeline = [ClangFormat(args.clang_version)]
     run_batch(task_pipeline, args, file_batches)
 
+    # These tasks fix clang-format formatting
     task_pipeline = [Jni()]
     run_pipeline(task_pipeline, args, files)
+
+    # Lint is run last since previous tasks can affect its output.
+    task_pipeline = [PyFormat(), Lint()]
+    run_batch(task_pipeline, args, file_batches)
 
 
 if __name__ == "__main__":
