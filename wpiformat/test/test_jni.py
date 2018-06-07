@@ -214,4 +214,28 @@ def test_jni():
         "  return nt::CreateInstance();" + os.linesep + \
         "}" + os.linesep, True, True)
 
+    # Handle function declarations properly
+    test.add_input("./TestJNI.cpp",
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    getDefaultInstance" + os.linesep + \
+        " * Signature: ()I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jint JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_getDefaultInstance" + os.linesep + \
+        "  (JNIEnv *, jclass);" + os.linesep + \
+        os.linesep + \
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_networktables_NetworkTablesJNI" + os.linesep + \
+        " * Method:    createInstance" + os.linesep + \
+        " * Signature: ()I" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT jint JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance" + os.linesep + \
+        "  (JNIEnv *, jclass)" + os.linesep + \
+        "{" + os.linesep + \
+        "  return nt::CreateInstance();" + os.linesep + \
+        "}" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     test.run(OutputType.FILE)

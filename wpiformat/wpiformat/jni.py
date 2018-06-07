@@ -72,7 +72,8 @@ class Jni(Task):
         regex_str_func = "Java_(?P<class>\w+)_(?P<method>[^_]+)$"
         regex_func = regex.compile(regex_str_func)
 
-        regex_str_arg = ", \s* (?P<arg>(?P<arg_type>[\w\*]+) \s+ \w+)|\)\s*{"
+        regex_str_arg = (", \s* (?P<arg>(?P<arg_type>[\w\*]+) \s+ \w+)|\)\s*"
+                         "(?P<trailing>{|;)")
         regex_arg = regex.compile(regex_str_arg, regex.VERBOSE)
 
         output = ""
@@ -123,7 +124,13 @@ class Jni(Task):
                 comment += self.map_jni_type(match_arg.group("arg_type"))
             comment += ")" + self.map_jni_type(match_sig.group("ret")) + linesep + \
                 " */" + linesep
-            signature += ")" + linesep + "{"
+
+            # Output correct trailing character for declaration vs definition
+            if match_arg.group("trailing") == "{":
+                signature += ")" + linesep + "{"
+            else:
+                signature += ");"
+
             output += comment + signature
 
             pos = match_sig.end() + match_arg.end()
