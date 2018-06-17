@@ -132,6 +132,24 @@ def test_licenseupdate():
         "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
         format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
+    # Ensure "/*" after "*/" on same line is detected
+    test.add_input("./Test.h",
+        "/*----------------------------------------------------------------------------*/" + os.linesep + \
+        "/* Copyright (c) 2011 FIRST. All Rights Reserved.                             */" + os.linesep + \
+        "/* Open Source Software - may be modified and shared by FRC teams. The code   */" + os.linesep + \
+        "/* must be accompanied by the FIRST BSD license file in the root directory of */" + os.linesep + \
+        "/* the project.                                                               */" + os.linesep + \
+        "/*----------------------------------------------------------------------------*//*" + os.linesep + \
+        os.linesep + \
+        "blah" + os.linesep + \
+        os.linesep + \
+        "*/" + os.linesep)
+    test.add_output(
+        "/*                                Company Name                                */"
+        + os.linesep +
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
+        format(year) + os.linesep + os.linesep, True, True)
+
     # File excluded from license update isn't modified
     test.add_input(
         "./Excluded.h", "/* Copyright (c) Company Name 2011-{}. */".format(year)

@@ -42,7 +42,7 @@ class LicenseUpdate(Task):
         license_end = 0
 
         # Regex for tokenizing on comment boundaries
-        token_regex = regex.compile("^/\*|\*/|^//")
+        token_regex = regex.compile("/\*|\*/|^//")
 
         in_multiline_comment = False
         for line in stripped_lines:
