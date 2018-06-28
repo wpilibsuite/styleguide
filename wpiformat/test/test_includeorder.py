@@ -46,6 +46,28 @@ def test_includeorder():
         "#include <iostream>" + os.linesep + \
         "#include <memory>" + os.linesep, True, True)
 
+    # Ensure NOLINT headers have newlines around them
+    test.add_input("./Test.h",
+        "#include \"ctre/PDP.h\"  // NOLINT" + os.linesep + \
+        "#include \"gtest/gtest.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep)
+    test.add_output(
+        "#include \"ctre/PDP.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "#include \"gtest/gtest.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "#include <iostream>" + os.linesep, True, True)
+
+    # Ensure NOLINT headers don't have extra newlines inserted after them
+    test.add_input("./Test.h",
+        "#include \"ctre/PDP.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "#include \"gtest/gtest.h\"  // NOLINT" + os.linesep + \
+        os.linesep + \
+        "namespace wpi {" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     # Ensure NOLINT headers take precedence over overrides and have newline
     # inserted
     test.add_input("./Test.h",
