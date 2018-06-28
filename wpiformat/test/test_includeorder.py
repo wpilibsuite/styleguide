@@ -144,6 +144,23 @@ def test_includeorder():
         "namespace std {" + os.linesep + \
         "}" + os.linesep, True, True)
 
+    # Ensure extra newlines aren't added between ifdef blocks
+    test.add_input("./Test.h",
+        "#include <stdint.h>" + os.linesep + \
+        os.linesep + \
+        "#ifdef __cplusplus" + os.linesep + \
+        "#include <cstddef>" + os.linesep + \
+        "#else" + os.linesep + \
+        "#include <stddef.h>" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "#ifdef __cplusplus" + os.linesep + \
+        "extern \"C\" {" + os.linesep + \
+        "#endif" + os.linesep + \
+        os.linesep + \
+        "struct CvMat;" + os.linesep)
+    test.add_latest_input_as_output(True)
+
     # Ensure headers stay grouped together between license header and other code
     test.add_input("./Test.cpp",
         "// Copyright (c) Company Name 2016." + os.linesep + \

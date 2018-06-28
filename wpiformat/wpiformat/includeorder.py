@@ -268,10 +268,11 @@ class IncludeOrder(Task):
                         else:
                             # Treat #ifdef as barrier and flush includes
                             output_list.extend(self.write_headers(includes))
-                            if output_list:
-                                # Only add newline if content already exists in
-                                # output_list that needs to be delimited from
-                                # the #ifdef
+                            if output_list and not output_list[-1].endswith(
+                                    self.linesep):
+                                # Only add newline if content exists in
+                                # output_list that doesn't end in a newline,
+                                # which needs to be delimited from the #ifdef
                                 output_list.append("")
                             includes = [[], [], [], [], []]
 
