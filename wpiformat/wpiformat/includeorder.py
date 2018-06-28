@@ -379,6 +379,10 @@ class IncludeOrder(Task):
         if suboutput:
             output_list.extend(suboutput)
 
+        # Remove extra empty lines from end of includes
+        while len(output_list) > 0 and output_list[-1].rstrip() == "":
+            del output_list[-1]  # Remove last newline
+
         # Remove possible extra newline from #endif
         if len(output_list) > 0:
             output_list[-1] = output_list[-1].rstrip()
