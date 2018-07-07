@@ -72,7 +72,9 @@ class Jni(Task):
         regex_str_func = "Java_(?P<class>\w+)_(?P<method>[^_]+)$"
         regex_func = regex.compile(regex_str_func)
 
-        regex_str_arg = (", \s* (?P<arg>(?P<arg_type>[\w\*]+) \s+ \w+)|\)\s*"
+        # Matches a comma followed by the type, an optional variable name, and
+        # an optional closing parenthesis
+        regex_str_arg = (", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*"
                          "(?P<trailing>{|;)")
         regex_arg = regex.compile(regex_str_arg, regex.VERBOSE)
 

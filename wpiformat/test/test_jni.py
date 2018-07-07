@@ -238,4 +238,29 @@ def test_jni():
         "}" + os.linesep)
     test.add_latest_input_as_output(True)
 
+    # Handle functions whose arguments don't have variable names properly
+    test.add_input("./DigitalGlitchFilterJNI.cpp",
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI" + os.linesep + \
+        " * Method:    cleanFilter" + os.linesep + \
+        " * Signature: (I)V" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cleanFilter" + os.linesep + \
+        "  (JNIEnv *, jclass, jint)" + os.linesep + \
+        "{" + os.linesep + \
+        "  HAL_CleanFilter(handle);" + os.linesep + \
+        "}" + os.linesep)
+    test.add_output(
+        "/*" + os.linesep + \
+        " * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI" + os.linesep + \
+        " * Method:    cleanFilter" + os.linesep + \
+        " * Signature: (I)V" + os.linesep + \
+        " */" + os.linesep + \
+        "JNIEXPORT void JNICALL" + os.linesep + \
+        "Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cleanFilter" + os.linesep + \
+        "  (JNIEnv *, jclass, jint)" + os.linesep + \
+        "{" + os.linesep + \
+        "  HAL_CleanFilter(handle);" + os.linesep + \
+        "}" + os.linesep, True, True)
+
     test.run(OutputType.FILE)
