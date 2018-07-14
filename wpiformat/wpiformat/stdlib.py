@@ -202,7 +202,7 @@ class Stdlib(Task):
 
         Returns tuple containing the following:
           modified file contents string
-          whethr file contents changed
+          whether file contents changed
         """
         pos = 0
         lines_changed = False

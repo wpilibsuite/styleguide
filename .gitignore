@@ -139,12 +139,10 @@ local.properties
 ### Python ###
 .eggs/
 .pytest_cache/
+build/
+dist/
 __pycache__
 *.egg-info/
-*.egg
-*.pyc
-*.tar.gz
-*.whl
 version.py
 
 # External tool builders
