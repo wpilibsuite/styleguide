@@ -158,6 +158,16 @@ def test_licenseupdate():
         "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
         os.linesep + file_appendix, False, True)
 
+    # Ensure license regex matches
+    test.add_input("./Test.h",
+        "/* Company Name */" + os.linesep + \
+        "/* Copyright (c) 1992-2015 Company Name. All Rights Reserved. */" + os.linesep + \
+        os.linesep + file_appendix)
+    test.add_output(
+        "/*                                Company Name                                */" + os.linesep + \
+        "/* Copyright (c) 1992-2018 Company Name. All Rights Reserved.                 */" + os.linesep + \
+        os.linesep + file_appendix, True, True)
+
     # Ensure excluded files won't be processed
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
     assert not task.should_process_file(config_file, "./Excluded.h")
