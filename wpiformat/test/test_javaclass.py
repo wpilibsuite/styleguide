@@ -43,4 +43,26 @@ def test_javaclass():
         "  public ExampleCommand() {}" + os.linesep + \
         "}" + os.linesep, True, True)
 
+    # class keyword in preceding comment to ensure regex matching it doesn't
+    # continue past end of comment
+    test.add_input("./Test.java",
+        "import edu.wpi.first.networktables.NetworkTableEntry;" + os.linesep + \
+        "import edu.wpi.first.wpilibj.Sendable;" + os.linesep + \
+        os.linesep + \
+        "/**" + os.linesep + \
+        " * A helper class for Shuffleboard containers to handle common child operations." + os.linesep + \
+        " */" + os.linesep + \
+        "final class ContainerHelper {" + os.linesep + \
+        os.linesep + \
+        "  private final ShuffleboardContainer m_container;" + os.linesep)
+    test.add_output(
+        "import edu.wpi.first.networktables.NetworkTableEntry;" + os.linesep + \
+        "import edu.wpi.first.wpilibj.Sendable;" + os.linesep + \
+        os.linesep + \
+        "/**" + os.linesep + \
+        " * A helper class for Shuffleboard containers to handle common child operations." + os.linesep + \
+        " */" + os.linesep + \
+        "final class ContainerHelper {" + os.linesep + \
+        "  private final ShuffleboardContainer m_container;" + os.linesep, True, True)
+
     test.run(OutputType.FILE)
