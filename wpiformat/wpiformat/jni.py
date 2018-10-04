@@ -66,7 +66,7 @@ class Jni(Task):
             "JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
             "(?P<func>Java_\w+)\s*\(\s*" + \
             "(?P<env_type>JNIEnv\s*\*\s*)" + \
-            "(?P<env_name>\w+)?,\s*jclass\s*(?P<jclass_name>\w*)?"
+            "(?P<env_name>\w+)?,\s*(jclass|jobject)\s*(?P<jclass_name>\w*)?"
         regex_sig = regex.compile(regex_str_sig)
 
         regex_str_func = "Java_(?P<class>\w+)_(?P<method>[^_]+)$"
