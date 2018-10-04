@@ -68,7 +68,8 @@ class Jni(Task):
             r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
             r"(?P<func>Java_\w+)\s*\(\s*" + \
             r"(?P<env_type>JNIEnv\s*\*\s*)" + \
-            r"(?P<env_name>\w+)?,\s*jclass\s*(?P<jclass_name>\w*)?"
+            r"(?P<env_name>\w+)?,\s*" + \
+            r"(?P<param_type>jclass|jobject)\s*(?P<param_name>\w*)?"
         regex_sig = regex.compile(regex_str_sig)
 
         regex_str_func = r"Java_(?P<class>\w+)_(?P<method>[^_]+)$"
@@ -95,9 +96,9 @@ class Jni(Task):
                 jni_args += match_sig.group("env_type")
             if match_sig.group("env_name"):
                 jni_args += match_sig.group("env_name")
-            jni_args += ", jclass"
-            if match_sig.group("jclass_name"):
-                jni_args += " " + match_sig.group("jclass_name")
+            jni_args += ", " + match_sig.group("param_type")
+            if match_sig.group("param_name"):
+                jni_args += " " + match_sig.group("param_name")
 
             # Write JNI function comment. Splitting at "__" removes overload
             # annotation from method comment
