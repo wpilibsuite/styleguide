@@ -1,0 +1,31 @@
+# Gradle
+# Build your Java projects and run tests with Gradle using a Gradle wrapper script.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/vsts/pipelines/languages/java
+
+resources:
+  containers:
+  - container: ubuntu18
+    image: ubuntu:18.04
+
+jobs:
+ - job: Styleguide
+   pool:
+     vmImage: 'Ubuntu 16.04'
+
+   steps:
+      - script: |
+          sudo apt-get update -y
+          sudo apt-get install clang-format-5.0 python3-setuptools -y
+          sudo pip3 install --upgrade pip
+          sudo pip3 install wpiformat
+          git checkout -b master
+        displayName: 'Install Dependencies'
+      - script: |
+          wpiformat -y 2018 -clang 5.0
+        displayName: 'Run wpiformat'
+        failOnStderr: true
+      - script: |
+          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+        displayName: 'Check wpiformat Output'
+        failOnStderr: true
