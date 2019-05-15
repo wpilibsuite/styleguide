@@ -1,9 +1,27 @@
 from datetime import date
 import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
 
 from test.tasktest import *
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
+
+
+class OpenTemporaryDirectory():
+
+    def __init__(self):
+        self.prev_dir = os.getcwd()
+
+    def __enter__(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        os.chdir(self.temp_dir.name)
+        return self.temp_dir
+
+    def __exit__(self, type, value, traceback):
+        os.chdir(self.prev_dir)
 
 
 def test_licenseupdate():
@@ -172,5 +190,84 @@ def test_licenseupdate():
     # Ensure excluded files won't be processed
     config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
     assert not task.should_process_file(config_file, "./Excluded.h")
+
+    # Create git repo to test license years for commits
+    with OpenTemporaryDirectory():
+        subprocess.run(["git", "init", "-q"])
+
+        # Add base files
+        with open(".styleguide-license", "w") as file:
+            file.write("// Copyright (c) {year}")
+        with open(".styleguide", "w") as file:
+            file.write("cppSrcFileInclude {\n" + r"\.cpp$")
+        subprocess.run(["git", "add", ".styleguide-license"])
+        subprocess.run(["git", "add", ".styleguide"])
+        subprocess.run(["git", "commit", "-q", "-m", "\"Initial commit\""])
+
+        # Add file with commit date of last year and range through this year
+        with open("last-year.cpp", "w") as file:
+            file.write(f"// Copyright (c) 2017-{year}")
+        subprocess.run(["git", "add", "last-year.cpp"])
+        subprocess.run(["git", "commit", "-q", "-m", "\"Last year\""])
+        last_iso_year = f"{int(year) - 1}-01-01T00:00:00"
+        subprocess.Popen([
+            "git", "commit", "-q", "--amend", "--no-edit",
+            f"--date={last_iso_year}"
+        ],
+                         env={
+                             **os.environ, "GIT_COMMITTER_DATE": last_iso_year
+                         }).wait()
+
+        # Add file with commit date of this year and range through this year
+        with open("this-year.cpp", "w") as file:
+            file.write(f"// Copyright (c) 2017-{year}")
+        subprocess.run(["git", "add", "this-year.cpp"])
+        subprocess.run(["git", "commit", "-q", "-m", "\"This year\""])
+
+        # Add file with commit date of next year and range through this year
+        with open("next-year.cpp", "w") as file:
+            file.write(f"// Copyright (c) 2017-{year}")
+        subprocess.run(["git", "add", "next-year.cpp"])
+        subprocess.run(["git", "commit", "-q", "-m", "\"Next year\""])
+        next_iso_year = f"{int(year) + 1}-01-01T00:00:00"
+        subprocess.Popen([
+            "git", "commit", "-q", "--amend", "--no-edit",
+            f"--date={next_iso_year}"
+        ],
+                         env={
+                             **os.environ, "GIT_COMMITTER_DATE": next_iso_year
+                         }).wait()
+
+        # Create uncommitted file with no year
+        Path("no-year.cpp").touch()
+
+        # Run wpiformat on last-year.cpp
+        with open("last-year.cpp", "r") as input:
+            lines = input.read()
+        output, changed, success = task.run_pipeline(config_file,
+                                                     "last-year.cpp", lines)
+        assert output == f"// Copyright (c) 2017-{int(year) - 1}\n\n"
+
+        # Run wpiformat on this-year.cpp
+        with open("last-year.cpp", "r") as input:
+            lines = input.read()
+        output, changed, success = task.run_pipeline(config_file,
+                                                     "this-year.cpp", lines)
+        assert output == f"// Copyright (c) 2017-{year}\n\n"
+
+        # Run wpiformat on next-year.cpp
+        with open("next-year.cpp", "r") as input:
+            lines = input.read()
+        output, changed, success = task.run_pipeline(config_file,
+                                                     "next-year.cpp", lines)
+        assert output == f"// Copyright (c) 2017-{int(year) + 1}\n\n"
+
+        # Run wpiformat on no-year.cpp
+        # Should have current calendar year
+        with open("no-year.cpp", "r") as input:
+            lines = input.read()
+        output, changed, success = task.run_pipeline(config_file, "no-year.cpp",
+                                                     lines)
+        assert output == f"// Copyright (c) {year}\n\n"
 
     test.run(OutputType.FILE)
