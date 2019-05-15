@@ -2,6 +2,7 @@
 
 import os
 import regex
+import subprocess
 import sys
 
 from wpiformat.config import Config
@@ -26,15 +27,17 @@ class LicenseUpdate(Task):
         return (config_file.is_c_file(name) or config_file.is_cpp_file(name) or
                 name.endswith(".java")) and not license_regex.search(name)
 
-    def __try_regex(self, lines, license_template):
+    def __try_regex(self, lines, last_year, license_template):
         """Try finding license with regex of license template.
 
         Keyword arguments:
         lines -- lines of file
+        last_year -- last year in copyright range
         license_template -- license_template string
 
         Returns:
-        Tuple of whether license was found, year, and file contents after license.
+        Tuple of whether license was found, first year in copyright range, and
+        file contents after license.
         """
         linesep = Task.get_linesep(lines)
 
@@ -47,28 +50,29 @@ class LicenseUpdate(Task):
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
         # Compare license
-        year = self.__current_year
         match = license_rgx.search(lines)
         if match:
             try:
-                year = match.group("year")
+                first_year = match.group("year")
             except IndexError:
                 pass
 
             # If comment at beginning of file is non-empty license, update it
-            return (True, year, linesep + lines[match.end():].lstrip())
+            return (True, first_year, linesep + lines[match.end():].lstrip())
         else:
-            return (False, year, lines)
+            return (False, last_year, lines)
 
-    def __try_string_search(self, lines, license_template):
+    def __try_string_search(self, lines, last_year, license_template):
         """Try finding license with string search.
 
         Keyword arguments:
         lines -- lines of file
+        last_year -- last year in copyright range
         license_template -- license_template string
 
         Returns:
-        Tuple of whether license was found, year, and file contents after license.
+        Tuple of whether license was found, first year in copyright range, and
+        file contents after license.
         """
         linesep = Task.get_linesep(lines)
 
@@ -107,8 +111,9 @@ class LicenseUpdate(Task):
             else:
                 license_end += 1
 
+        first_year = last_year
+
         # If comment at beginning of file is non-empty license, update it
-        year = self.__current_year
         if first_comment_is_license and license_end > 0:
             license_part = linesep.join(stripped_lines[0:license_end])
             appendix_part = \
@@ -119,12 +124,12 @@ class LicenseUpdate(Task):
                 match = year_regex.search(line)
                 # If license contains copyright pattern, extract the first year
                 if match:
-                    year = match.group(1)
+                    first_year = match.group(1)
                     break
 
-            return (True, year, appendix_part)
+            return (True, first_year, appendix_part)
         else:
-            return (False, year, linesep + lines.lstrip())
+            return (False, first_year, linesep + lines.lstrip())
 
     def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
@@ -132,20 +137,38 @@ class LicenseUpdate(Task):
         license_template = Config.read_file(
             os.path.dirname(os.path.abspath(name)), ".styleguide-license")
 
-        success, year, appendix = self.__try_regex(lines, license_template)
+        # Get year when file was most recently modified in Git history
+        #
+        # Committer date is used instead of author date (the one shown by "git
+        # log" because the year the file was last modified in the history should
+        # be used. Author dates can be older than this or even out of order in
+        # the log.
+        cmd = ["git", "log", "-n", "1", "--format=%ci", "--", name]
+        last_year = subprocess.run(cmd,
+                                   stdout=subprocess.PIPE).stdout.decode()[:4]
+
+        # If file hasn't been committed yet, use current calendar year as end of
+        # copyright year range
+        if last_year == "":
+            last_year = self.__current_year
+
+        success, first_year, appendix = self.__try_regex(
+            lines, last_year, license_template)
         if not success:
-            success, year, appendix = self.__try_string_search(
-                lines, license_template)
+            success, first_year, appendix = self.__try_string_search(
+                lines, last_year, license_template)
 
         output = ""
 
         # Determine copyright range and trailing padding
-        if year != self.__current_year:
-            year = year + "-" + self.__current_year
+        if first_year != last_year:
+            year_range = first_year + "-" + last_year
+        else:
+            year_range = first_year
 
         for line in license_template:
             # Insert copyright year range
-            line = line.replace("{year}", year)
+            line = line.replace("{year}", year_range)
 
             # Insert padding which expands to the 80th column. If there is more
             # than one padding token, the line may contain fewer than 80
