@@ -24,15 +24,15 @@ class Header:
         self.func_names = func_names
         self.add_prefix = add_prefix
 
-        regex_prefix = ""
+        regex_prefix = r""
         if add_prefix:
-            self.prefix = "std::"
-            self.type_sub = "std::\g<1>"
-            regex_prefix = ""
+            self.prefix = r"std::"
+            self.type_sub = r"std::\g<1>"
+            regex_prefix = r""
         else:
-            self.prefix = ""
-            self.type_sub = "\g<1>"
-            regex_prefix = "std::"
+            self.prefix = r""
+            self.type_sub = r"\g<1>"
+            regex_prefix = r"std::"
 
         if func_names != []:
             # Matches C standard library function uses. C standard library
@@ -42,9 +42,9 @@ class Header:
             self.func_regex = regex.compile(
                 # Preceded by nonword character and spaces, comma, arithmetic
                 # operators, or "("
-                "(?:[^\w]\s+|,|\(|\+|-|\*|/)" + regex_prefix +
-                "([a-z][a-z0-9]*)" +  # C stdlib function name
-                "(?:\()"  # Followed by open parenthesis
+                r"(?:[^\w]\s+|,|\(|\+|-|\*|/)" + regex_prefix +
+                r"([a-z][a-z0-9]*)" +  # C stdlib function name
+                r"(?:\()"  # Followed by open parenthesis
             )
         else:
             self.func_regex = None
@@ -54,13 +54,13 @@ class Header:
 
             # Preceded by beginning of file, "<" (template), " ", ",", "(", or
             # line separator and optional spaces
-            lookbehind = "(?<=^|\<| |,|\(|\n)"
+            lookbehind = r"(?<=^|\<| |,|\(|\n)"
 
-            type_names = regex_prefix + "(" + "|".join(type_regexes) + ")"
+            type_names = regex_prefix + r"(" + r"|".join(type_regexes) + r")"
 
             # Followed by optional spaces and ">", ")", ",", ";", or pointer
             # asterisks
-            lookahead = "(?=(\s*(\>|\)|,|;|\*+))|\s)"
+            lookahead = r"(?=(\s*(\>|\)|,|;|\*+))|\s)"
 
             self.type_regex = regex.compile(lookbehind + type_names + lookahead)
         else:

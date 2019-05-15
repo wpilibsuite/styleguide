@@ -18,7 +18,7 @@ class UsingDeclaration(Task):
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
         token_regex = regex.compile(r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" +
-                                    linesep + "|\{|\}|using\s[^;]*;")
+                                    linesep + r"|\{|\}|using\s[^;]*;")
 
         brace_count = 0
         in_multicomment = False

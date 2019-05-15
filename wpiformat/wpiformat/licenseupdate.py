@@ -40,10 +40,10 @@ class LicenseUpdate(Task):
 
         # Convert the license template to a regex
         license_rgxstr = "^" + linesep.join(license_template)
-        license_rgxstr = license_rgxstr.replace("*", "\*").replace(
-            ".", "\.").replace("(", "\(").replace(")", "\)").replace(
+        license_rgxstr = license_rgxstr.replace("*", r"\*").replace(
+            ".", r"\.").replace("(", r"\(").replace(")", r"\)").replace(
                 "{year}",
-                "(?P<year>[0-9]+)(-[0-9]+)?").replace("{padding}", "[ ]*")
+                r"(?P<year>[0-9]+)(-[0-9]+)?").replace("{padding}", "[ ]*")
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
         # Compare license
@@ -82,7 +82,7 @@ class LicenseUpdate(Task):
         license_end = 0
 
         # Regex for tokenizing on comment boundaries
-        token_regex = regex.compile("/\*|\*/|^//")
+        token_regex = regex.compile(r"/\*|\*/|^//")
 
         in_multiline_comment = False
         for line in stripped_lines:
@@ -114,7 +114,7 @@ class LicenseUpdate(Task):
             appendix_part = \
                 linesep + linesep.join(stripped_lines[license_end:]).lstrip()
 
-            year_regex = regex.compile("Copyright \(c\)(?>.*?\s(20..))")
+            year_regex = regex.compile(r"Copyright \(c\)(?>.*?\s(20..))")
             for line in license_part.split(linesep):
                 match = year_regex.search(line)
                 # If license contains copyright pattern, extract the first year

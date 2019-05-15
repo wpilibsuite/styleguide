@@ -62,20 +62,20 @@ class Jni(Task):
     def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
 
-        regex_str_sig = "(/\*(?>(.|\n)*?\*/)\s+)?" + \
-            "JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
-            "(?P<func>Java_\w+)\s*\(\s*" + \
-            "(?P<env_type>JNIEnv\s*\*\s*)" + \
-            "(?P<env_name>\w+)?,\s*jclass\s*(?P<jclass_name>\w*)?"
+        regex_str_sig = r"(/\*(?>(.|\n)*?\*/)\s+)?" + \
+            r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
+            r"(?P<func>Java_\w+)\s*\(\s*" + \
+            r"(?P<env_type>JNIEnv\s*\*\s*)" + \
+            r"(?P<env_name>\w+)?,\s*jclass\s*(?P<jclass_name>\w*)?"
         regex_sig = regex.compile(regex_str_sig)
 
-        regex_str_func = "Java_(?P<class>\w+)_(?P<method>[^_]+)$"
+        regex_str_func = r"Java_(?P<class>\w+)_(?P<method>[^_]+)$"
         regex_func = regex.compile(regex_str_func)
 
         # Matches a comma followed by the type, an optional variable name, and
         # an optional closing parenthesis
-        regex_str_arg = (", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*"
-                         "(?P<trailing>{|;)")
+        regex_str_arg = (r", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*"
+                         r"(?P<trailing>{|;)")
         regex_arg = regex.compile(regex_str_arg, regex.VERBOSE)
 
         output = ""

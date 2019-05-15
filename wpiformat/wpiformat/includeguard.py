@@ -26,8 +26,8 @@ class IncludeGuard(Task):
         output_list = lines_list
 
         state = State.FINDING_IFNDEF
-        ifndef_regex = regex.compile("#ifndef \w+", regex.ASCII)
-        define_regex = regex.compile("#define \w+", regex.ASCII)
+        ifndef_regex = regex.compile(r"#ifndef \w+", regex.ASCII)
+        define_regex = regex.compile(r"#define \w+", regex.ASCII)
 
         if_preproc_count = 0
         for i in range(len(lines_list)):
@@ -96,9 +96,9 @@ class IncludeGuard(Task):
                         include_root) and len(include_root) > len(prefix):
                     prefix = include_root
             guard_path += guard_root[len(prefix):]
-            return (regex.sub("[^a-zA-Z0-9]", "_", guard_path).upper() +
+            return (regex.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() +
                     "_").lstrip("_")
 
         # No include guard roots matched, so append full name
         guard_path += guard_root
-        return regex.sub("[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
+        return regex.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() + "_"

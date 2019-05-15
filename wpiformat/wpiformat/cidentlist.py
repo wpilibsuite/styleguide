@@ -36,13 +36,13 @@ class CIdentList(Task):
         #
         # "def\\s+\w+" matches preprocessor directives "#ifdef" and "#ifndef" so
         # their contents aren't used as a return type.
-        preproc_str = "#else|#endif|"
-        comment_str = "/\*|\*/|//|" + linesep + "|"
+        preproc_str = r"#else|#endif|"
+        comment_str = r"/\*|\*/|//|" + linesep + r"|"
         string_str = r"\\\\|\\\"|\"|"
         char_str = r"\\'|'|"
-        extern_str = "(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
-        braces_str = "\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
-        postfix_str = "(?=\s*(;|\{))"
+        extern_str = r"(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
+        braces_str = r"\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
+        postfix_str = r"(?=\s*(;|\{))"
         token_regex = regex.compile(preproc_str + comment_str + string_str +
                                     char_str + extern_str + braces_str +
                                     postfix_str)
