@@ -16,13 +16,13 @@ class BraceComment(Task):
         linesep = Task.get_linesep(lines)
         output = ""
 
-        brace_prefix = "(?P<prefix>(extern|namespace)\s+[\w\"]*)"
-        brace_postfix = "[ \t]*/(/|\*)[^\r\n]*"
+        brace_prefix = r"(?P<prefix>(extern|namespace)\s+[\w\"]*)"
+        brace_postfix = r"[ \t]*/(/|\*)[^\r\n]*"
 
         brace_regex = regex.compile(
-            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + "|" + \
-            "(" + brace_prefix + "\s*)?{|"  # "{" with optional prefix
-            "}(" + brace_postfix + ")?")  # "}" with optional comment postfix
+            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|" + \
+            r"(" + brace_prefix + r"\s*)?{|"  # "{" with optional prefix
+            r"}(" + brace_postfix + r")?")  # "}" with optional comment postfix
 
         name_stack = []
         brace_count = 0

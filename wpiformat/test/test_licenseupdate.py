@@ -166,7 +166,7 @@ def test_licenseupdate():
         os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */" + os.linesep + \
-        "/* Copyright (c) 1992-2018 Company Name. All Rights Reserved.                 */" + os.linesep + \
+        "/* Copyright (c) 1992-" + year + " Company Name. All Rights Reserved.                 */" + os.linesep + \
         os.linesep + file_appendix, True, True)
 
     # Ensure excluded files won't be processed

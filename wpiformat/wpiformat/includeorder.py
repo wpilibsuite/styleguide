@@ -34,7 +34,7 @@ class IncludeOrder(Task):
         ]
 
         # Header type 1: C system headers
-        self.c_sys_regex = regex.compile("<[a-z][A-Za-z0-9/_-]*\.h>")
+        self.c_sys_regex = regex.compile(r"<[a-z][A-Za-z0-9/_-]*\.h>")
 
         # Header type 2: C++ standard library headers
         self.cpp_std = [
@@ -61,13 +61,13 @@ class IncludeOrder(Task):
         #
         # Header type 4: Project headers
         # They use double quotes (all other headers)
-        self.header_regex = regex.compile("(?P<comment>//\s*)?"
-                                          "\#include\s*"
-                                          "(?P<header>"
-                                          "(?P<open_bracket><|\")"
-                                          "(?P<name>[^>\"]*)"
-                                          "(?P<close_bracket>>|\"))"
-                                          "(?P<postfix>.*)$")
+        self.header_regex = regex.compile(r"(?P<comment>//\s*)?"
+                                          r"\#include\s*"
+                                          r"(?P<header>"
+                                          r"(?P<open_bracket><|\")"
+                                          r"(?P<name>[^>\"]*)"
+                                          r"(?P<close_bracket>>|\"))"
+                                          r"(?P<postfix>.*)$")
 
     def should_process_file(self, config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)

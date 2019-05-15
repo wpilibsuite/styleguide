@@ -80,9 +80,9 @@ class Config:
 
         if len(group_contents) == 0:
             # If regex string is empty, make regex match nothing
-            return regex.compile("a^")
+            return regex.compile(r"a^")
         else:
-            return regex.compile("|".join(group_contents))
+            return regex.compile(r"|".join(group_contents))
 
     def is_c_file(self, name):
         """Returns True if file is either C header or C source file.
