@@ -22,8 +22,8 @@ jobs:
             sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
           displayName: Set up sudo
         - script: |
-            apt-get update -y
-            apt-get install clang-format python3-setuptools -y
+            sudo apt-get update -y
+            sudo apt-get install clang-format python3-setuptools -y
           displayName: 'Install Dependencies'
         - script: |
             cd wpiformat
