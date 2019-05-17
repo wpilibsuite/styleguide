@@ -13,6 +13,8 @@ jobs:
    pool:
      vmImage: 'Ubuntu 16.04'
 
+   container: ubuntu18
+
    steps:
       - script: |
           sudo apt-get update -y
@@ -24,8 +26,8 @@ jobs:
       - script: |
           wpiformat -y 2018 -clang 5.0
         displayName: 'Run wpiformat'
-        failOnStderr: true
+        failOnStderr: 'true'
       - script: |
           git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
         displayName: 'Check wpiformat Output'
-        failOnStderr: true
+        failOnStderr: 'true'
