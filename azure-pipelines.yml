@@ -32,20 +32,20 @@ jobs:
             sudo python3 setup.py install --optimize=1 --skip-build
           displayName: 'Build'
         - script: |
-            py -3 setup.py test
-            py -3 -m wpiformat -v
+            python3 setup.py test
+            python3 -m wpiformat -v
             cd wpiformat
             # One file
-            py -3 -m wpiformat -f wpiformat\__init__.py -v
+            python3 -m wpiformat -f wpiformat\__init__.py -v
 
             # Absolute path to file
-            py -3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+            python3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
 
             # Multiple files
-            py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
+            python3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
 
             #Directory
-            py -3 -m wpiformat -f wpiformat -v
+            python3 -m wpiformat -f wpiformat -v
 
             git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
           displayName: 'Test'
