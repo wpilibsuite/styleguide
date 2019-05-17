@@ -7,6 +7,7 @@ resources:
   containers:
   - container: ubuntu18
     image: ubuntu:18.04
+    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
 
 jobs:
   - job: Styleguide
@@ -17,17 +18,19 @@ jobs:
 
     steps:
         - script: |
+            /tmp/docker exec -t -u 0 ci-container \
+            sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+          displayName: Set up sudo
+        - script: |
             apt-get update -y
             apt-get install clang-format python3-setuptools -y
           displayName: 'Install Dependencies'
         - script: |
-            wpiformat -y 2018 -clang 5.0
-          displayName: 'Run wpiformat'
-          failOnStderr: 'true'
-        - script: |
-            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-          displayName: 'Check wpiformat Output'
-          failOnStderr: 'true'
+            cd wpiformat
+            python3 setup.py build
+            python3 setup.py install --optimize=1 --skip-build
+            python3 setup.py test
+          displayName: 'Build'
 
   - job: WindowsStyleguide
     pool:
@@ -38,7 +41,8 @@ jobs:
           choco install llvm --version 7.0.1
         displayName: 'Install Dependencies'
       - script: |
-          cd styleguide\wpiformat
+          cd wpiformat
           py -3 setup.py build
           py -3 setup.py install --optimize=1 --skip-build
+          py -3 setup.py test
         displayName: 'Build'
