@@ -7,27 +7,78 @@ resources:
   containers:
   - container: ubuntu18
     image: ubuntu:18.04
+    options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
 
 jobs:
- - job: Styleguide
-   pool:
-     vmImage: 'Ubuntu 16.04'
+  - job: Styleguide
+    pool:
+      vmImage: 'Ubuntu 16.04'
 
-   container: ubuntu18
+    container: ubuntu18
 
-   steps:
+    steps:
+        - script: |
+            /tmp/docker exec -t -u 0 ci-container \
+            sh -c "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confold" -y install sudo"
+          displayName: Set up sudo
+        - script: |
+            sudo apt-get update -y
+            sudo apt-get install clang-format gcc g++ python3-setuptools python3-dev git -y
+          displayName: 'Install Dependencies'
+        - script: |
+            git fetch --unshallow
+            cd wpiformat
+            python3 setup.py build
+            sudo python3 setup.py install --optimize=1 --skip-build
+          displayName: 'Build'
+        - script: |
+            python3 setup.py test
+            python3 -m wpiformat -v
+            cd wpiformat
+            # One file
+            python3 -m wpiformat -f wpiformat\__init__.py -v
+
+            # Absolute path to file
+            python3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+
+            # Multiple files
+            python3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
+
+            #Directory
+            python3 -m wpiformat -f wpiformat -v
+
+            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+          displayName: 'Test'
+
+  - job: WindowsStyleguide
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
       - script: |
-          sudo apt-get update -y
-          sudo apt-get install clang-format-5.0 python3-setuptools -y
-          sudo pip3 install --upgrade pip
-          sudo pip3 install wpiformat
-          git checkout -b master
+          choco install llvm --version 6.0.1
         displayName: 'Install Dependencies'
       - script: |
-          wpiformat -y 2018 -clang 5.0
-        displayName: 'Run wpiformat'
-        failOnStderr: 'true'
-      - script: |
+          git fetch --unshallow
+          cd wpiformat
+          py -3 setup.py build
+          py -3 setup.py install --optimize=1 --skip-build
+        displayName: 'Build'
+      - powershell: |
+          py -3 setup.py test
+          py -3 -m wpiformat -v
+          cd wpiformat
+          # One file
+          py -3 -m wpiformat -f wpiformat\__init__.py -v
+
+          # Absolute path to file
+          py -3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+
+          # Multiple files
+          py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
+
+          #Directory
+          py -3 -m wpiformat -f wpiformat -v
+
           git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-        displayName: 'Check wpiformat Output'
-        failOnStderr: 'true'
+        displayName: 'Test'
