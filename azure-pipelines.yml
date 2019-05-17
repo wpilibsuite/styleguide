@@ -44,10 +44,11 @@ jobs:
             # Multiple files
             python3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
 
-            #Directory
+            # Directory
             python3 -m wpiformat -f wpiformat -v
 
-            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+            # Ensure formatter made no changes
+            git --no-pager diff --exit-code HEAD
           displayName: 'Test'
 
   - job: WindowsStyleguide
@@ -77,8 +78,9 @@ jobs:
           # Multiple files
           py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
 
-          #Directory
+          # Directory
           py -3 -m wpiformat -f wpiformat -v
 
-          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+          # Ensure formatter made no changes
+          git --no-pager diff --exit-code HEAD
         displayName: 'Test'
