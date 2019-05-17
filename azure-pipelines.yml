@@ -23,7 +23,7 @@ jobs:
           displayName: Set up sudo
         - script: |
             sudo apt-get update -y
-            sudo apt-get install clang-format gcc g++ python3-setuptools git -y
+            sudo apt-get install clang-format gcc g++ python3-setuptools python3-dev git -y
           displayName: 'Install Dependencies'
         - script: |
             git fetch --unshallow
