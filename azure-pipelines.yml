@@ -47,7 +47,7 @@ jobs:
           py -3 setup.py build
           py -3 setup.py install --optimize=1 --skip-build
         displayName: 'Build'
-      - script: |
+      - powershell: |
           # py -3 setup.py test
           py -3 -m wpiformat -v
           cd wpiformat
