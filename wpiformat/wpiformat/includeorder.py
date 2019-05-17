@@ -176,8 +176,8 @@ class IncludeOrder(Task):
 
         for i in range(5):
             if includes[i]:
-                sublist = sorted(
-                    includes[i], key=lambda include: include.group("name"))
+                sublist = sorted(includes[i],
+                                 key=lambda include: include.group("name"))
                 str_list = [self.rebuild_include(x, i) for x in sublist]
                 output_list.extend(self.dedup_list(str_list))
                 output_list.append("")  # Delimits groups of includes

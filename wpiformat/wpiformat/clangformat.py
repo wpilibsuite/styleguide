@@ -30,9 +30,8 @@ class ClangFormat(Task):
         try:
             returncode = subprocess.run([self.exec_name] + args).returncode
         except FileNotFoundError:
-            print(
-                "Error: " + self.exec_name +
-                " not found in PATH. Is it installed?",
-                file=sys.stderr)
+            print("Error: " + self.exec_name +
+                  " not found in PATH. Is it installed?",
+                  file=sys.stderr)
             return False
         return returncode == 0

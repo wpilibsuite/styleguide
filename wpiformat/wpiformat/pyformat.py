@@ -16,8 +16,7 @@ class PyFormat(Task):
             args = [sys.executable, "-m", "yapf", "--style", "google", "-i"]
             returncode = subprocess.run(args + names).returncode
         except FileNotFoundError:
-            print(
-                "Error: yapf not found in PATH. Is it installed?",
-                file=sys.stderr)
+            print("Error: yapf not found in PATH. Is it installed?",
+                  file=sys.stderr)
             return False
         return True

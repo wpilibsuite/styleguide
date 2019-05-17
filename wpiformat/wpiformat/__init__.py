@@ -313,9 +313,8 @@ def main():
     # Create list of all changed files
     changed_file_list = []
 
-    output_list = subprocess.run(
-        ["git", "diff", "--name-only", "master"],
-        stdout=subprocess.PIPE).stdout.split()
+    output_list = subprocess.run(["git", "diff", "--name-only", "master"],
+                                 stdout=subprocess.PIPE).stdout.split()
     for line in output_list:
         changed_file_list.append(root_path + os.sep +
                                  line.strip().decode("ascii"))

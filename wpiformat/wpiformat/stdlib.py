@@ -103,8 +103,8 @@ class Stdlib(Task):
                     "isgreater", "isgreaterequal", "isless", "islessequal",
                     "islessgreater", "isunordered"
                 }))
-        self.headers.append(
-            Header("setjmp", {"longjmp", "setjmp"}, ["jmp_buf"]))
+        self.headers.append(Header("setjmp", {"longjmp", "setjmp"},
+                                   ["jmp_buf"]))
         self.headers.append(
             Header("signal", {"signal", "raise"}, ["sig_atomic_t"], False))
         self.headers.append(Header("stdarg", {"va_list"}))
@@ -114,12 +114,11 @@ class Stdlib(Task):
         # size_t isn't actually defined in stdint, but it fits best here for
         # removing the std:: prefix
         self.headers.append(
-            Header(
-                "stdint",
-                type_regexes=[
-                    "((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"
-                ],
-                add_prefix=False))
+            Header("stdint",
+                   type_regexes=[
+                       "((u?int((_fast|_least)?(8|16|32|64)|max|ptr)|size)_t)"
+                   ],
+                   add_prefix=False))
 
         self.headers.append(
             Header(

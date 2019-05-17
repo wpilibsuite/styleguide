@@ -42,8 +42,8 @@ class LicenseUpdate(Task):
         license_rgxstr = "^" + linesep.join(license_template)
         license_rgxstr = license_rgxstr.replace("*", "\*").replace(
             ".", "\.").replace("(", "\(").replace(")", "\)").replace(
-                "{year}", "(?P<year>[0-9]+)(-[0-9]+)?").replace(
-                    "{padding}", "[ ]*")
+                "{year}",
+                "(?P<year>[0-9]+)(-[0-9]+)?").replace("{padding}", "[ ]*")
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
         # Compare license

@@ -26,29 +26,29 @@ def test_licenseupdate():
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # pragma once at top of file preceded by newline
     test.add_input("./Test.h", os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date license preceded by newline
     test.add_input(
         "./Test.h", os.linesep +
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date range license
     test.add_input(
@@ -60,16 +60,16 @@ def test_licenseupdate():
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File containing up-to-date license with one year
     test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix)
     test.add_latest_input_as_output(True)
 
     # File with three newlines between license and include guard
@@ -77,26 +77,26 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + os.linesep + file_appendix)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File with only one newline between license and include guard
     test.add_input(
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + file_appendix)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # File with multiline comment spanning multiple lines of license header
     test.add_input(
@@ -109,8 +109,8 @@ def test_licenseupdate():
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */".
-        format(year) + os.linesep + os.linesep + "/*" + os.linesep +
+        "/* Copyright (c) {} Company Name. All Rights Reserved.                      */"
+        .format(year) + os.linesep + os.linesep + "/*" + os.linesep +
         " * Autogenerated file! Do not manually edit this file. This version is regenerated"
         + os.linesep +
         " * any time the publish task is run, or when this file is deleted." +
@@ -124,13 +124,13 @@ def test_licenseupdate():
         "./Test.h",
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix)
+        "/* Copyright (c) Company Name 2011-{}. All Rights Reserved.                 */"
+        .format(year) + os.linesep + os.linesep + file_appendix)
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep + file_appendix, True, True)
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */"
+        .format(year) + os.linesep + os.linesep + file_appendix, True, True)
 
     # Ensure "/*" after "*/" on same line is detected
     test.add_input("./Test.h",
@@ -147,13 +147,14 @@ def test_licenseupdate():
     test.add_output(
         "/*                                Company Name                                */"
         + os.linesep +
-        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */".
-        format(year) + os.linesep + os.linesep, True, True)
+        "/* Copyright (c) 2011-{} Company Name. All Rights Reserved.                 */"
+        .format(year) + os.linesep + os.linesep, True, True)
 
     # File excluded from license update isn't modified
     test.add_input(
-        "./Excluded.h", "/* Copyright (c) Company Name 2011-{}. */".format(year)
-        + os.linesep + os.linesep + file_appendix)
+        "./Excluded.h",
+        "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
+        os.linesep + file_appendix)
     test.add_output(
         "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
         os.linesep + file_appendix, False, True)
