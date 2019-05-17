@@ -29,7 +29,7 @@ jobs:
             git fetch --unshallow
             cd wpiformat
             python3 setup.py build
-            python3 setup.py install --optimize=1 --skip-build
+            sudo python3 setup.py install --optimize=1 --skip-build
             python3 setup.py test
           displayName: 'Build'
 
