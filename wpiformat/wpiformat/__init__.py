@@ -90,7 +90,7 @@ def proc_pipeline(name):
                         print("  with " + type(subtask).__name__)
 
     lines = ""
-    with open(name, "r") as file:
+    with open(name, "r", encoding="utf8") as file:
         try:
             lines = file.read()
         except UnicodeDecodeError:
