@@ -30,7 +30,7 @@ jobs:
             cd wpiformat
             python3 setup.py build
             sudo python3 setup.py install --optimize=1 --skip-build
-            python3 setup.py test
+            sudo python3 setup.py test
           displayName: 'Build'
 
   - job: WindowsStyleguide
