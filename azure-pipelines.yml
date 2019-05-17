@@ -26,6 +26,7 @@ jobs:
             sudo apt-get install clang-format python3-setuptools -y
           displayName: 'Install Dependencies'
         - script: |
+            git fetch --unshallow
             cd wpiformat
             python3 setup.py build
             python3 setup.py install --optimize=1 --skip-build
@@ -41,6 +42,7 @@ jobs:
           choco install llvm --version 7.0.1
         displayName: 'Install Dependencies'
       - script: |
+          git fetch --unshallow
           cd wpiformat
           py -3 setup.py build
           py -3 setup.py install --optimize=1 --skip-build
