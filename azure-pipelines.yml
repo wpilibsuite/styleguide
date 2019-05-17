@@ -9,25 +9,36 @@ resources:
     image: ubuntu:18.04
 
 jobs:
- - job: Styleguide
-   pool:
-     vmImage: 'Ubuntu 16.04'
+  - job: Styleguide
+    pool:
+      vmImage: 'Ubuntu 16.04'
 
-   container: ubuntu18
+    container: ubuntu18
 
-   steps:
+    steps:
+        - script: |
+            apt-get update -y
+            apt-get install clang-format python3-setuptools -y
+          displayName: 'Install Dependencies'
+        - script: |
+            wpiformat -y 2018 -clang 5.0
+          displayName: 'Run wpiformat'
+          failOnStderr: 'true'
+        - script: |
+            git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+          displayName: 'Check wpiformat Output'
+          failOnStderr: 'true'
+
+  - job: WindowsStyleguide
+    pool:
+      vmImage: 'vs2017-win2016'
+
+    steps:
       - script: |
-          sudo apt-get update -y
-          sudo apt-get install clang-format-5.0 python3-setuptools -y
-          sudo pip3 install --upgrade pip
-          sudo pip3 install wpiformat
-          git checkout -b master
+          choco install llvm --version 7.0.1
         displayName: 'Install Dependencies'
       - script: |
-          wpiformat -y 2018 -clang 5.0
-        displayName: 'Run wpiformat'
-        failOnStderr: 'true'
-      - script: |
-          git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-        displayName: 'Check wpiformat Output'
-        failOnStderr: 'true'
+          cd styleguide\wpiformat
+          py -3 setup.py build
+          py -3 setup.py install --optimize=1 --skip-build
+        displayName: 'Build'
