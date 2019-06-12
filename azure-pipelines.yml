@@ -10,7 +10,7 @@ resources:
     options: "--name ci-container -v /usr/bin/docker:/tmp/docker:ro"
 
 jobs:
-  - job: Styleguide
+  - job: Linux
     pool:
       vmImage: 'Ubuntu 16.04'
 
@@ -32,17 +32,27 @@ jobs:
             sudo python3 setup.py install --optimize=1 --skip-build
           displayName: 'Build'
         - script: |
+            # Make sure .git/refs/heads/master exists
+            git config --global user.email "you@example.com"
+            git config --global user.name "Your Name"
+            git checkout -b pr
+            git checkout master
+            git checkout pr
+
+            cd wpiformat
             python3 setup.py test
+            cd ..
+
             python3 -m wpiformat -v
             cd wpiformat
             # One file
-            python3 -m wpiformat -f wpiformat\__init__.py -v
+            python3 -m wpiformat -f wpiformat/__init__.py -v
 
             # Absolute path to file
-            python3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+            python3 -m wpiformat -f /__w/1/s/wpiformat/wpiformat/__init__.py -v
 
             # Multiple files
-            python3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
+            python3 -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
 
             # Directory
             python3 -m wpiformat -f wpiformat -v
@@ -51,7 +61,7 @@ jobs:
             git --no-pager diff --exit-code HEAD
           displayName: 'Test'
 
-  - job: WindowsStyleguide
+  - job: Windows
     pool:
       vmImage: 'vs2017-win2016'
 
@@ -66,14 +76,24 @@ jobs:
           py -3 setup.py install --optimize=1 --skip-build
         displayName: 'Build'
       - powershell: |
+          # Make sure .git/refs/heads/master exists
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git checkout -b pr
+          git checkout master
+          git checkout pr
+
+          cd wpiformat
           py -3 setup.py test
+          cd ..
+
           py -3 -m wpiformat -v
           cd wpiformat
           # One file
           py -3 -m wpiformat -f wpiformat\__init__.py -v
 
           # Absolute path to file
-          py -3 -m wpiformat -f C:\projects\styleguide\wpiformat\wpiformat\__init__.py -v
+          py -3 -m wpiformat -f D:\a\1\s\wpiformat\wpiformat\__init__.py -v
 
           # Multiple files
           py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v

@@ -71,7 +71,7 @@ def IsSourceFile(filename):
   return _source_regex.search(filename)
 
 
-_USAGE = """
+_USAGE = r"""
 Syntax: cpplint.py [--repository=path]
                    [--headers=header_regex]
                    [--srcs=src_regex]

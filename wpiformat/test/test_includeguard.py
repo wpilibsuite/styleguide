@@ -2,10 +2,13 @@ import os
 
 from test.tasktest import *
 from wpiformat.includeguard import IncludeGuard
+from wpiformat.task import Task
 
 
 def test_includeguard():
     test = TaskTest(IncludeGuard())
+
+    repo_root = os.path.basename(Task.get_repo_root()).upper()
 
     # Fix incorrect include guard
     test.add_input("./Test.h",
@@ -14,10 +17,10 @@ def test_includeguard():
         os.linesep + \
         "#endif" + os.linesep)
     test.add_output(
-        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
 
     # Ensure nested preprocessor statements are handled properly for incorrect
     # include guard
@@ -30,20 +33,20 @@ def test_includeguard():
         "#endif" + os.linesep + \
         "#endif" + os.linesep)
     test.add_output(
-        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
         "#if SOMETHING" + os.linesep + \
         "// do something" + os.linesep + \
         "#endif" + os.linesep + \
-        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
 
     # Don't touch correct include guard
     test.add_input("./Test.h",
-        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep)
     test.add_latest_input_as_output(True)
 
     # Fail on missing include guard
@@ -56,27 +59,27 @@ def test_includeguard():
 
     # Ensure include guard roots are processed correctly
     test.add_input("./Test.h",
-        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_WPIFORMAT_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_WPIFORMAT_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_H_" + os.linesep)
+        "#endif  // " + repo_root + "_WPIFORMAT_TEST_H_" + os.linesep)
     test.add_output(
-        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
 
     # Ensure leading underscores are removed (this occurs if the user doesn't
     # include a trailing "/" in the include guard root)
     test.add_input("./Test/Test.h",
-        "#ifndef STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_WPIFORMAT_TEST_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_WPIFORMAT_TEST_TEST_H_" + os.linesep)
+        "#endif  // " + repo_root + "_WPIFORMAT_TEST_TEST_H_" + os.linesep)
     test.add_output(
-        "#ifndef STYLEGUIDE_TEST_H_" + os.linesep + \
-        "#define STYLEGUIDE_TEST_H_" + os.linesep + \
+        "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
+        "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // STYLEGUIDE_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
 
     test.run(OutputType.FILE)
