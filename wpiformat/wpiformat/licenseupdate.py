@@ -1,5 +1,6 @@
 """This task updates the license header at the top of the file."""
 
+from datetime import date
 import os
 import regex
 import subprocess
@@ -10,16 +11,6 @@ from wpiformat.task import Task
 
 
 class LicenseUpdate(Task):
-
-    def __init__(self, current_year):
-        """Constructor for LicenseUpdate task.
-
-        Keyword arguments:
-        current_year -- year string
-        """
-        Task.__init__(self)
-
-        self.__current_year = current_year
 
     def should_process_file(self, config_file, name):
         license_regex = config_file.regex("licenseUpdateExclude")
@@ -150,7 +141,7 @@ class LicenseUpdate(Task):
         # If file hasn't been committed yet, use current calendar year as end of
         # copyright year range
         if last_year == "":
-            last_year = self.__current_year
+            last_year = str(date.today().year)
 
         success, first_year, appendix = self.__try_regex(
             lines, last_year, license_template)

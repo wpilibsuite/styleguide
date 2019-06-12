@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-from datetime import date
 import math
 import multiprocessing as mp
 import os
@@ -236,13 +235,6 @@ def main():
         default=mp.cpu_count(),
         help="number of jobs to run (default is number of cores)")
     parser.add_argument(
-        "-y",
-        dest="year",
-        type=int,
-        default=date.today().year,
-        help=
-        "year to use when updating license headers (default is current year)")
-    parser.add_argument(
         "-clang",
         dest="clang_version",
         type=str,
@@ -352,7 +344,7 @@ def main():
         BraceComment(),
         CIdentList(),
         IncludeGuard(),
-        LicenseUpdate(str(args.year)),
+        LicenseUpdate(),
         JavaClass(),
         Newline(),
         Stdlib(),

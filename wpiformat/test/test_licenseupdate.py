@@ -27,7 +27,7 @@ class OpenTemporaryDirectory():
 def test_licenseupdate():
     year = str(date.today().year)
 
-    task = LicenseUpdate(year)
+    task = LicenseUpdate()
     test = TaskTest(task)
 
     file_appendix = \
