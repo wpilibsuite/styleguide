@@ -22,7 +22,7 @@ class UsingNamespaceStd(Task):
             linenum = lines.count(linesep, 0, match.start()) + 1
             print(
                 "Warning: " + name + ": " + str(linenum) +
-                ": avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols."
+                ": avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use \"using std::thing;\" instead."
             )
 
         return (lines, False, True)
