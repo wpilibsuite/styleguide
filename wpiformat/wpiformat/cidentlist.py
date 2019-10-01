@@ -17,7 +17,6 @@ class CIdentList(Task):
 
     def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
-        file_changed = False
 
         output = ""
         pos = 0
@@ -115,7 +114,7 @@ class CIdentList(Task):
 
                 if len(extern_brace_indices) == 0:
                     self.__print_failure(name)
-                    return (lines, False, False)
+                    return (lines, False)
 
                 # If the next stack frame is from an extern without braces, pop
                 # it.
@@ -125,7 +124,7 @@ class CIdentList(Task):
             elif token == ";":
                 if len(extern_brace_indices) == 0:
                     self.__print_failure(name)
-                    return (lines, False, False)
+                    return (lines, False)
 
                 # If the next stack frame is from an extern without braces, pop
                 # it.
@@ -155,8 +154,6 @@ class CIdentList(Task):
                 output += lines[pos:match.span("paren")[0]] + "(void)"
                 pos = match.span("paren")[0] + len("()")
 
-                file_changed = True
-
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
             output += lines[pos:]
@@ -166,7 +163,4 @@ class CIdentList(Task):
         if not success:
             self.__print_failure(name)
 
-        if file_changed:
-            return (output, file_changed, success)
-        else:
-            return (lines, file_changed, success)
+        return (output, success)

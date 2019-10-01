@@ -82,17 +82,16 @@ class TaskTest:
                 print("Running test {}...".format(i))
 
                 if output_type == OutputType.FILE:
-                    output, file_changed, success = self.task.run_pipeline(
+                    output, success = self.task.run_pipeline(
                         config_file, self.inputs[i][0], self.inputs[i][1])
                 elif output_type == OutputType.STDOUT:
                     saved_stdout = sys.stdout
                     sys.stdout = io.StringIO()
-                    _output, file_changed, success = self.task.run_pipeline(
+                    _output, success = self.task.run_pipeline(
                         config_file, self.inputs[i][0], self.inputs[i][1])
                     sys.stdout.seek(0)
                     output = sys.stdout.read()
                     sys.stdout = saved_stdout
 
                 assert output == self.outputs[i][0]
-                assert file_changed == self.outputs[i][1]
                 assert success == self.outputs[i][2]

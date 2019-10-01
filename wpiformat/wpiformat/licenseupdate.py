@@ -176,4 +176,4 @@ class LicenseUpdate(Task):
         # Copy rest of original file into new one
         output += appendix
 
-        return (output, lines != output, True)
+        return (output, True)

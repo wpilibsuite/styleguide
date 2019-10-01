@@ -62,14 +62,10 @@ class IncludeGuard(Task):
         if state == State.FINDING_IFNDEF:
             print("Error: " + name +
                   ": doesn't contain include guard or '#pragma once'")
-            return (lines, False, False)
+            return (lines, False)
 
         output = linesep.join(output_list).rstrip() + linesep
-
-        if output != lines:
-            return (output, True, True)
-        else:
-            return (lines, False, True)
+        return (output, True)
 
     def make_include_guard(self, config_file, name):
         """Returns properly formatted include guard based on repository root and

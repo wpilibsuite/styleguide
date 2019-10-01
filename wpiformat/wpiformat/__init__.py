@@ -97,24 +97,18 @@ def proc_pipeline(name):
                   "Should this be considered a generated file?")
             return False
 
-    file_changed = False
-
     # The success flag is aggregated across multiple file processing results
     all_success = True
 
+    output = lines
     for subtask in task_pipeline:
         if subtask.should_process_file(config_file, name):
-            lines, changed, success = subtask.run_pipeline(
-                config_file, name, lines)
-            file_changed |= changed
+            output, success = subtask.run_pipeline(config_file, name, output)
             all_success &= success
 
-    if file_changed:
+    if lines != output:
         with open(name, "wb") as file:
-            file.write(lines.encode())
-
-        # After file is written, reset file_changed flag
-        file_changed = False
+            file.write(output.encode())
 
     return all_success
 
@@ -351,15 +345,10 @@ def main():
         IncludeOrder(),
         UsingDeclaration(),
         UsingNamespaceStd(),
-        Whitespace()
+        Whitespace(),
+        ClangFormat(args.clang_version),
+        Jni(),  # Fixes clang-format formatting
     ]
-    run_pipeline(task_pipeline, args, files)
-
-    task_pipeline = [ClangFormat(args.clang_version)]
-    run_batch(task_pipeline, args, file_batches)
-
-    # These tasks fix clang-format formatting
-    task_pipeline = [Jni()]
     run_pipeline(task_pipeline, args, files)
 
     # Lint is run last since previous tasks can affect its output.

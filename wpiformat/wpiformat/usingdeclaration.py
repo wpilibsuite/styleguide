@@ -71,4 +71,4 @@ class UsingDeclaration(Task):
                         print(name + ": " + str(linenum) + ": '" + token + \
                               "' in global namespace")
 
-        return (lines, False, format_succeeded)
+        return (lines, format_succeeded)

@@ -375,7 +375,7 @@ class IncludeOrder(Task):
 
         # If header failed to classify, return failure
         if not valid_headers:
-            return (lines, False, False)
+            return (lines, False)
 
         if suboutput:
             output_list.extend(suboutput)
@@ -393,7 +393,4 @@ class IncludeOrder(Task):
         output_list.extend(lines_list[i:])
 
         output = self.linesep.join(output_list).rstrip() + self.linesep
-        if output != lines:
-            return (output, True, True)
-        else:
-            return (lines, False, True)
+        return (output, True)
