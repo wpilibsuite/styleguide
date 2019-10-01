@@ -163,7 +163,6 @@ class Stdlib(Task):
         return config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        file_changed = False
         for header in self.headers:
             # Prepare include names
             before = ""
@@ -176,22 +175,16 @@ class Stdlib(Task):
                 after = header.name + ".h"
 
             if "#include <" + before + ">" in lines:
-                if not file_changed:
-                    file_changed = True
                 lines = lines.replace("#include <" + before + ">",
                                       "#include <" + after + ">")
 
             if header.func_regex:
-                (lines, changed) = self.func_substitute(header, lines)
-                file_changed |= changed
+                lines = self.func_substitute(header, lines)
 
             if header.type_regex:
-                old_length = len(lines)
                 lines = header.type_regex.sub(header.type_sub, lines)
-                if not file_changed and old_length != len(lines):
-                    file_changed = True
 
-        return (lines, file_changed, True)
+        return (lines, True)
 
     def func_substitute(self, header, lines):
         """Returns modified lines and whether string changed.
@@ -200,12 +193,9 @@ class Stdlib(Task):
         header -- Header object
         lines -- file contents string
 
-        Returns tuple containing the following:
-          modified file contents string
-          whether file contents changed
+        Returns modified file contents string
         """
         pos = 0
-        lines_changed = False
         while pos < len(lines):
             old_length = len(lines)
 
@@ -221,6 +211,4 @@ class Stdlib(Task):
             if match.group(1) in header.func_names:
                 lines = lines[0:match.start(1)] + header.prefix + \
                     match.group(1) + lines[match.end(1):]
-                if not lines_changed and old_length != len(lines):
-                    lines_changed = True
-        return (lines, lines_changed)
+        return lines

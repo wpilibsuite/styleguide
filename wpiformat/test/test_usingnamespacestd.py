@@ -7,7 +7,7 @@ from wpiformat.usingnamespacestd import UsingNamespaceStd
 def test_usingnamespacestd():
     test = TaskTest(UsingNamespaceStd())
 
-    warning_str = "avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols.\n"
+    warning_str = "avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use \"using std::thing;\" instead.\n"
 
     # Hello World
     test.add_input("./Main.cpp",

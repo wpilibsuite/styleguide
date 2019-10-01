@@ -66,10 +66,10 @@ class Task:
         name -- file name string
         lines -- file contents string
 
-        Returns tuple containing processed lines, whether lines were changed,
-        and whether task succeeded in formatting the file.
+        Returns tuple containing processed lines and whether task succeeded in
+        processing the file.
         """
-        return ("", False, True)
+        return ("", True)
 
     @abstractmethod
     def run_batch(self, config_file, names):

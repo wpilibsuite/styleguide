@@ -6,9 +6,4 @@ from wpiformat.task import Task
 class Newline(Task):
 
     def run_pipeline(self, config_file, name, lines):
-        output = lines.rstrip() + Task.get_linesep(lines)
-
-        if output != lines:
-            return (output, True, True)
-        else:
-            return (lines, False, True)
+        return (lines.rstrip() + Task.get_linesep(lines), True)

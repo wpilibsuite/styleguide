@@ -12,7 +12,6 @@ class JavaClass(Task):
 
     def run_pipeline(self, config_file, name, lines):
         linesep = Task.get_linesep(lines)
-        file_changed = False
 
         output = ""
         pos = 0
@@ -44,13 +43,8 @@ class JavaClass(Task):
                 output += lines[pos:match.span("extra")[0]]
                 pos = match.span()[1]
 
-                file_changed = True
-
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
             output += lines[pos:]
 
-        if file_changed:
-            return (output, file_changed, True)
-        else:
-            return (lines, file_changed, True)
+        return (output, True)

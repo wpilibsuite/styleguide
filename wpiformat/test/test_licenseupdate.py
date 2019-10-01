@@ -244,30 +244,26 @@ def test_licenseupdate():
         # Run wpiformat on last-year.cpp
         with open("last-year.cpp", "r") as input:
             lines = input.read()
-        output, changed, success = task.run_pipeline(config_file,
-                                                     "last-year.cpp", lines)
+        output, success = task.run_pipeline(config_file, "last-year.cpp", lines)
         assert output == f"// Copyright (c) 2017-{int(year) - 1}\n\n"
 
         # Run wpiformat on this-year.cpp
         with open("last-year.cpp", "r") as input:
             lines = input.read()
-        output, changed, success = task.run_pipeline(config_file,
-                                                     "this-year.cpp", lines)
+        output, success = task.run_pipeline(config_file, "this-year.cpp", lines)
         assert output == f"// Copyright (c) 2017-{year}\n\n"
 
         # Run wpiformat on next-year.cpp
         with open("next-year.cpp", "r") as input:
             lines = input.read()
-        output, changed, success = task.run_pipeline(config_file,
-                                                     "next-year.cpp", lines)
+        output, success = task.run_pipeline(config_file, "next-year.cpp", lines)
         assert output == f"// Copyright (c) 2017-{int(year) + 1}\n\n"
 
         # Run wpiformat on no-year.cpp
         # Should have current calendar year
         with open("no-year.cpp", "r") as input:
             lines = input.read()
-        output, changed, success = task.run_pipeline(config_file, "no-year.cpp",
-                                                     lines)
+        output, success = task.run_pipeline(config_file, "no-year.cpp", lines)
         assert output == f"// Copyright (c) {year}\n\n"
 
     test.run(OutputType.FILE)
