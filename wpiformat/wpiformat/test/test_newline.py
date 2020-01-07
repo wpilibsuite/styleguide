@@ -1,6 +1,6 @@
 import os
 
-from test.tasktest import *
+from .tasktest import *
 from wpiformat.newline import Newline
 
 
