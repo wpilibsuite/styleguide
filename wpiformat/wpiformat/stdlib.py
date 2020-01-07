@@ -9,7 +9,10 @@ from wpiformat.task import Task
 
 class Header:
 
-    def __init__(self, name, func_names=set(), type_regexes=[],
+    def __init__(self,
+                 name,
+                 func_names=set(),
+                 type_regexes=[],
                  add_prefix=True):
         """Manages function and type names in standard library header.
 
