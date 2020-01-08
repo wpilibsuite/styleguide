@@ -40,6 +40,8 @@ class LicenseUpdate(Task):
                 r"(?P<year>[0-9]+)(-[0-9]+)?").replace("{padding}", "[ ]*")
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
+        first_year = last_year
+
         # Compare license
         match = license_rgx.search(lines)
         if match:
@@ -51,7 +53,7 @@ class LicenseUpdate(Task):
             # If comment at beginning of file is non-empty license, update it
             return (True, first_year, linesep + lines[match.end():].lstrip())
         else:
-            return (False, last_year, lines)
+            return (False, first_year, lines)
 
     def __try_string_search(self, lines, last_year, license_template):
         """Try finding license with string search.
