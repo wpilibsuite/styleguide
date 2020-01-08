@@ -1,11 +1,11 @@
 import os
 
 from .tasktest import *
-from wpiformat.newline import Newline
+from wpiformat.eofnewline import EofNewline
 
 
-def test_newline():
-    test = TaskTest(Newline())
+def test_eofnewline():
+    test = TaskTest(EofNewline())
 
     file_appendix = \
         "#pragma once" + os.linesep + \

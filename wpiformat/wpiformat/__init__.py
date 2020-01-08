@@ -11,13 +11,13 @@ from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.config import Config
+from wpiformat.eofnewline import EofNewline
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
 from wpiformat.jni import Jni
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
-from wpiformat.newline import Newline
 from wpiformat.pyformat import PyFormat
 from wpiformat.stdlib import Stdlib
 from wpiformat.task import Task
@@ -337,10 +337,10 @@ def main():
     task_pipeline = [
         BraceComment(),
         CIdentList(),
+        EofNewline(),
         IncludeGuard(),
         LicenseUpdate(),
         JavaClass(),
-        Newline(),
         Stdlib(),
         IncludeOrder(),
         UsingDeclaration(),
