@@ -71,7 +71,7 @@ def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
 
 
 def proc_pipeline(name):
-    """Runs the contents of each files through the task pipeline.
+    """Runs the contents of each file through the task pipeline.
 
     If the contents were modified at any point, the result is written back out
     to the file.
