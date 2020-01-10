@@ -140,9 +140,13 @@ class LicenseUpdate(Task):
         last_year = subprocess.run(cmd,
                                    stdout=subprocess.PIPE).stdout.decode()[:4]
 
-        # If file hasn't been committed yet, use current calendar year as end of
-        # copyright year range
-        if last_year == "":
+        # Check if file has uncomitted changes in the working directory
+        cmd = ["git", "diff-index", "--quiet", "HEAD", "--", name]
+        has_uncommitted_changes = subprocess.run(cmd).returncode
+
+        # If file hasn't been committed yet or has changes in the working
+        # directory, use current calendar year as end of copyright year range
+        if last_year == "" or has_uncommitted_changes:
             last_year = str(date.today().year)
 
         success, first_year, appendix = self.__try_regex(

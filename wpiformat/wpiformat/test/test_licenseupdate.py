@@ -247,6 +247,18 @@ def test_licenseupdate():
         output, success = task.run_pipeline(config_file, "last-year.cpp", lines)
         assert output == f"// Copyright (c) 2017-{int(year) - 1}\n\n"
 
+        # Run wpiformat on last-year.cpp with uncommitted changes. It should
+        # update to next year instead of keeping previous year
+        with open("last-year.cpp", "a") as input:
+            input.write("change\n")
+        output, success = task.run_pipeline(config_file, "last-year.cpp",
+                                            lines + "change\n")
+        assert output == f"// Copyright (c) 2017-{year}\n\nchange\n"
+
+        # Erase changes made to last-year.cpp in previous test
+        with open("last-year.cpp", "w") as input:
+            input.write(lines)
+
         # Run wpiformat on this-year.cpp
         with open("last-year.cpp", "r") as input:
             lines = input.read()
