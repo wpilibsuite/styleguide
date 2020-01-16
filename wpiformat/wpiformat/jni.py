@@ -60,7 +60,7 @@ class Jni(Task):
             return ret + "?"
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         regex_str_sig = r"(/\*(?>(.|\n)*?\*/)\s+)?" + \
             r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \

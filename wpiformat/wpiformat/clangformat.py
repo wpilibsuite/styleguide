@@ -15,7 +15,7 @@ class ClangFormat(Task):
         clang_version -- version number of clang-format appended to executable
                          name
         """
-        Task.__init__(self)
+        super().__init__()
 
         if clang_version == "":
             self.exec_name = "clang-format"
