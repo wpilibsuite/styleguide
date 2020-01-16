@@ -21,7 +21,7 @@ class IncludeGuard(Task):
         return config_file.is_header_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
         lines_list = lines.split(linesep)
         output_list = lines_list
 
@@ -77,7 +77,7 @@ class IncludeGuard(Task):
         """
         repo_root_name_override = config_file.group("repoRootNameOverride")
 
-        repo_root = Task.get_repo_root()
+        repo_root = super().get_repo_root()
         guard_root = os.path.relpath(name, repo_root)
         if not repo_root_name_override:
             guard_path = os.path.basename(repo_root) + os.sep

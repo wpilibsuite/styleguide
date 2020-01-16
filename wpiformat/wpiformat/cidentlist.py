@@ -16,7 +16,7 @@ class CIdentList(Task):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         output = ""
         pos = 0

@@ -11,7 +11,7 @@ class UsingDeclaration(Task):
         return config_file.is_cpp_header_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
         format_succeeded = True
 
         # Tokenize file as brace opens, brace closes, and "using" declarations.

@@ -11,7 +11,7 @@ class JavaClass(Task):
         return name.endswith(".java")
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         output = ""
         pos = 0

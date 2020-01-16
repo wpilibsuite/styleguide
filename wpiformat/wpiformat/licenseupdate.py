@@ -30,7 +30,7 @@ class LicenseUpdate(Task):
         Tuple of whether license was found, first year in copyright range, and
         file contents after license.
         """
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         # Convert the license template to a regex
         license_rgxstr = "^" + linesep.join(license_template)
@@ -67,7 +67,7 @@ class LicenseUpdate(Task):
         Tuple of whether license was found, first year in copyright range, and
         file contents after license.
         """
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         # Strip newlines at top of file
         stripped_lines = lines.lstrip().split(linesep)
@@ -125,7 +125,7 @@ class LicenseUpdate(Task):
             return (False, first_year, linesep + lines.lstrip())
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         license_template = Config.read_file(
             os.path.dirname(os.path.abspath(name)), ".styleguide-license")

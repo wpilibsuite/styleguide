@@ -73,7 +73,7 @@ class Header:
 class Stdlib(Task):
 
     def __init__(self):
-        Task.__init__(self)
+        super().__init__()
 
         self.headers = []
 

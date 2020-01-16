@@ -9,7 +9,7 @@ from wpiformat.task import Task
 class IncludeOrder(Task):
 
     def __init__(self):
-        Task.__init__(self)
+        super().__init__()
 
         # There are 5 header groups:
         # 0. Related headers
@@ -356,7 +356,7 @@ class IncludeOrder(Task):
             regex_str = config_file.regex(group)
             self.override_regexes.append(regex.compile(regex_str))
 
-        self.linesep = Task.get_linesep(lines)
+        self.linesep = super().get_linesep(lines)
 
         file_name = os.path.basename(name)
 

@@ -11,7 +11,7 @@ class UsingNamespaceStd(Task):
         return config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         # Find instances of "using namespace std;" or subnamespaces of "std",
         # but not std::literals or std::chrono_literals.

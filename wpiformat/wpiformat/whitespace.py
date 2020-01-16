@@ -8,7 +8,7 @@ from wpiformat.task import Task
 class Whitespace(Task):
 
     def run_pipeline(self, config_file, name, lines):
-        linesep = Task.get_linesep(lines)
+        linesep = super().get_linesep(lines)
 
         output = ""
 
