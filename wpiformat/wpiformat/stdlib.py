@@ -11,8 +11,8 @@ class Header:
 
     def __init__(self,
                  name,
-                 func_names=set(),
-                 type_regexes=[],
+                 func_names=None,
+                 type_regexes=None,
                  add_prefix=True):
         """Manages function and type names in standard library header.
 
@@ -23,6 +23,10 @@ class Header:
         add_prefix -- determines whether std:: prefix is added or removed
                       (default True)
         """
+        if type_regexes is None:
+            type_regexes = []
+        if func_names is None:
+            func_names = set()
         self.name = name
         self.func_names = func_names
         self.add_prefix = add_prefix
