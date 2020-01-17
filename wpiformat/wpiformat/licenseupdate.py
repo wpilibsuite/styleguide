@@ -51,9 +51,9 @@ class LicenseUpdate(Task):
                 pass
 
             # If comment at beginning of file is non-empty license, update it
-            return (True, first_year, linesep + lines[match.end():].lstrip())
+            return True, first_year, linesep + lines[match.end():].lstrip()
         else:
-            return (False, first_year, lines)
+            return False, first_year, lines
 
     def __try_string_search(self, lines, last_year, license_template):
         """Try finding license with string search.
@@ -120,9 +120,9 @@ class LicenseUpdate(Task):
                     first_year = match.group(1)
                     break
 
-            return (True, first_year, appendix_part)
+            return True, first_year, appendix_part
         else:
-            return (False, first_year, linesep + lines.lstrip())
+            return False, first_year, linesep + lines.lstrip()
 
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
@@ -182,4 +182,4 @@ class LicenseUpdate(Task):
         # Copy rest of original file into new one
         output += appendix
 
-        return (output, True)
+        return output, True

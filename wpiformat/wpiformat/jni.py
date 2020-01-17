@@ -142,6 +142,6 @@ class Jni(Task):
             output += lines[pos:]
 
         if output == "":
-            return (lines, True)
+            return lines, True
         else:
-            return (output, True)
+            return output, True

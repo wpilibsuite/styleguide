@@ -47,4 +47,4 @@ class JavaClass(Task):
         if pos < len(lines):
             output += lines[pos:]
 
-        return (output, True)
+        return output, True

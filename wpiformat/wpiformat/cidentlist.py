@@ -114,7 +114,7 @@ class CIdentList(Task):
 
                 if len(extern_brace_indices) == 0:
                     self.__print_failure(name)
-                    return (lines, False)
+                    return lines, False
 
                 # If the next stack frame is from an extern without braces, pop
                 # it.
@@ -124,7 +124,7 @@ class CIdentList(Task):
             elif token == ";":
                 if len(extern_brace_indices) == 0:
                     self.__print_failure(name)
-                    return (lines, False)
+                    return lines, False
 
                 # If the next stack frame is from an extern without braces, pop
                 # it.
@@ -163,4 +163,4 @@ class CIdentList(Task):
         if not success:
             self.__print_failure(name)
 
-        return (output, success)
+        return output, success

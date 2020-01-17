@@ -187,7 +187,7 @@ class Stdlib(Task):
             if header.type_regex:
                 lines = header.type_regex.sub(header.type_sub, lines)
 
-        return (lines, True)
+        return lines, True
 
     def func_substitute(self, header, lines):
         """Returns modified lines and whether string changed.

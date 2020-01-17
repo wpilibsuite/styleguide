@@ -37,6 +37,6 @@ class ClangFormat(Task):
             print("Error: " + self.exec_name +
                   " not found in PATH. Is it installed?",
                   file=sys.stderr)
-            return (lines, False)
+            return lines, False
 
-        return (output, True)
+        return output, True
