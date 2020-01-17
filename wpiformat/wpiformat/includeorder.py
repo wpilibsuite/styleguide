@@ -240,7 +240,7 @@ class IncludeOrder(Task):
 
                         # If header failed to classify, return failure
                         if not valid_headers:
-                            return (output_list, inc_present, i, False)
+                            return output_list, inc_present, i, False
 
                         if suboutput:
                             ifdef += self.linesep.join(suboutput) + self.linesep
@@ -285,7 +285,7 @@ class IncludeOrder(Task):
                     written = self.write_headers(includes, ifdef_blocks)
                     if written:
                         output_list.extend(written)
-                    return (output_list, includes_present, i, True)
+                    return output_list, includes_present, i, True
 
                 if "NOLINT" in lines_list[i]:
                     # NOLINT is a barrier, so flush includes
@@ -314,7 +314,7 @@ class IncludeOrder(Task):
                     includes_present[idx] = True
                 else:
                     # If header failed to classify, return failure
-                    return (output_list, includes_present, i, False)
+                    return output_list, includes_present, i, False
             elif ifdef_level > 0 and lines_list[i] != "":
                 # Non-preprocessor statements within a #ifdef block don't mark
                 # the end of header include processing, but act as barrier for
@@ -335,7 +335,7 @@ class IncludeOrder(Task):
                 if written:
                     output_list.extend(written)
 
-                return (output_list, includes_present, i, True)
+                return output_list, includes_present, i, True
             i += 1
 
         # Write headers and #ifdef blocks if found
@@ -343,7 +343,7 @@ class IncludeOrder(Task):
         if written:
             output_list.extend(written)
 
-        return (output_list, includes_present, i, True)
+        return output_list, includes_present, i, True
 
     def run_pipeline(self, config_file, name, lines):
         self.override_regexes = []
@@ -375,7 +375,7 @@ class IncludeOrder(Task):
 
         # If header failed to classify, return failure
         if not valid_headers:
-            return (lines, False)
+            return lines, False
 
         if suboutput:
             output_list.extend(suboutput)
@@ -393,4 +393,4 @@ class IncludeOrder(Task):
         output_list.extend(lines_list[i:])
 
         output = self.linesep.join(output_list).rstrip() + self.linesep
-        return (output, True)
+        return output, True

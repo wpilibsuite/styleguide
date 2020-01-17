@@ -16,4 +16,4 @@ class Whitespace(Task):
             processed_line = line[0:len(line)].rstrip()
             output += processed_line + linesep
 
-        return (output, True)
+        return output, True

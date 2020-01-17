@@ -84,4 +84,4 @@ class BraceComment(Task):
         if extract_location < len(lines):
             output += lines[extract_location:]
 
-        return (output, True)
+        return output, True

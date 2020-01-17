@@ -25,4 +25,4 @@ class UsingNamespaceStd(Task):
                 ": avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use \"using std::thing;\" instead."
             )
 
-        return (lines, True)
+        return lines, True
