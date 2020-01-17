@@ -163,7 +163,7 @@ class IncludeOrder(Task):
         seen_add = seen.add
         return [x for x in seq if not (x in seen or seen_add(x))]
 
-    def write_headers(self, includes, ifdef_blocks=[[], [], [], [], []]):
+    def write_headers(self, includes, ifdef_blocks=None):
         """Write out includes from sets.
 
         Keyword arguments:
@@ -172,6 +172,8 @@ class IncludeOrder(Task):
 
         Returns list of output lines.
         """
+        if ifdef_blocks is None:
+            ifdef_blocks = [[], [], [], [], []]
         output_list = []
 
         for i in range(5):
