@@ -69,7 +69,8 @@ class IncludeOrder(Task):
                                           r"(?P<close_bracket>>|\"))"
                                           r"(?P<postfix>.*)$")
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def classify_header(self, config_file, include_line, file_name):
@@ -112,7 +113,8 @@ class IncludeOrder(Task):
         else:
             return -1
 
-    def include_is_header(self, config_file, file_name, include_name):
+    @staticmethod
+    def include_is_header(config_file, file_name, include_name):
         """Return True if include name has header extension.
 
         Keyword arguments:
@@ -129,7 +131,8 @@ class IncludeOrder(Task):
         else:
             return True
 
-    def rebuild_include(self, name_match, group_number):
+    @staticmethod
+    def rebuild_include(name_match, group_number):
         """Adds appropriate brackets around include name and "#include" before
         that based on group number.
 
@@ -151,7 +154,8 @@ class IncludeOrder(Task):
         else:
             return output
 
-    def dedup_list(self, seq):
+    @staticmethod
+    def dedup_list(seq):
         """Remove duplicates from list while preserving order.
 
         Keyword arguments:

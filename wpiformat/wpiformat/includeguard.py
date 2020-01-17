@@ -17,7 +17,8 @@ class State(Enum):
 
 class IncludeGuard(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_header_file(name)
 
     def run_pipeline(self, config_file, name, lines):

@@ -22,7 +22,8 @@ class ClangFormat(Task):
         else:
             self.exec_name = "clang-format-" + clang_version
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):

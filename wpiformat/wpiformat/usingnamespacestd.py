@@ -7,7 +7,8 @@ from wpiformat.task import Task
 
 class UsingNamespaceStd(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):

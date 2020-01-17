@@ -101,7 +101,8 @@ class Config:
         """
         return self.__c_header_include_regex.search(name) is not None
 
-    def is_c_src_file(self, name):
+    @staticmethod
+    def is_c_src_file(name):
         """Returns True if file is C source file.
 
         Keyword arguments:

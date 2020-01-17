@@ -12,7 +12,8 @@ from wpiformat.task import Task
 
 class LicenseUpdate(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         license_regex = config_file.regex("licenseUpdateExclude")
 
         return (config_file.is_c_file(name) or config_file.is_cpp_file(name) or

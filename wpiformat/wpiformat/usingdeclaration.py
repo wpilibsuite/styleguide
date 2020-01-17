@@ -7,7 +7,8 @@ from wpiformat.task import Task
 
 class UsingDeclaration(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_cpp_header_file(name)
 
     def run_pipeline(self, config_file, name, lines):
