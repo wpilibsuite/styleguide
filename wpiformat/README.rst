@@ -43,7 +43,7 @@ Generated files should not be modified; if they are, wpiformat will emit warning
 
 File names matching regexes in the group ``licenseUpdateExclude`` will be skipped by the license header update task.
 
-Empty config groups can be omitted. Directory separators must be "/", not "\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
+Empty config groups can be omitted. Directory separators must be "/", not "\\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 
 Valid include guard patterns use capital letters, start with the repository name, include the path to the file and the file name itself, have directory separators and hyphens replaced with underscores, and have a trailing underscore. The path to the file starts from the repository root by default. Other paths, such as include directories, can be specified in the group ``includeGuardRoots``. If a path matches, that string will be truncated from the include guard pattern.
 
