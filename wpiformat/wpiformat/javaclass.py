@@ -7,7 +7,8 @@ from wpiformat.task import Task
 
 class JavaClass(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return name.endswith(".java")
 
     def run_pipeline(self, config_file, name, lines):

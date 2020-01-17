@@ -43,8 +43,9 @@ class Task:
             current_dir = os.path.dirname(current_dir)
         return ""
 
+    @staticmethod
     @abstractmethod
-    def should_process_file(self, config_file, name):
+    def should_process_file(config_file, name):
         """Returns true if file should be processed by this task.
 
         Keyword arguments:
@@ -71,8 +72,9 @@ class Task:
         """
         return ("", True)
 
+    @staticmethod
     @abstractmethod
-    def run_batch(self, config_file, names):
+    def run_batch(config_file, names):
         """Performs task on list of files.
 
         This function is for processing multiple files in one task to reduce

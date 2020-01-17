@@ -166,7 +166,8 @@ class Stdlib(Task):
                     "localtime", "mktime", "strftime", "time"
                 }, ["(clock|time)_t"]))
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):
@@ -193,7 +194,8 @@ class Stdlib(Task):
 
         return lines, True
 
-    def func_substitute(self, header, lines):
+    @staticmethod
+    def func_substitute(header, lines):
         """Returns modified lines and whether string changed.
 
         Keyword arguments:

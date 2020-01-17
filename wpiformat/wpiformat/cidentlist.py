@@ -7,12 +7,14 @@ from wpiformat.task import Task
 
 class CIdentList(Task):
 
-    def __print_failure(self, name):
+    @staticmethod
+    def __print_failure(name):
         print("Error: " + name + ": unmatched curly braces when scanning for "
               "C identifier lists. If the code compiles, this is a bug in "
               "wpiformat.")
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):

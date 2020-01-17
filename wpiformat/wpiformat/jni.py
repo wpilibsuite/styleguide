@@ -26,10 +26,12 @@ from wpiformat.task import Task
 
 class Jni(Task):
 
-    def should_process_file(self, config_file, name):
+    @staticmethod
+    def should_process_file(config_file, name):
         return config_file.is_cpp_src_file(name)
 
-    def map_jni_type(self, type_name):
+    @staticmethod
+    def map_jni_type(type_name):
         ret = ""
         if type_name.endswith("*") or type_name.endswith("Array"):
             ret += "["
