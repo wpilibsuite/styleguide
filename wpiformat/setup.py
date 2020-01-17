@@ -58,7 +58,7 @@ setup(
     name="wpiformat",
     version=__version__,
     description=
-    "Linters and formatters for ensuring WPILib\'s source code conforms to its style guide",
+    "Linters and formatters for ensuring WPILib's source code conforms to its style guide",
     long_description=long_description,
     author="WPILib",
     maintainer="Tyler Veness",
