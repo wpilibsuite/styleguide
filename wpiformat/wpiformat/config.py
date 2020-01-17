@@ -99,7 +99,7 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__c_header_include_regex.search(name) != None
+        return self.__c_header_include_regex.search(name) is not None
 
     def is_c_src_file(self, name):
         """Returns True if file is C source file.
@@ -123,7 +123,7 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__cpp_header_include_regex.search(name) != None
+        return self.__cpp_header_include_regex.search(name) is not None
 
     def is_cpp_src_file(self, name):
         """Returns True if file is C++ source file.
@@ -131,7 +131,7 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__cpp_src_include_regex.search(name) != None
+        return self.__cpp_src_include_regex.search(name) is not None
 
     def is_header_file(self, name):
         """Returns True if file is either C or C++ header file.
@@ -147,7 +147,7 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__generated_exclude_regex.search(name) != None
+        return self.__generated_exclude_regex.search(name) is not None
 
     def is_modifiable_file(self, name):
         """Returns True if file is modifiable but should be skipped.
@@ -155,7 +155,7 @@ class Config:
         Keyword arguments:
         name -- file name string
         """
-        return self.__modifiable_exclude_regex.search(name) != None
+        return self.__modifiable_exclude_regex.search(name) is not None
 
     def __parse_config_file(self, directory, file_name):
         """Parse values from config file.

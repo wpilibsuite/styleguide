@@ -41,7 +41,7 @@ class Header:
             self.type_sub = r"\g<1>"
             regex_prefix = r"std::"
 
-        if func_names != []:
+        if func_names:
             # Matches C standard library function uses. C standard library
             # function names are alphanumeric and start with a letter. If the
             # function name is preceded by a word character and a space, it's
@@ -56,7 +56,7 @@ class Header:
         else:
             self.func_regex = None
 
-        if type_regexes != []:
+        if type_regexes:
             # Check for type uses
 
             # Preceded by beginning of file, "<" (template), " ", ",", "(", or
