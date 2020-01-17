@@ -142,7 +142,7 @@ class IncludeOrder(Task):
 
         Returns include name with approriate brackets and "#include" prefix.
         """
-        if group_number >= 1 and group_number <= 3:
+        if 1 <= group_number <= 3:
             output = "#include <" + name_match.group("name") + ">" + \
                 name_match.group("postfix")
         else:
