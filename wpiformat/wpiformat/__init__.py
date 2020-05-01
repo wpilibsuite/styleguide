@@ -89,6 +89,7 @@ def proc_pipeline(name):
         with print_lock:
             print("Processing", name)
             if verbose2:
+                print("  with config " + config_file.file_name)
                 for subtask in task_pipeline:
                     if subtask.should_process_file(config_file, name):
                         print("  with " + type(subtask).__name__)
