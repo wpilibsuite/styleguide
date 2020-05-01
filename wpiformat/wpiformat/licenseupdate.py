@@ -69,6 +69,7 @@ class LicenseUpdate(Task):
         file contents after license.
         """
         linesep = super().get_linesep(lines)
+        asdf
 
         # Strip newlines at top of file
         stripped_lines = lines.lstrip().split(linesep)
