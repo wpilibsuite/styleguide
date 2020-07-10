@@ -1,0 +1,98 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8]
+    name: Test - ${{ matrix.os }}, ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Fetch all history and metadata
+      run: |
+        git fetch --prune --unshallow
+        git checkout -b pr
+        git branch -f master origin/master
+
+    - name: Install clang-format
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get install clang-format-10
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          choco install llvm --version 10.0.0
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install clang-format
+        else
+          echo "$RUNNER_OS not supported"
+          exit 1
+        fi
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install wpiformat
+      run: |
+        cd wpiformat
+        pip install -e .
+
+    - name: Install test dependencies
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Windows" ]; then
+          # This pytest dependency is installed manually with bash because the
+          # installation prints to stderr. Prints to stderr cause Powershell to
+          # report a nonzero return code and cause the tests to fail.
+          pip install wheel iniconfig
+        fi
+
+    - name: Run unit tests
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        cd wpiformat
+        python setup.py test
+
+    - name: wpiformat - whole repo
+      run: |
+        python -m wpiformat -v
+
+    - name: wpiformat - one file
+      run: |
+        cd wpiformat
+        python -m wpiformat -f wpiformat/__init__.py -v
+
+    - name: wpiformat - absolute path to file
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          python -m wpiformat -f /home/runner/work/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          python -m wpiformat -f /d/a/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          python -m wpiformat -f /Users/runner/work/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
+        else
+          echo "$RUNNER_OS not supported"
+          exit 1
+        fi
+
+    - name: wpiformat - multiple files
+      run: |
+        cd wpiformat
+        python -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
+
+    - name: wpiformat - directory
+      run: |
+        cd wpiformat
+        python -m wpiformat -f wpiformat -v
+
+    - name: Ensure formatter made no changes
+      run: git --no-pager diff --exit-code HEAD

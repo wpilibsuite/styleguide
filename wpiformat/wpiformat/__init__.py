@@ -287,6 +287,12 @@ def main():
             else:
                 files.append(name)
 
+    # Throw an error if any files or directories don't exist
+    for f in files:
+        if not os.path.exists(f):
+            print(f"error: {f}: No such file or directory")
+            sys.exit(1)
+
     # Convert relative paths of files to absolute paths
     files = [os.path.abspath(name) for name in files]
 
