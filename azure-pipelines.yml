@@ -32,34 +32,38 @@ jobs:
             sudo python3 setup.py install --optimize=1 --skip-build
           displayName: 'Build'
         - script: |
-            # Make sure .git/refs/heads/master exists
             git config --global user.email "you@example.com"
             git config --global user.name "Your Name"
             git checkout -b pr
             git checkout master
             git checkout pr
-
+          displayName: 'Make sure .git/refs/heads/master exists'
+        - script: |
             cd wpiformat
             python3 setup.py test
-            cd ..
-
+          displayName: 'Run unit tests'
+        - script: |
             python3 -m wpiformat -v
+          displayName: 'Run wpiformat'
+        - script: |
             cd wpiformat
-            # One file
             python3 -m wpiformat -f wpiformat/__init__.py -v
-
-            # Absolute path to file
+          displayName: 'One file'
+        - script: |
+            cd wpiformat
             python3 -m wpiformat -f /__w/1/s/wpiformat/wpiformat/__init__.py -v
-
-            # Multiple files
+          displayName: 'Absolute path to file'
+        - script: |
+            cd wpiformat
             python3 -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
-
-            # Directory
+          displayName: 'Multiple files'
+        - script: |
+            cd wpiformat
             python3 -m wpiformat -f wpiformat -v
-
-            # Ensure formatter made no changes
+          displayName: 'Directory'
+        - script: |
             git --no-pager diff --exit-code HEAD
-          displayName: 'Test'
+          displayName: 'Ensure formatter made no changes'
 
   - job: Windows
     pool:
@@ -76,31 +80,35 @@ jobs:
           py -3 setup.py install --optimize=1 --skip-build
         displayName: 'Build'
       - powershell: |
-          # Make sure .git/refs/heads/master exists
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
           git checkout -b pr
           git checkout master
           git checkout pr
-
+        displayName: 'Make sure .git/refs/heads/master exists'
+      - powershell: |
           cd wpiformat
           py -3 setup.py test
-          cd ..
-
+        displayName: 'Run unit tests'
+      - powershell: |
           py -3 -m wpiformat -v
+        displayName: 'Run wpiformat'
+      - powershell: |
           cd wpiformat
-          # One file
           py -3 -m wpiformat -f wpiformat\__init__.py -v
-
-          # Absolute path to file
+        displayName: 'One file'
+      - powershell: |
+          cd wpiformat
           py -3 -m wpiformat -f D:\a\1\s\wpiformat\wpiformat\__init__.py -v
-
-          # Multiple files
+        displayName: 'Absolute path to file'
+      - powershell: |
+          cd wpiformat
           py -3 -m wpiformat -f wpiformat\__init__.py wpiformat\__main__.py -v
-
-          # Directory
+        displayName: 'Multiple files'
+      - powershell: |
+          cd wpiformat
           py -3 -m wpiformat -f wpiformat -v
-
-          # Ensure formatter made no changes
+        displayName: 'Directory'
+      - powershell: |
           git --no-pager diff --exit-code HEAD
-        displayName: 'Test'
+        displayName: 'Ensure formatter made no changes'
