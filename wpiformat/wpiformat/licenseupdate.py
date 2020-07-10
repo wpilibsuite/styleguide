@@ -137,13 +137,12 @@ class LicenseUpdate(Task):
         # log" because the year the file was last modified in the history should
         # be used. Author dates can be older than this or even out of order in
         # the log.
-        cmd = ["git", "log", "-n", "1", "--format=%ci", "--", name]
-        last_year = subprocess.run(cmd,
-                                   stdout=subprocess.PIPE).stdout.decode()[:4]
+        last_year = subprocess.check_output(
+            ["git", "log", "-n", "1", "--format=%ci", "--", name]).decode()[:4]
 
         # Check if file has uncomitted changes in the working directory
-        cmd = ["git", "diff-index", "--quiet", "HEAD", "--", name]
-        has_uncommitted_changes = subprocess.run(cmd).returncode
+        has_uncommitted_changes = subprocess.run(
+            ["git", "diff-index", "--quiet", "HEAD", "--", name]).returncode
 
         # If file hasn't been committed yet or has changes in the working
         # directory, use current calendar year as end of copyright year range

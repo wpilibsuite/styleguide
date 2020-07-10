@@ -36,10 +36,14 @@ def filter_ignored_files(names):
     # Windows, so os.linesep isn't used here.
     encoded_names = "\n".join(names).encode()
 
-    output_list = subprocess.run(
+    proc = subprocess.run(
         ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
         input=encoded_names,
-        stdout=subprocess.PIPE).stdout.decode().split("\n")
+        stdout=subprocess.PIPE)
+    if proc.returncode == 128:
+        raise subprocess.CalledProcessError
+
+    output_list = proc.stdout.decode().split("\n")
 
     # "git check-ignore" prefixes the names of non-ignored files with "::",
     # wraps names in quotes on Windows, and outputs "\n" line separators on all
@@ -303,13 +307,11 @@ def main():
     files = filter_ignored_files(files)
 
     # Create list of all changed files
-    changed_file_list = []
-
-    output_list = subprocess.run(["git", "diff", "--name-only", "master"],
-                                 stdout=subprocess.PIPE).stdout.split()
-    for line in output_list:
-        changed_file_list.append(root_path + os.sep +
-                                 line.strip().decode("ascii"))
+    output_list = subprocess.check_output(
+        ["git", "diff", "--name-only", "master"], encoding="ascii").split()
+    changed_file_list = [
+        root_path + os.sep + line.strip() for line in output_list
+    ]
 
     # Don't run tasks on modifiable or generated files
     work = []
