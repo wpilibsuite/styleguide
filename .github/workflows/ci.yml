@@ -71,7 +71,6 @@ jobs:
         python -m wpiformat -f wpiformat/__init__.py -v
 
     - name: wpiformat - absolute path to file
-      shell: bash
       run: |
         python -m wpiformat -f $GITHUB_WORKSPACE/wpiformat/wpiformat/__init__.py -v
 
