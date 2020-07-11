@@ -73,16 +73,7 @@ jobs:
     - name: wpiformat - absolute path to file
       shell: bash
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          python -m wpiformat -f /home/runner/work/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
-        elif [ "$RUNNER_OS" == "Windows" ]; then
-          python -m wpiformat -f /d/a/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          python -m wpiformat -f /Users/runner/work/styleguide/styleguide/wpiformat/wpiformat/__init__.py -v
-        else
-          echo "$RUNNER_OS not supported"
-          exit 1
-        fi
+        python -m wpiformat -f $GITHUB_WORKSPACE/wpiformat/wpiformat/__init__.py -v
 
     - name: wpiformat - multiple files
       run: |
