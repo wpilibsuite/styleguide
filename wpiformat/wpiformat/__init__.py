@@ -228,9 +228,7 @@ def main():
     )
     # mp uses a few internal events, and windows cannot wait on more then 64 events at once
     # Therefore, on a 64 thread system you can't use 64 threads.
-    cpu_count = mp.cpu_count()
-    if cpu_count > 60:
-        cpu_count = 60
+    cpu_count = min(60, mp.cpu_count())
     parser.add_argument(
         "-j",
         dest="jobs",
