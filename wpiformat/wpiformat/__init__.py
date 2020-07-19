@@ -226,11 +226,16 @@ def main():
         help=
         "verbosity level 2 (prints names of processed files and tasks run on them)"
     )
+    # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
+    # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
+    # once, and mp uses a few internal events. Therefore, the maximum number of
+    # parallel jobs is 60.
+    cpu_count = min(60, mp.cpu_count())
     parser.add_argument(
         "-j",
         dest="jobs",
         type=int,
-        default=mp.cpu_count(),
+        default=cpu_count,
         help="number of jobs to run (default is number of cores)")
     parser.add_argument(
         "-clang",
