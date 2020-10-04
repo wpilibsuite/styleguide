@@ -2248,8 +2248,8 @@ def CheckBraces(filename, clean_lines, linenum, error):
 
   # If braces come on one side of an else, they should be on both.
   # However, we have to worry about "else if" that spans multiple lines!
-  if Search(r'else if\s*\(', line):       # could be multi-line if
-    brace_on_left = bool(Search(r'}\s*else if\s*\(', line))
+  if Search(r'else if(\s+constexpr)?\s*\(', line):  # could be multi-line if
+    brace_on_left = bool(Search(r'}\s*else if(\s+constexpr)?\s*\(', line))
     # find the ( after the if
     pos = line.find('else if')
     pos = line.find('(', pos)
