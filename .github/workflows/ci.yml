@@ -87,3 +87,26 @@ jobs:
 
     - name: Ensure formatter made no changes
       run: git --no-pager diff --exit-code HEAD
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Build package
+        run: python setup.py bdist_wheel
+        working-directory: wpiformat
+
+      - name: Upload package to PyPi
+        uses: pypa/gh-action-pypi-publish@v1.4.1
+        with:
+          packages_dir: wpiformat/dist
+          password: ${{ secrets.PYPI_PASSWORD }}
