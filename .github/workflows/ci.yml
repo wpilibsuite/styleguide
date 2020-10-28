@@ -101,6 +101,9 @@ jobs:
         with:
           python-version: 3.7
 
+      - name: Install Python dependencies
+        run: pip install wheel
+
       - name: Build package
         run: python setup.py bdist_wheel
         working-directory: wpiformat
