@@ -97,8 +97,9 @@ def proc_pipeline(name):
         try:
             lines = file.read()
         except UnicodeDecodeError:
-            print("Error: " + name + " contains characters not in UTF-8. "
-                  "Should this be considered a generated file?")
+            print(
+                f"error: {name} contains characters not in UTF-8. Should this be considered a generated file?"
+            )
             return False
 
     # The success flag is aggregated across multiple file processing results
@@ -311,9 +312,25 @@ def main():
     # Don't check for changes in or run tasks on ignored files
     files = filter_ignored_files(files)
 
+    # Determine name of main branch for generated file comparisons
+    branch_options = ["master", "main"]
+    main_branch = ""
+    for branch in branch_options:
+        proc = subprocess.run(["git", "rev-parse", "-q", "--verify", branch],
+                              stdout=subprocess.DEVNULL)
+        if proc.returncode == 0:
+            main_branch = branch
+            break
+
+    if not main_branch:
+        print(
+            f"error: One of the following branches is required for generated file comparisons, but none exist: {branch_options}."
+        )
+        sys.exit(1)
+
     # Create list of all changed files
     output_list = subprocess.check_output(
-        ["git", "diff", "--name-only", "master"], encoding="ascii").split()
+        ["git", "diff", "--name-only", main_branch], encoding="ascii").split()
     changed_file_list = [
         root_path + os.sep + line.strip() for line in output_list
     ]
