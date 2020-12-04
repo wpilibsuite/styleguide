@@ -92,6 +92,9 @@ class TaskTest:
                     sys.stdout.seek(0)
                     output = sys.stdout.read()
                     sys.stdout = saved_stdout
+            else:
+                output = self.inputs[i][1]
+                success = True
 
-                assert output == self.outputs[i][0]
-                assert success == self.outputs[i][2]
+            assert output == self.outputs[i][0]
+            assert success == self.outputs[i][2]

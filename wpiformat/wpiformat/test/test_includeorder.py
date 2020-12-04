@@ -536,7 +536,7 @@ def test_includeorder():
 
     # Ensure lines containing #include that aren't includes are not processed
     test.add_input("./Test.h", "// #included here" + os.linesep)
-    test.add_output("// #included here" + os.linesep, False, True)
+    test.add_latest_input_as_output(True)
 
     # Ensure extra newline isn't inserted between #pragma and #ifdef
     test.add_input("./Test.h",
