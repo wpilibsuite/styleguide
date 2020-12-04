@@ -173,9 +173,7 @@ def test_licenseupdate():
         "./Excluded.h",
         "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
         os.linesep + file_appendix)
-    test.add_output(
-        "/* Copyright (c) Company Name 2011-{}. */".format(year) + os.linesep +
-        os.linesep + file_appendix, False, True)
+    test.add_latest_input_as_output(True)
 
     # Ensure license regex matches
     test.add_input("./Test.h",
