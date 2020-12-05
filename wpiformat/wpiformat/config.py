@@ -2,7 +2,6 @@
 
 import os
 import regex
-import sys
 
 
 class Config:
@@ -22,31 +21,50 @@ class Config:
         self.__modifiable_exclude_regex = self.regex("modifiableFileExclude")
 
     @staticmethod
-    def read_file(directory, file_name):
-        """Find file and return contents.
+    def find_file(directory, file_name):
+        """Searches for file starting from Python's current working directory.
 
         Checks current directory for file. If one doesn't exist, try all parent
-        directories as well.
+        directories as well up to the root folder which contains ".git".
 
         Keyword arguments:
         directory -- current directory from which to start search
         file_name -- file name string
 
-        Returns list containing file contents or triggers program exit.
+        Returns absolute path to file or empty string if file doesn't exist.
         """
         file_found = False
         while not file_found:
-            try:
-                with open(directory + os.sep + file_name, "r") as file_contents:
-                    file_found = True
-                    return file_contents.read().splitlines()
-            except OSError:
+            if os.path.isfile(directory + os.sep + file_name):
+                file_found = True
+            elif os.path.isdir(directory + os.sep + ".git"):
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
                     print("Error: config file '" + file_name +
                           "' not found in '" + directory + "'")
-                    sys.exit(1)
+                    return ""
+            else:
                 directory = os.path.dirname(directory)
+        return directory + os.sep + file_name
+
+    @staticmethod
+    def read_file(directory, file_name):
+        """Find file and return contents.
+
+        Checks current directory for file. If one doesn't exist, try all parent
+        directories as well up to the root folder which contains ".git".
+
+        Keyword arguments:
+        directory -- current directory from which to start search
+        file_name -- file name string
+
+        Returns list of file contents or empty list if file doesn't exist.
+        """
+        file_name = Config.find_file(directory, file_name)
+        if not file_name:
+            return []
+        with open(file_name, "r") as file_contents:
+            return file_contents.read().splitlines()
 
     def group(self, group_name):
         """Returns value from config dictionary given key string.
