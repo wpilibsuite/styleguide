@@ -227,6 +227,18 @@ def main():
         help=
         "verbosity level 2 (prints names of processed files and tasks run on them)"
     )
+    parser.add_argument(
+        "-list-all-files",
+        dest="list_all_files",
+        action="store_true",
+        help="list files to be processed instead of processing them")
+    parser.add_argument(
+        "-list-changed-files",
+        dest="list_changed_files",
+        action="store_true",
+        help=
+        "same as list-all-files, but list only files changed from main branch"
+    )
     # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
     # once, and mp uses a few internal events. Therefore, the maximum number of
@@ -353,6 +365,14 @@ def main():
 
     # If there are no files left, do nothing
     if len(files) == 0:
+        sys.exit(0)
+
+    # Handle list-all-files and list-changed-files options
+    if args.list_all_files or args.list_changed_files:
+        if args.list_changed_files:
+            files = list(set(files) & set(changed_file_list))
+        for file in files:
+            print(file)
         sys.exit(0)
 
     # Prepare file batches for batch tasks
