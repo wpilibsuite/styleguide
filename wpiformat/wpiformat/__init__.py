@@ -227,12 +227,13 @@ def main():
         help=
         "verbosity level 2 (prints names of processed files and tasks run on them)"
     )
-    parser.add_argument(
+    list_files_group = parser.add_mutually_exclusive_group()
+    list_files_group.add_argument(
         "-list-all-files",
         dest="list_all_files",
         action="store_true",
         help="list files to be processed instead of processing them")
-    parser.add_argument(
+    list_files_group.add_argument(
         "-list-changed-files",
         dest="list_changed_files",
         action="store_true",
