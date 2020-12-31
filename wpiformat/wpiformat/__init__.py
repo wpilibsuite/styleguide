@@ -293,11 +293,18 @@ def main():
         "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
     )
     parser.add_argument(
-        "-tidy",
-        dest="tidy",
+        "-tidy-changed",
+        dest="tidy-changed",
         action="store_true",
         help=
-        "also runs clang-tidy-CLANG_VERSION; this requires a compile_commands.json file"
+        "also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file"
+    )
+    parser.add_argument(
+        "-tidy-all",
+        dest="tidy-all",
+        action="store_true",
+        help=
+        "also runs clang-tidy-CLANG_VERSION on all files (this takes a while); this requires a compile_commands.json file"
     )
     parser.add_argument(
         "-compile-commands",
@@ -447,7 +454,9 @@ def main():
     run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
-    if args.tidy:
+    if args.tidy_all or args.tidy_changed:
+        if args.tidy_changed:
+            files = list(set(files) & set(changed_file_list))
         task_pipeline = [ClangTidy(args.clang_version, args.compile_commands)]
         run_standalone(task_pipeline, args, files)
 
