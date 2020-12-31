@@ -255,13 +255,10 @@ def main():
         help=
         "file or directory names (can be path relative to python invocation directory or absolute path)"
     )
-    parser.add_argument(
-        "-no-format",
-        dest="no_format",
-        action="store_true",
-        help=
-        "disable formatting steps, only run linting"
-    )
+    parser.add_argument("-no-format",
+                        dest="no_format",
+                        action="store_true",
+                        help="disable formatting steps, only run linting")
     args = parser.parse_args()
 
     # All discovered files are relative to Git repo root directory, so find the
