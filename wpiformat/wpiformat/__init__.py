@@ -10,6 +10,7 @@ import sys
 from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
+from wpiformat.clangtidy import ClangTidy
 from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
 from wpiformat.includeguard import IncludeGuard
@@ -118,6 +119,31 @@ def proc_pipeline(name):
     return all_success
 
 
+def proc_standalone(name):
+    """Runs each task on each file.
+
+    Keyword arguments:
+    name -- file name string
+    """
+    config_file = Config(os.path.dirname(name), ".styleguide")
+    if verbose2:
+        with print_lock:
+            print("Processing", name)
+            for subtask in task_pipeline:
+                if subtask.should_process_file(config_file, name):
+                    print("  with " + type(subtask).__name__)
+
+    # The success flag is aggregated across multiple file processing results
+    all_success = True
+
+    for subtask in task_pipeline:
+        if subtask.should_process_file(config_file, name):
+            success = subtask.run_standalone(config_file, name)
+            all_success &= success
+
+    return all_success
+
+
 def chunks(l, max_len):
     """Yield successive chunks from l whose content lengths sum to less than
     max_len.
@@ -190,6 +216,26 @@ def run_pipeline(task_pipeline, args, files):
             sys.exit(1)
 
 
+def run_standalone(task_pipeline, args, files):
+    """Spawns process pool for proc_standalone().
+
+    Keyword arguments:
+    task_pipeline -- task pipeline
+    args -- command line arguments from argparse
+    files -- list of file names to process
+
+    Calls sys.exit(1) if any task fails.
+    """
+    init_args = (task_pipeline, args.verbose1, args.verbose2)
+
+    with mp.Pool(args.jobs, proc_init, init_args) as pool:
+        # Start worker processes for task pipeline
+        results = pool.map(proc_standalone, files)
+
+        if not all(results):
+            sys.exit(1)
+
+
 def run_batch(task_pipeline, args, file_batches):
     """Spawns process pool for proc_batch().
 
@@ -245,6 +291,29 @@ def main():
         default="",
         help=
         "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
+    )
+    tidy_group = parser.add_mutually_exclusive_group()
+    tidy_group.add_argument(
+        "-tidy-changed",
+        dest="tidy_changed",
+        action="store_true",
+        help=
+        "also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file"
+    )
+    tidy_group.add_argument(
+        "-tidy-all",
+        dest="tidy_all",
+        action="store_true",
+        help=
+        "also runs clang-tidy-CLANG_VERSION on all files (this takes a while); this requires a compile_commands.json file"
+    )
+    parser.add_argument(
+        "-compile-commands",
+        dest="compile_commands",
+        type=str,
+        default="",
+        help=
+        "path to directory containing compile_commands.json; if unset will search in parent paths"
     )
     parser.add_argument(
         "-f",
@@ -384,6 +453,13 @@ def main():
     # Lint is run last since previous tasks can affect its output.
     task_pipeline = [PyFormat(), Lint()]
     run_batch(task_pipeline, args, file_batches)
+
+    # ClangTidy is run last of all; it needs the actual files
+    if args.tidy_all or args.tidy_changed:
+        if args.tidy_changed:
+            files = list(set(files) & set(changed_file_list))
+        task_pipeline = [ClangTidy(args.clang_version, args.compile_commands)]
+        run_standalone(task_pipeline, args, files)
 
 
 if __name__ == "__main__":
