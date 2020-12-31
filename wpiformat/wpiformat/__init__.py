@@ -255,6 +255,13 @@ def main():
         help=
         "file or directory names (can be path relative to python invocation directory or absolute path)"
     )
+    parser.add_argument(
+        "-no-format",
+        dest="no_format",
+        action="store_true",
+        help=
+        "disable formatting steps, only run linting"
+    )
     args = parser.parse_args()
 
     # All discovered files are relative to Git repo root directory, so find the
@@ -361,29 +368,34 @@ def main():
         files[i:i + chunksize] for i in range(0, len(files), chunksize)
     ]
 
-    # IncludeOrder is run after Stdlib so any C std headers changed to C++ or
-    # vice versa are sorted properly. ClangFormat is run after the other tasks
-    # so it can clean up their formatting.
-    task_pipeline = [
-        BraceComment(),
-        CIdentList(),
-        EofNewline(),
-        IncludeGuard(),
-        LicenseUpdate(),
-        JavaClass(),
-        Stdlib(),
-        IncludeOrder(),
-        UsingDeclaration(),
-        UsingNamespaceStd(),
-        Whitespace(),
-        ClangFormat(args.clang_version),
-        Jni(),  # Fixes clang-format formatting
-    ]
-    run_pipeline(task_pipeline, args, files)
+    if args.no_format:
+        # Only run Lint
+        task_pipeline = [Lint()]
+        run_batch(task_pipeline, args, file_batches)
+    else:
+        # IncludeOrder is run after Stdlib so any C std headers changed to C++
+        # or vice versa are sorted properly. ClangFormat is run after the other
+        # tasks so it can clean up their formatting.
+        task_pipeline = [
+            BraceComment(),
+            CIdentList(),
+            EofNewline(),
+            IncludeGuard(),
+            LicenseUpdate(),
+            JavaClass(),
+            Stdlib(),
+            IncludeOrder(),
+            UsingDeclaration(),
+            UsingNamespaceStd(),
+            Whitespace(),
+            ClangFormat(args.clang_version),
+            Jni(),  # Fixes clang-format formatting
+        ]
+        run_pipeline(task_pipeline, args, files)
 
-    # Lint is run last since previous tasks can affect its output.
-    task_pipeline = [PyFormat(), Lint()]
-    run_batch(task_pipeline, args, file_batches)
+        # Lint is run last since previous tasks can affect its output.
+        task_pipeline = [PyFormat(), Lint()]
+        run_batch(task_pipeline, args, file_batches)
 
 
 if __name__ == "__main__":
