@@ -342,6 +342,15 @@ def main():
                         help="disable formatting steps, only run linting")
     args = parser.parse_args()
 
+    # tidy requires compile_commands.json
+    if args.tidy_all or args.tidy_changed:
+        ccloc = os.path.join(args.compile_commands, "compile_commands.json")
+        if not os.path.exists(ccloc):
+            print(
+                f"error: clang-tidy: {ccloc} not found (try -compile-commands)",
+                file=sys.stderr)
+            sys.exit(1)
+
     # All discovered files are relative to Git repo root directory, so find the
     # root.
     root_path = Task.get_repo_root()
