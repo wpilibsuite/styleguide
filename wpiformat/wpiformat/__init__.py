@@ -296,7 +296,9 @@ def main():
         "-tidy",
         dest="tidy",
         action="store_true",
-        help="also runs clang-tidy-CLANG_VERSION; this requires a compile_commands.json file")
+        help=
+        "also runs clang-tidy-CLANG_VERSION; this requires a compile_commands.json file"
+    )
     parser.add_argument(
         "-compile-commands",
         dest="compile_commands",
@@ -448,6 +450,7 @@ def main():
     if args.tidy:
         task_pipeline = [ClangTidy(args.clang_version, args.compile_commands)]
         run_standalone(task_pipeline, args, files)
+
 
 if __name__ == "__main__":
     main()
