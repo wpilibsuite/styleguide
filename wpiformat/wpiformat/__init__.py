@@ -292,14 +292,15 @@ def main():
         help=
         "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
     )
-    parser.add_argument(
+    tidy_group = parser.add_mutually_exclusive_group()
+    tidy_group.add_argument(
         "-tidy-changed",
         dest="tidy_changed",
         action="store_true",
         help=
         "also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file"
     )
-    parser.add_argument(
+    tidy_group.add_argument(
         "-tidy-all",
         dest="tidy_all",
         action="store_true",
