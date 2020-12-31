@@ -236,9 +236,7 @@ def main():
         "-list-changed-files",
         dest="list_changed_files",
         action="store_true",
-        help=
-        "same as list-all-files, but list only files changed from main branch"
-    )
+        help="same as list-all-files, but list only files changed from main branch")
     # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
     # once, and mp uses a few internal events. Therefore, the maximum number of
