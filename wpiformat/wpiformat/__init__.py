@@ -485,6 +485,12 @@ def main():
 
     # ClangTidy is run last of all; it needs the actual files
     if args.tidy_all or args.tidy_changed:
+        ccloc = os.path.join(args.compile_commands, "compile_commands.json")
+        if not os.path.exists(ccloc):
+            print(f"error: clang-tidy: {ccloc} not found (try -compile-commands)",
+                  file=sys.stderr)
+            sys.exit(1)
+
         if args.tidy_changed:
             files = list(set(files) & set(changed_file_list))
         task_pipeline = [ClangTidy(args.clang_version, args.compile_commands)]
