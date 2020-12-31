@@ -294,14 +294,14 @@ def main():
     )
     parser.add_argument(
         "-tidy-changed",
-        dest="tidy-changed",
+        dest="tidy_changed",
         action="store_true",
         help=
         "also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file"
     )
     parser.add_argument(
         "-tidy-all",
-        dest="tidy-all",
+        dest="tidy_all",
         action="store_true",
         help=
         "also runs clang-tidy-CLANG_VERSION on all files (this takes a while); this requires a compile_commands.json file"
