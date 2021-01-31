@@ -2,7 +2,7 @@
 
 pushd wpiformat
 rm -rf dist
-git checkout master || exit 1
+git checkout main || exit 1
 
 # Ensure no files are untracked, changed, or staged respectively
 if [ `echo -n $(git clean -n) | wc -c` != 0 ]; then
@@ -18,7 +18,7 @@ if [ `echo -n $(git diff --staged) | wc -c` != 0 ]; then
   exit 1
 fi
 
-git pull git://github.com/wpilibsuite/styleguide master || exit 1
+git pull git://github.com/wpilibsuite/styleguide main || exit 1
 python setup.py sdist bdist_wheel
 twine upload dist/*
 popd
