@@ -46,6 +46,11 @@ def test_usingnamespacestd():
                    "using namespace std::chrono_literals;" + os.linesep)
     test.add_output("", False, True)
 
+    # Ignore std::string_view_literals
+    test.add_input("./Main.cpp",
+                   "using namespace std::string_view_literals;" + os.linesep)
+    test.add_output("", False, True)
+
     # Ignore std::placeholders
     test.add_input("./Main.cpp",
                    "using namespace std::placeholders;" + os.linesep)
