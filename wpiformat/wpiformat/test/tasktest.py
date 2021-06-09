@@ -5,6 +5,7 @@ import io
 import os
 import sys
 
+from .tempdir import *
 from wpiformat.config import Config
 
 
@@ -74,6 +75,10 @@ class TaskTest:
         output_type -- the type of output stored in the output list
         """
         assert len(self.inputs) == len(self.outputs)
+
+        # Create git repo to test each task
+        with OpenTemporaryDirectory():
+            subprocess.run(["git", "init", "-q"])
 
         config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
 

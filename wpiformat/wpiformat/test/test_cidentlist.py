@@ -1,6 +1,7 @@
 import os
 
 from .tasktest import *
+from .tempdir import *
 from wpiformat.cidentlist import CIdentList
 
 
@@ -299,4 +300,16 @@ def test_cidentlist():
         "}" + os.linesep)
     test.add_latest_input_as_output(True)
 
-    test.run(OutputType.FILE)
+    with OpenTemporaryDirectory():
+        with open(".styleguide", "w") as file:
+            file.write(r"""cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+includeProject {
+  ^ctre/
+}
+""")
+        test.run(OutputType.FILE)

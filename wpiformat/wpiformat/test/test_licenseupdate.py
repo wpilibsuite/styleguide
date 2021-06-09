@@ -3,25 +3,11 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import tempfile
 
+from .tempdir import *
 from .tasktest import *
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
-
-
-class OpenTemporaryDirectory():
-
-    def __init__(self):
-        self.prev_dir = os.getcwd()
-
-    def __enter__(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
-        os.chdir(self.temp_dir.name)
-        return self.temp_dir
-
-    def __exit__(self, type, value, traceback):
-        os.chdir(self.prev_dir)
 
 
 def test_licenseupdate():
@@ -185,10 +171,6 @@ def test_licenseupdate():
         "/* Copyright (c) 1992-" + year + " Company Name. All Rights Reserved.                 */" + os.linesep + \
         os.linesep + file_appendix, True, True)
 
-    # Ensure excluded files won't be processed
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
-    assert not task.should_process_file(config_file, "./Excluded.h")
-
     # Create git repo to test license years for commits
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
@@ -197,10 +179,25 @@ def test_licenseupdate():
         with open(".styleguide-license", "w") as file:
             file.write("// Copyright (c) {year}")
         with open(".styleguide", "w") as file:
-            file.write("cppSrcFileInclude {\n" + r"\.cpp$")
+            file.write(r"""cppHeaderFileInclude {
+  \.h$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+licenseUpdateExclude {
+  Excluded\.h$
+}
+""")
         subprocess.run(["git", "add", ".styleguide-license"])
         subprocess.run(["git", "add", ".styleguide"])
         subprocess.run(["git", "commit", "-q", "-m", "\"Initial commit\""])
+
+        # Ensure excluded files won't be processed
+        config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+        assert not task.should_process_file(config_file, "./Excluded.h")
 
         # Add file with commit date of last year and range through this year
         with open("last-year.cpp", "w") as file:
@@ -276,4 +273,9 @@ def test_licenseupdate():
         output, success = task.run_pipeline(config_file, "no-year.cpp", lines)
         assert output == f"// Copyright (c) {year}\n\n"
 
-    test.run(OutputType.FILE)
+        with open(".styleguide-license", "w") as file:
+            file.write(r"""/*{padding}Company Name{padding}*/
+/* Copyright (c) {year} Company Name. All Rights Reserved.{padding}*/
+""")
+
+        test.run(OutputType.FILE)
