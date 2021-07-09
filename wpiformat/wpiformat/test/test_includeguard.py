@@ -1,6 +1,6 @@
 import os
 
-from .tasktest import *
+from .test_tasktest import *
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.task import Task
 
