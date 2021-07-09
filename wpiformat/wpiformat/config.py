@@ -32,14 +32,17 @@ class Config:
         directory -- current directory from which to start search
         file_name -- file name string
 
-        Returns list containing file contents or triggers program exit.
+        Returns tuple of file name and list containing file contents or triggers
+        program exit.
         """
         file_found = False
         while not file_found:
             try:
                 with open(directory + os.sep + file_name, "r") as file_contents:
                     file_found = True
-                    return file_contents.read().splitlines()
+                    return os.path.join(
+                        directory,
+                        file_name), file_contents.read().splitlines()
             except OSError:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
@@ -175,7 +178,7 @@ class Config:
         group_name = ""
         group_elements = []
 
-        lines = self.read_file(directory, file_name)
+        self.file_name, lines = self.read_file(directory, file_name)
         if not lines:
             return None
 
