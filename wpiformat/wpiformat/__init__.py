@@ -11,6 +11,7 @@ from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
 from wpiformat.clangformat import ClangFormat
 from wpiformat.clangtidy import ClangTidy
+from wpiformat.commentformat import CommentFormat
 from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
 from wpiformat.includeguard import IncludeGuard
@@ -475,6 +476,7 @@ def main():
         task_pipeline = [
             BraceComment(),
             CIdentList(),
+            CommentFormat(),
             EofNewline(),
             IncludeGuard(),
             LicenseUpdate(),
