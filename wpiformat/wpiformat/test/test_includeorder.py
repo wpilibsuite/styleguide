@@ -1,6 +1,6 @@
 import os
 
-from .tasktest import *
+from .test_tasktest import *
 from wpiformat.includeorder import IncludeOrder
 
 

@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import tempfile
 
-from .tasktest import *
+from .test_tasktest import *
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
 

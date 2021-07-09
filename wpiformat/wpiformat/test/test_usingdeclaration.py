@@ -2,7 +2,7 @@ import io
 import os
 import sys
 
-from .tasktest import *
+from .test_tasktest import *
 from wpiformat.usingdeclaration import UsingDeclaration
 
 
