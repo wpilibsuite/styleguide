@@ -228,10 +228,10 @@ class IncludeOrder(Task):
 
         i = start
         while i < end:
-            if "#ifdef" in lines_list[i]:
+            if "#ifdef" in lines_list[i] or "#ifndef" in lines_list[i]:
                 ifdef_count = 1
                 for j in range(i + 1, end):
-                    if "#ifdef" in lines_list[j]:
+                    if "#ifdef" in lines_list[j] or "#ifndef" in lines_list[j]:
                         ifdef_count += 1
                     elif "#endif" in lines_list[j]:
                         ifdef_count -= 1
@@ -371,6 +371,7 @@ class IncludeOrder(Task):
         # Write lines from beginning of file to headers
         i = 0
         while i < len(lines_list) and ("#ifdef" not in lines_list[i] and
+                                       "#ifndef" not in lines_list[i] and
                                        "#include" not in lines_list[i]):
             i += 1
         output_list = lines_list[0:i]
