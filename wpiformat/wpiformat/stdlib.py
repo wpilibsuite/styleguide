@@ -182,9 +182,15 @@ class Stdlib(Task):
                 before = "c" + header.name
                 after = header.name + ".h"
 
-            if "#include <" + before + ">" in lines:
-                lines = lines.replace("#include <" + before + ">",
-                                      "#include <" + after + ">")
+            output_lines = []
+            for line in lines.split("\n"):
+                if "NOLINT" not in line:
+                    output_lines.append(
+                        line.replace("#include <" + before + ">",
+                                     "#include <" + after + ">"))
+                else:
+                    output_lines.append(line)
+            lines = "\n".join(output_lines)
 
             if header.func_regex:
                 lines = self.func_substitute(header, lines)
