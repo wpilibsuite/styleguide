@@ -43,11 +43,24 @@ class ClangTidy(Task):
                   file=sys.stderr)
             return False
 
-        lines = [l for l in output.split('\n') if l]
+        lines = [l for l in output.rstrip().split('\n') if l]
 
-        # ignore include file not found errors at beginning
-        if lines and "file not found [clang-diagnostic-error]" in lines[0]:
-            lines = lines[3:]
+        # Filter out "X error(s) and Y warning(s) generated." lines
+        lines = [l for l in lines if " generated." not in l]
+
+        # Filter out "Error while processing" lines
+        lines = [l for l in lines if "Error while processing" not in l]
+
+        # Ignore include file not found errors
+        filtered_lines = []
+        for l in lines:
+            if "file not found [clang-diagnostic-error]" in l:
+                # Skip #include line and caret indicator line
+                next(lines)
+                next(lines)
+            else:
+                filtered_lines.append(l)
+        lines = filtered_lines
 
         if lines:
             print("== clang-tidy " + name + " ==")
