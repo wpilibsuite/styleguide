@@ -1,6 +1,6 @@
 """This task runs clang-tidy on the file."""
 
-from subprocess import Popen, PIPE
+import subprocess
 import sys
 
 from wpiformat.task import Task
@@ -33,11 +33,10 @@ class ClangTidy(Task):
 
     def run_standalone(self, config_file, name):
         try:
-            p = Popen([self.exec_name] + self.args + [name],
-                      encoding="utf-8",
-                      stdout=PIPE,
-                      stderr=PIPE)
-            output = p.communicate()[0]
+            output = subprocess.run([self.exec_name] + self.args + [name],
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,
+                                    encoding="utf-8").stdout
         except FileNotFoundError:
             print("Error: " + self.exec_name +
                   " not found in PATH. Is it installed?",
