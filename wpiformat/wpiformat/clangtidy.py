@@ -53,11 +53,12 @@ class ClangTidy(Task):
 
         # Ignore include file not found errors
         filtered_lines = []
-        for l in lines:
+        iterlines = iter(lines)
+        for l in iterlines:
             if "file not found [clang-diagnostic-error]" in l:
                 # Skip #include line and caret indicator line
-                next(lines)
-                next(lines)
+                next(iterlines)
+                next(iterlines)
             else:
                 filtered_lines.append(l)
         lines = filtered_lines
