@@ -20,7 +20,7 @@ def test_includeguard():
         "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
         "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True)
 
     # Ensure nested preprocessor statements are handled properly for incorrect
     # include guard
@@ -39,7 +39,7 @@ def test_includeguard():
         "#if SOMETHING" + os.linesep + \
         "// do something" + os.linesep + \
         "#endif" + os.linesep + \
-        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True)
 
     # Don't touch correct include guard
     test.add_input("./Test.h",
@@ -67,7 +67,7 @@ def test_includeguard():
         "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
         "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True)
 
     # Ensure leading underscores are removed (this occurs if the user doesn't
     # include a trailing "/" in the include guard root)
@@ -80,6 +80,6 @@ def test_includeguard():
         "#ifndef " + repo_root + "_TEST_H_" + os.linesep + \
         "#define " + repo_root + "_TEST_H_" + os.linesep + \
         os.linesep + \
-        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True, True)
+        "#endif  // " + repo_root + "_TEST_H_" + os.linesep, True)
 
     test.run(OutputType.FILE)

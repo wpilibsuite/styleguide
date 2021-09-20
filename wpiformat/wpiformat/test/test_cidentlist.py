@@ -26,7 +26,7 @@ def test_cidentlist():
         "int main(void) {" + os.linesep + \
         "  return 0;" + os.linesep + \
         "}" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Main.cpp: signature for C function marked extern "C"
     test.add_input("./Main.cpp",
@@ -36,7 +36,7 @@ def test_cidentlist():
     test.add_output(
         "extern \"C\" int main(void) {" + os.linesep + \
         "  return 0;" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Main.cpp: extern "C++" function nested in extern "C" block
     test.add_input("./Main.cpp",
@@ -55,7 +55,7 @@ def test_cidentlist():
     test.add_output(
         "int main(void) {" + os.linesep + \
         "  return 0;" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Main.c: signature for C++ function in extern "C++" block
     test.add_input("./Main.c",
@@ -85,7 +85,7 @@ def test_cidentlist():
         "extern \"C\" int main(void) {" + os.linesep + \
         "  return 0;" + os.linesep + \
         "}" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Don't match function calls
     test.add_input("./Main.c",
@@ -97,7 +97,7 @@ def test_cidentlist():
         "int main(void) {" + os.linesep + \
         "  foo();" + os.linesep + \
         "  return 0;" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Don't match function calls with return (return is a keyword not a return
     # type)
@@ -108,7 +108,7 @@ def test_cidentlist():
     test.add_output(
         "int main(void) {" + os.linesep + \
         "  return foo();" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Match function prototypes
     test.add_input("./Main.c",
@@ -124,7 +124,7 @@ def test_cidentlist():
         "int main(void) {" + os.linesep + \
         "  foo();" + os.linesep + \
         "  return 0;" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Make sure leaving extern block resets extern language type of
     # parent block
@@ -145,7 +145,7 @@ def test_cidentlist():
         "int func() {" + os.linesep + \
         "  return 0;" + os.linesep + \
         "}" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Don't match lambda function that takes no arguments
     test.add_input("./Main.cpp",
@@ -204,7 +204,7 @@ def test_cidentlist():
         os.linesep + \
         "private:" + os.linesep + \
         "    friend void Timer1IntHandler();" + os.linesep + \
-        "};" + os.linesep, True, True)
+        "};" + os.linesep, True)
 
     # Ensure comments with } in them don't mess up brace stack
     test.add_input("./Test.cpp",
@@ -285,7 +285,7 @@ def test_cidentlist():
         "extern \"C\"" + os.linesep + \
         "{" + os.linesep + \
         "  void func(void) {}" + os.linesep + \
-        "}  // extern \"C\"" + os.linesep, True, True)
+        "}  // extern \"C\"" + os.linesep, True)
 
     # Test logic for deduplicating braces within #ifdef
     test.add_input("./Test.cpp",

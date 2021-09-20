@@ -30,7 +30,7 @@ def test_includeorder():
         os.linesep + \
         "#include \"HAL/HAL.h\"" + os.linesep + \
         "#include \"Task.h\"" + os.linesep + \
-        "#include \"nivision.h\"" + os.linesep, True, True)
+        "#include \"nivision.h\"" + os.linesep, True)
 
     # Ensure quotes around C and C++ std header includes are replaced with
     # angle brackets and they are properly sorted into two groups
@@ -44,7 +44,7 @@ def test_includeorder():
         "#include <stdio.h>" + os.linesep + \
         os.linesep + \
         "#include <iostream>" + os.linesep + \
-        "#include <memory>" + os.linesep, True, True)
+        "#include <memory>" + os.linesep, True)
 
     # Ensure NOLINT headers have newlines around them
     test.add_input("./Test.h",
@@ -57,7 +57,7 @@ def test_includeorder():
         os.linesep + \
         "#include \"gtest/gtest.h\"  // NOLINT" + os.linesep + \
         os.linesep + \
-        "#include <iostream>" + os.linesep, True, True)
+        "#include <iostream>" + os.linesep, True)
 
     # Ensure NOLINT headers don't have extra newlines inserted after them
     test.add_input("./Test.h",
@@ -80,7 +80,7 @@ def test_includeorder():
         os.linesep + \
         "#include <atomic>" + os.linesep + \
         "#include <condition_variable>" + os.linesep + \
-        "#include <thread>" + os.linesep, True, True)
+        "#include <thread>" + os.linesep, True)
 
     # Check sorting for at least one header from each group except related
     # header. Test.inc isn't considered related in headers.
@@ -100,7 +100,7 @@ def test_includeorder():
         "#include <boost/algorithm/string/replace.hpp>" + os.linesep + \
         os.linesep + \
         "#include \"MyHeader.h\"" + os.linesep + \
-        "#include \"Test.inc\"" + os.linesep, True, True)
+        "#include \"Test.inc\"" + os.linesep, True)
 
     # Verify "other header" isn't identified as C system include
     test.add_input("./Test.h",
@@ -109,7 +109,7 @@ def test_includeorder():
     test.add_output(
         "#include <sys/time.h>" + os.linesep + \
         os.linesep + \
-        "#include <OtherHeader.h>" + os.linesep, True, True)
+        "#include <OtherHeader.h>" + os.linesep, True)
 
     # Verify newline is added between last header and code after it
     test.add_input("./Test.cpp",
@@ -124,7 +124,7 @@ def test_includeorder():
         "#include \"MyFile.h\"" + os.linesep + \
         os.linesep + \
         "namespace std {" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Verify newlines are removed between last header and code after it
     test.add_input("./Test.cpp",
@@ -142,7 +142,7 @@ def test_includeorder():
         "#include \"MyFile.h\"" + os.linesep + \
         os.linesep + \
         "namespace std {" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Ensure extra newlines aren't added between ifdef blocks
     test.add_input("./Test.h",
@@ -175,7 +175,7 @@ def test_includeorder():
         "#include <iostream>" + os.linesep + \
         os.linesep + \
         "namespace std {" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Verify headers are sorted across #ifdef
     test.add_input("./Error.h",
@@ -209,7 +209,7 @@ def test_includeorder():
         "#endif" + os.linesep + \
         os.linesep + \
         "#include \"Base.h\"" + os.linesep + \
-        "#include \"llvm/StringRef.h\"" + os.linesep, True, True)
+        "#include \"llvm/StringRef.h\"" + os.linesep, True)
 
     # Verify "#ifdef _WIN32" acts as barrier for out-of-order includes
     test.add_input("./Error.h",
@@ -258,7 +258,7 @@ def test_includeorder():
         "#include <string>" + os.linesep + \
         os.linesep + \
         "#include \"Base.h\"" + os.linesep + \
-        "#include \"llvm/StringRef.h\"" + os.linesep, True, True)
+        "#include \"llvm/StringRef.h\"" + os.linesep, True)
 
     # Verify "#ifdef __linux__" is included in output if no headers are in same
     # category
@@ -315,7 +315,7 @@ def test_includeorder():
         "#include <cstring>" + os.linesep + \
         "#endif" + os.linesep + \
         os.linesep + \
-        "using namespace cs;" + os.linesep, True, True)
+        "using namespace cs;" + os.linesep, True)
 
     # Verify comments aren't mangled
     test.add_input("./cscore.h",
@@ -350,7 +350,7 @@ def test_includeorder():
         "#ifdef __GNUC__ > 4" + os.linesep + \
         "#include <algorithm>" + os.linesep + \
         "#endif" + os.linesep + \
-        "#endif" + os.linesep, True, True)
+        "#endif" + os.linesep, True)
 
     # Verify extra newline from #endif is removed
     test.add_input("./Test.h",
@@ -425,7 +425,7 @@ def test_includeorder():
         "#include \"c_util.h\"" + os.linesep + \
         "#include \"cscore_cpp.h\"" + os.linesep + \
         os.linesep + \
-        "using namespace cs;" + os.linesep, True, True)
+        "using namespace cs;" + os.linesep, True)
 
     # Verify relevant headers are found and sorted correctly
     test.add_input("./PDP.cpp",
@@ -443,7 +443,7 @@ def test_includeorder():
         os.linesep + \
         "#include \"ctre/PDP.h\"" + os.linesep + \
         os.linesep + \
-        "using namespace hal;" + os.linesep, True, True)
+        "using namespace hal;" + os.linesep, True)
 
     # Check for idempotence
     test.add_input("./PDP.cpp",
@@ -464,7 +464,7 @@ def test_includeorder():
     test.add_output(
         "#include \"llvm/SmallString.h\"" + os.linesep + \
         "#include \"llvm/raw_ostream.h\"" + os.linesep + \
-        "#include \"support/jni_util.h\"" + os.linesep, True, True)
+        "#include \"support/jni_util.h\"" + os.linesep, True)
 
     # Verify duplicate headers are removed
     test.add_input("./PDP.cpp",
@@ -484,7 +484,7 @@ def test_includeorder():
         os.linesep + \
         "#include \"ctre/PDP.h\"" + os.linesep + \
         os.linesep + \
-        "using namespace hal;" + os.linesep, True, True)
+        "using namespace hal;" + os.linesep, True)
 
     # Verify source file inclusion is disallowed
     test.add_input("./Test.h",
@@ -504,7 +504,7 @@ def test_includeorder():
         "#include <stdio.h>" + os.linesep + \
         os.linesep + \
         "#include <iostream>" + os.linesep + \
-        "// #include <memory>" + os.linesep, True, True)
+        "// #include <memory>" + os.linesep, True)
 
     # Ensure commented-out includes with space before them are still sorted
     test.add_input("./Test.h",
@@ -518,7 +518,7 @@ def test_includeorder():
         "#include <stdio.h>" + os.linesep + \
         os.linesep + \
         "#include <iostream>" + os.linesep + \
-        "#include <memory>" + os.linesep, True, True)
+        "#include <memory>" + os.linesep, True)
 
     # Ensure includes with no space between #include and bracket are sorted
     test.add_input("./Test.h",
@@ -532,7 +532,7 @@ def test_includeorder():
         "#include <stdio.h>" + os.linesep + \
         os.linesep + \
         "#include <iostream>" + os.linesep + \
-        "#include <memory>" + os.linesep, True, True)
+        "#include <memory>" + os.linesep, True)
 
     # Ensure lines containing #include that aren't includes are not processed
     test.add_input("./Test.h", "// #included here" + os.linesep)

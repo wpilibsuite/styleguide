@@ -39,29 +39,23 @@ class TaskTest:
         """
         self.inputs.append((file_name, contents))
 
-    def add_output(self, contents, contents_modified, succeeded):
-        """Adds the given file contents, whether they were modified from the
-        corresponding input, and whether processing of the input list was
-        successful.
+    def add_output(self, contents, succeeded):
+        """Adds the given file contents and whether processing of the input list
+        was successful.
 
         Keyword arguments:
         contents -- file contents string
-        contents_modified -- whether file contents were modified from the
-                             corresponding input
         succeeded -- whether processing of the input list was successful
         """
-        self.outputs.append((contents, contents_modified, succeeded))
+        self.outputs.append((contents, succeeded))
 
     def add_latest_input_as_output(self, succeeded):
         """Adds the latest input to the output list.
 
-        Since the output matches its corresponding input, the contents_modified
-        flag is automatically set to False.
-
         Keyword arguments:
         succeeded -- whether processing of the input list was successful
         """
-        self.add_output(self.inputs[len(self.inputs) - 1][1], False, succeeded)
+        self.add_output(self.inputs[len(self.inputs) - 1][1], succeeded)
 
     def run(self, output_type):
         """Runs the task on each input list element, then compares the resulting
@@ -97,4 +91,4 @@ class TaskTest:
                 success = True
 
             assert output == self.outputs[i][0]
-            assert success == self.outputs[i][2]
+            assert success == self.outputs[i][1]

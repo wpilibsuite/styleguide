@@ -20,7 +20,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_TestJNI_testFunc" + os.linesep + \
         "  (JNIEnv* env, jclass)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Input aligned to "(" and args past end of line
     test.add_input("./TestJNI.cpp",
@@ -37,7 +37,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent" + os.linesep + \
         "  (JNIEnv* env, jclass, jint source)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Args in input on line after "(" and args length > 80 characters
     test.add_input("./TestJNI.cpp",
@@ -52,7 +52,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame" + os.linesep + \
 "  (JNIEnv *env, jclass, jint source, jlong imageNativeObj)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Args > 80 characters long
     test.add_input("./TestJNI.cpp",
@@ -69,7 +69,7 @@ def test_jni():
         "Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty" + os.linesep + \
 "  (JNIEnv *env, jclass, jint source, jstring name, jint kind, jint minimum," + os.linesep + \
 "   jint maximum, jint step, jint defaultValue, jint value)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Ensure fixes clang-format output aligned with "("
     test.add_input("./TestJNI.cpp",
@@ -85,7 +85,7 @@ def test_jni():
         "JNIEXPORT jint JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance" + os.linesep + \
         "  (JNIEnv*, jclass)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Idempotence for same code
     test.add_input("./TestJNI.cpp",
@@ -132,7 +132,7 @@ def test_jni():
         "JNIEXPORT jint JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry" + os.linesep + \
         "  (JNIEnv* env, jclass, jint inst, jstring key)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Function with array type as argument
     test.add_input("./NetworkTablesJNI.cpp",
@@ -154,7 +154,7 @@ def test_jni():
         "JNIEXPORT jintArray JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries" + os.linesep + \
         "  (JNIEnv* env, jclass, jint inst, jstring prefix, jint types)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Ensure functions with overloads are handled correctly
     test.add_input("./NetworkTablesJNI.cpp",
@@ -212,7 +212,7 @@ def test_jni():
         "  (JNIEnv *, jclass)" + os.linesep + \
         "{" + os.linesep + \
         "  return nt::CreateInstance();" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Handle function declarations properly
     test.add_input("./TestJNI.cpp",
@@ -261,7 +261,7 @@ def test_jni():
         "  (JNIEnv *, jclass, jint)" + os.linesep + \
         "{" + os.linesep + \
         "  HAL_CleanFilter(handle);" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Input args go to next line even if they fit on same line
     test.add_input("./TestJNI.cpp",
@@ -276,7 +276,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_TestJNI_testFunc" + os.linesep + \
         "  (JNIEnv* env, jobject)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Input aligned to "(" and args past end of line
     test.add_input("./TestJNI.cpp",
@@ -293,7 +293,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent" + os.linesep + \
         "  (JNIEnv* env, jobject, jint source)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Args in input on line after "(" and args length > 80 characters
     test.add_input("./TestJNI.cpp",
@@ -308,7 +308,7 @@ def test_jni():
         "JNIEXPORT void JNICALL" + os.linesep + \
         "Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame" + os.linesep + \
 "  (JNIEnv *env, jobject, jint source, jlong imageNativeObj)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Args > 80 characters long
     test.add_input("./TestJNI.cpp",
@@ -325,7 +325,7 @@ def test_jni():
         "Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty" + os.linesep + \
 "  (JNIEnv *env, jobject, jint source, jstring name, jint kind, jint minimum," + os.linesep + \
 "   jint maximum, jint step, jint defaultValue, jint value)" + os.linesep + \
-"{" + os.linesep, True, True)
+"{" + os.linesep, True)
 
     # Ensure fixes clang-format output aligned with "("
     test.add_input("./TestJNI.cpp",
@@ -341,7 +341,7 @@ def test_jni():
         "JNIEXPORT jint JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance" + os.linesep + \
         "  (JNIEnv*, jobject)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Idempotence for same code
     test.add_input("./TestJNI.cpp",
@@ -388,7 +388,7 @@ def test_jni():
         "JNIEXPORT jint JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry" + os.linesep + \
         "  (JNIEnv* env, jobject, jint inst, jstring key)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Function with array type as argument
     test.add_input("./NetworkTablesJNI.cpp",
@@ -410,7 +410,7 @@ def test_jni():
         "JNIEXPORT jintArray JNICALL" + os.linesep + \
         "Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries" + os.linesep + \
         "  (JNIEnv* env, jobject, jint inst, jstring prefix, jint types)" + os.linesep + \
-        "{" + os.linesep, True, True)
+        "{" + os.linesep, True)
 
     # Ensure functions with overloads are handled correctly
     test.add_input("./NetworkTablesJNI.cpp",
@@ -468,7 +468,7 @@ def test_jni():
         "  (JNIEnv *, jobject)" + os.linesep + \
         "{" + os.linesep + \
         "  return nt::CreateInstance();" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Handle function declarations properly
     test.add_input("./TestJNI.cpp",
@@ -517,6 +517,6 @@ def test_jni():
         "  (JNIEnv *, jobject, jint)" + os.linesep + \
         "{" + os.linesep + \
         "  HAL_CleanFilter(handle);" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     test.run(OutputType.FILE)
