@@ -29,7 +29,7 @@ def test_javaclass():
     test.add_output(
         "public class ExampleCommand extends Command {" + os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # Three line separators at beginning of class
     test.add_input("./Test.java",
@@ -41,7 +41,7 @@ def test_javaclass():
     test.add_output(
         "public class ExampleCommand extends Command {" + os.linesep + \
         "  public ExampleCommand() {}" + os.linesep + \
-        "}" + os.linesep, True, True)
+        "}" + os.linesep, True)
 
     # class keyword in preceding comment to ensure regex matching it doesn't
     # continue past end of comment
@@ -63,6 +63,6 @@ def test_javaclass():
         " * A helper class for Shuffleboard containers to handle common child operations." + os.linesep + \
         " */" + os.linesep + \
         "final class ContainerHelper {" + os.linesep + \
-        "  private final ShuffleboardContainer m_container;" + os.linesep, True, True)
+        "  private final ShuffleboardContainer m_container;" + os.linesep, True)
 
     test.run(OutputType.FILE)

@@ -13,7 +13,7 @@ def test_bracecomment():
         "}// comment" + os.linesep)
     test.add_output(
         "namespace {" + os.linesep + \
-        "}  // namespace" + os.linesep, True, True)
+        "}  // namespace" + os.linesep, True)
 
     # Anonymous namespace containing comment
     test.add_input("./Test.h",
@@ -23,7 +23,7 @@ def test_bracecomment():
     test.add_output(
         "namespace {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}  // namespace" + os.linesep, True, True)
+        "}  // namespace" + os.linesep, True)
 
     # namespace
     test.add_input("./Test.h",
@@ -33,7 +33,7 @@ def test_bracecomment():
     test.add_output(
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
-        "}  // namespace hal" + os.linesep, True, True)
+        "}  // namespace hal" + os.linesep, True)
 
     # namespace with leftover input
     test.add_input("./Test.h",
@@ -47,7 +47,7 @@ def test_bracecomment():
         "namespace hal {" + os.linesep + \
         "  // comment" + os.linesep + \
         "}  // namespace hal" + os.linesep + \
-        "// comment after namespace" + os.linesep, True, True)
+        "// comment after namespace" + os.linesep, True)
 
     # Braces within namespace
     test.add_input("./Test.h",
@@ -71,7 +71,7 @@ def test_bracecomment():
         "  int32_t center;" + os.linesep + \
         "}" + os.linesep + \
         os.linesep + \
-        "}  // namespace" + os.linesep, True, True)
+        "}  // namespace" + os.linesep, True)
 
     # extern "C"
     test.add_input("./Test.h",
@@ -81,7 +81,7 @@ def test_bracecomment():
     test.add_output(
         "extern \"C\" {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}  // extern \"C\"" + os.linesep, True, True)
+        "}  // extern \"C\"" + os.linesep, True)
 
     # Nested brackets should be handled properly
     test.add_input("./Test.cpp",
@@ -103,14 +103,13 @@ def test_bracecomment():
     test.add_output(
         "namespace wpi {" + os.linesep + \
         "{{}}" + os.linesep + \
-        "}  // namespace wpi" + os.linesep, True, True)
+        "}  // namespace wpi" + os.linesep, True)
 
     # Handle single-line statements correctly
     test.add_input("./Test.cpp",
                    "namespace hal { Type typeName; }" + os.linesep)
     test.add_output(
-        "namespace hal { Type typeName; }  // namespace hal" + os.linesep, True,
-        True)
+        "namespace hal { Type typeName; }  // namespace hal" + os.linesep, True)
 
     # Two incorrect comments
     test.add_input("./Test.h",
@@ -126,7 +125,7 @@ def test_bracecomment():
         "}  // namespace" + os.linesep + \
         "namespace Name {" + os.linesep + \
         "    // nothing" + os.linesep + \
-        "}  // namespace Name" + os.linesep, True, True)
+        "}  // namespace Name" + os.linesep, True)
 
     # Don't touch correct comment
     test.add_input("./Test.h",
@@ -165,6 +164,6 @@ def test_bracecomment():
         "}  // namespace sys" + os.linesep + \
         "}  // namespace wpi" + os.linesep + \
         os.linesep + \
-        "#endif  // ALLWPILIB_WPI_PATH_H_" + os.linesep, True, True)
+        "#endif  // ALLWPILIB_WPI_PATH_H_" + os.linesep, True)
 
     test.run(OutputType.FILE)

@@ -18,13 +18,13 @@ def test_eofnewline():
 
     # Empty file
     test.add_input("./Test.h", "")
-    test.add_output("\n", True, True)
+    test.add_output("\n", True)
 
     test_output = file_appendix + os.linesep
 
     # No newline
     test.add_input("./Test.h", file_appendix)
-    test.add_output(test_output, True, True)
+    test.add_output(test_output, True)
 
     # One newline
     test.add_input("./Test.h", test_output)
@@ -32,10 +32,10 @@ def test_eofnewline():
 
     # Two newlines
     test.add_input("./Test.h", test_output + os.linesep)
-    test.add_output(test_output, True, True)
+    test.add_output(test_output, True)
 
     # .bat file with no "./" prefix
     test.add_input("test.bat", file_appendix.replace(os.linesep, "\r\n"))
-    test.add_output(test_output.replace(os.linesep, "\r\n"), True, True)
+    test.add_output(test_output.replace(os.linesep, "\r\n"), True)
 
     test.run(OutputType.FILE)

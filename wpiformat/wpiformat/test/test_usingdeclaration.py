@@ -15,14 +15,14 @@ def test_usingdeclaration():
         "class Test {" + os.linesep + \
         "}" + os.linesep)
     test.add_output("./Test.h: 1: 'using std::chrono;' in global namespace\n",
-                    False, False)
+                    False)
 
     # Inside enum block
     test.add_input("./Test.h",
         "enum Test {" + os.linesep + \
         "  using std::chrono;" + os.linesep + \
         "}" + os.linesep)
-    test.add_output("", False, True)
+    test.add_output("", True)
 
     # After { block
     test.add_input("./Test.h",
@@ -30,13 +30,13 @@ def test_usingdeclaration():
         "}" + os.linesep + \
         "using std::chrono;" + os.linesep)
     test.add_output("./Test.h: 3: 'using std::chrono;' in global namespace\n",
-                    False, False)
+                    False)
 
     # Before class block with NOLINT
     test.add_input("./Test.h",
         "using std::chrono;  // NOLINT" + os.linesep + \
         "class Test {" + os.linesep + \
         "}" + os.linesep)
-    test.add_output("", False, True)
+    test.add_output("", True)
 
     test.run(OutputType.STDOUT)
