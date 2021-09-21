@@ -13,6 +13,7 @@ from wpiformat.clangformat import ClangFormat
 from wpiformat.clangtidy import ClangTidy
 from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
+from wpiformat.gtestname import GTestName
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
@@ -476,6 +477,7 @@ def main():
             BraceComment(),
             CIdentList(),
             EofNewline(),
+            GTestName(),
             IncludeGuard(),
             LicenseUpdate(),
             JavaClass(),
