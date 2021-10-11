@@ -26,7 +26,7 @@ jobs:
         if [ "$RUNNER_OS" == "Linux" ]; then
           sudo apt-get install clang-format-10
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          choco install llvm --version 10.0.0
+          choco install --allow-downgrade llvm --version 10.0.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
           brew install clang-format
         else
