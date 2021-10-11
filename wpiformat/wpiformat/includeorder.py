@@ -24,36 +24,174 @@ class IncludeOrder(Task):
         # Base name of include matches base name of current file
 
         # Header type 1: C standard library headers
+        # From https://en.cppreference.com/w/cpp/header
         self.c_std = [
-            "assert.h", "complex.h", "ctype.h", "errno.h", "fenv.h", "float.h",
-            "inttypes.h", "iso646.h", "limits.h", "locale.h", "math.h",
-            "setjmp.h", "signal.h", "stdalign.h", "stdarg.h", "stdatomic.h",
-            "stdbool.h", "stddef.h", "stdint.h", "stdio.h", "stdlib.h",
-            "stdnoreturn.h", "string.h", "tgmath.h", "threads.h", "time.h",
-            "uchar.h", "wchar.h", "wctype.h"
+            # C compatibility headers
+            "assert.h",
+            "ctype.h",
+            "errno.h",
+            "fenv.h",
+            "float.h",
+            "inttypes.h",
+            "limits.h",
+            "locale.h",
+            "math.h",
+            "setjmp.h",
+            "signal.h",
+            "stdarg.h",
+            "stddef.h",
+            "stdint.h",
+            "stdio.h",
+            "stdlib.h",
+            "string.h",
+            "time.h",
+            "uchar.h",
+            "wchar.h",
+            "wctype.h",
+            # Special C compatibility headers
+            "stdatomic.h",
+            # Empty C headers
+            "ccomplex",
+            "complex.h",
+            "ctgmath",
+            "tgmath.h",
+            # Meaningless C headers
+            "ciso646",
+            "cstdalign",
+            "cstdbool",
+            "iso646.h",
+            "stdalign.h",
+            "stdbool.h",
+            # Unsupported C headers
+            "stdatomic.h",
+            "stdnoreturn.h",
+            "threads.h"
         ]
 
         # Header type 1: C system headers
         self.c_sys_regex = regex.compile(r"<[a-z][A-Za-z0-9/_-]*\.h>")
 
         # Header type 2: C++ standard library headers
+        # List from https://en.cppreference.com/w/cpp/header
         self.cpp_std = [
-            "cstdlib", "csignal", "csetjmp", "cstdarg", "typeinfo", "typeindex",
-            "type_traits", "bitset", "functional", "utility", "ctime", "chrono",
-            "cstddef", "initializer_list", "tuple", "new", "memory",
-            "scoped_allocator", "climits", "cfloat", "cstdint", "cinttypes",
-            "limits", "exception", "stdexcept", "cassert", "system_error",
-            "cerrno", "cctype", "cwctype", "cstring", "cwchar", "cuchar",
-            "string", "array", "vector", "deque", "list", "forward_list", "set",
-            "map", "unordered_set", "unordered_map", "stack", "queue",
-            "algorithm", "iterator", "cmath", "complex", "valarray", "random",
-            "numeric", "ratio", "cfenv", "iosfwd", "ios", "istream", "ostream",
-            "iostream", "fstream", "sstream", "strstream", "iomanip",
-            "streambuf", "cstdio", "locale", "clocale", "codecvt", "regex",
-            "atomic", "thread", "mutex", "shared_mutex", "future",
-            "condition_variable", "ciso646", "ccomplex", "ctgmath", "cstdalign",
-            "cstdbool", "any", "filesystem", "optional", "string_view",
-            "variant", "numbers"
+            # Concepts library
+            "concepts",
+            # Coroutines library
+            "coroutine",
+            # Utilities library
+            "any",
+            "bitset",
+            "chrono",
+            "compare",
+            "csetjmp",
+            "csignal",
+            "cstdarg",
+            "cstddef",
+            "cstdlib",
+            "ctime",
+            "functional",
+            "initializer_list",
+            "optional",
+            "source_location",
+            "stacktrace",
+            "tuple",
+            "type_traits",
+            "typeindex",
+            "typeinfo",
+            "utility",
+            "variant",
+            "version",
+            # Dynamic memory management
+            "memory",
+            "memory_resource",
+            "new",
+            "scoped_allocator",
+            # Numeric limits
+            "cfloat",
+            "cinttypes",
+            "climits",
+            "cstdint",
+            "limits",
+            # Error handling
+            "cassert",
+            "cerrno",
+            "exception",
+            "stdexcept",
+            "system_error",
+            # Strings library
+            "cctype",
+            "charconv",
+            "cstring",
+            "cuchar",
+            "cwchar",
+            "cwctype",
+            "format",
+            "string",
+            "string_view",
+            # Containers library
+            "array",
+            "deque",
+            "forward_list",
+            "list",
+            "map",
+            "queue",
+            "set",
+            "span",
+            "stack",
+            "unordered_map",
+            "unordered_set",
+            "vector",
+            # Iterators library
+            "iterator",
+            # Ranges library
+            "ranges",
+            # Algorithms library
+            "algorithm",
+            "execution",
+            # Numerics library
+            "bit",
+            "cfenv",
+            "cmath",
+            "complex",
+            "numbers",
+            "numeric",
+            "random",
+            "ratio",
+            "valarray",
+            # Localization library
+            "clocale",
+            "codecvt",
+            "locale",
+            # Input/output library
+            "cstdio",
+            "fstream",
+            "iomanip",
+            "ios",
+            "iosfwd",
+            "iostream",
+            "istream",
+            "ostream",
+            "spanstream",
+            "sstream",
+            "streambuf",
+            "strstream",
+            "syncstream",
+            # Filesystem library
+            "filesystem",
+            # Regular Expressions library
+            "regex",
+            # Atomic Operations library
+            "atomic",
+            # Thread support library
+            "barrier",
+            "condition_variable",
+            "future",
+            "latch",
+            "mutex",
+            "semaphore",
+            "shared_mutex",
+            "stop_token",
+            "thread"
         ]
 
         # Header type 3: Other library headers
