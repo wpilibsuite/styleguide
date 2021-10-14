@@ -72,127 +72,10 @@ class IncludeOrder(Task):
         self.c_sys_regex = regex.compile(r"<[a-z][A-Za-z0-9/_-]*\.h>")
 
         # Header type 2: C++ standard library headers
-        # List from https://en.cppreference.com/w/cpp/header
-        self.cpp_std = [
-            # Concepts library
-            "concepts",
-            # Coroutines library
-            "coroutine",
-            # Utilities library
-            "any",
-            "bitset",
-            "chrono",
-            "compare",
-            "csetjmp",
-            "csignal",
-            "cstdarg",
-            "cstddef",
-            "cstdlib",
-            "ctime",
-            "functional",
-            "initializer_list",
-            "optional",
-            "source_location",
-            "stacktrace",
-            "tuple",
-            "type_traits",
-            "typeindex",
-            "typeinfo",
-            "utility",
-            "variant",
-            "version",
-            # Dynamic memory management
-            "memory",
-            "memory_resource",
-            "new",
-            "scoped_allocator",
-            # Numeric limits
-            "cfloat",
-            "cinttypes",
-            "climits",
-            "cstdint",
-            "limits",
-            # Error handling
-            "cassert",
-            "cerrno",
-            "exception",
-            "stdexcept",
-            "system_error",
-            # Strings library
-            "cctype",
-            "charconv",
-            "cstring",
-            "cuchar",
-            "cwchar",
-            "cwctype",
-            "format",
-            "string",
-            "string_view",
-            # Containers library
-            "array",
-            "deque",
-            "forward_list",
-            "list",
-            "map",
-            "queue",
-            "set",
-            "span",
-            "stack",
-            "unordered_map",
-            "unordered_set",
-            "vector",
-            # Iterators library
-            "iterator",
-            # Ranges library
-            "ranges",
-            # Algorithms library
-            "algorithm",
-            "execution",
-            # Numerics library
-            "bit",
-            "cfenv",
-            "cmath",
-            "complex",
-            "numbers",
-            "numeric",
-            "random",
-            "ratio",
-            "valarray",
-            # Localization library
-            "clocale",
-            "codecvt",
-            "locale",
-            # Input/output library
-            "cstdio",
-            "fstream",
-            "iomanip",
-            "ios",
-            "iosfwd",
-            "iostream",
-            "istream",
-            "ostream",
-            "spanstream",
-            "sstream",
-            "streambuf",
-            "strstream",
-            "syncstream",
-            # Filesystem library
-            "filesystem",
-            # Regular Expressions library
-            "regex",
-            # Atomic Operations library
-            "atomic",
-            # Thread support library
-            "barrier",
-            "condition_variable",
-            "future",
-            "latch",
-            "mutex",
-            "semaphore",
-            "shared_mutex",
-            "stop_token",
-            "thread"
-        ]
+        # With the exception of a few C standard library headers above, they are
+        # the only headers which use only lowercase and underscores, and don't
+        # have a ".h" suffix
+        self.cpp_std_regex = regex.compile(r"(<|\")[a-z0-9_]+(>|\")")
 
         # Header type 3: Other library headers
         # They use angle brackets (open_bracket group is angle bracket)
@@ -242,7 +125,7 @@ class IncludeOrder(Task):
             return 1
         elif self.c_sys_regex.search(include_line.group("header")):
             return 1
-        elif include_line.group("name") in self.cpp_std:
+        elif self.cpp_std_regex.search(include_line.group("header")):
             return 2
         elif include_line.group("open_bracket") == "<":
             return 3
