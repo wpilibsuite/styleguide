@@ -66,8 +66,10 @@ class UsingDeclaration(Task):
                 brace_count -= 1
             elif token.startswith("using"):
                 if brace_count == 0:
+                    # 1-indexed
                     linenum = lines.count(linesep, 0, match.start()) + 1
-                    if "NOLINT" not in lines.splitlines()[linenum - 1]:
+                    # -1 for 0-indexed list, -1 for the line before
+                    if "NOLINT" not in lines.splitlines()[linenum - 2]:
                         format_succeeded = False
                         print(name + ": " + str(linenum) + ": '" + token + \
                               "' in global namespace")
