@@ -2,9 +2,9 @@
 style guide.
 """
 
-import os
 import re
 from enum import Enum
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -18,11 +18,11 @@ class State(Enum):
 
 class IncludeGuard(PipelineTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str):
+    def should_process_file(config_file: Config, filename: Path):
         return config_file.is_header_file(filename)
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
         lines_list = lines.split(linesep)
@@ -70,7 +70,7 @@ class IncludeGuard(PipelineTask):
         output = linesep.join(output_list).rstrip() + linesep
         return output, True
 
-    def make_include_guard(self, config_file: Config, filename: str) -> str:
+    def make_include_guard(self, config_file: Config, filename: Path) -> str:
         """Returns properly formatted include guard based on repository root and
         filename.
 
@@ -81,12 +81,12 @@ class IncludeGuard(PipelineTask):
         repo_root = super().get_repo_root()
 
         if repo_root_override := config_file.group("repoRootNameOverride"):
-            guard_path = repo_root_override[0] + os.sep
+            guard_path = repo_root_override[0] + "/"
         else:
-            guard_path = os.path.basename(repo_root) + os.sep
+            guard_path = repo_root.name + "/"
 
         # Use include root that results in shortest include guard
-        guard_root = os.path.relpath(filename, repo_root)
+        guard_root = filename.relative_to(repo_root).as_posix()
         for include_root in sorted(
             config_file.group("includeGuardRoots"), key=len, reverse=True
         ):

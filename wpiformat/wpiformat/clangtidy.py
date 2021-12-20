@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from pathlib import Path
 
 import clang_tidy
 
@@ -32,10 +33,10 @@ class ClangTidy(StandaloneTask):
             self.args += ["-extra-arg", "-" + arg]
 
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_cpp_file(filename)
 
-    def run_standalone(self, config_file: Config, filename: str) -> bool:
+    def run_standalone(self, config_file: Config, filename: Path) -> bool:
         try:
             stdout = subprocess.run(
                 [self.exec_name] + self.args + [filename],

@@ -1,9 +1,9 @@
 """This task updates the license header at the top of the file."""
 
-import os
 import re
 import subprocess
 from datetime import date
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -11,14 +11,14 @@ from wpiformat.task import PipelineTask
 
 class LicenseUpdate(PipelineTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         license_regex = config_file.regex("licenseUpdateExclude")
 
         return (
             config_file.is_c_file(filename)
             or config_file.is_cpp_file(filename)
-            or filename.endswith(".java")
-        ) and not license_regex.search(filename)
+            or filename.suffix == ".java"
+        ) and not license_regex.search(filename.as_posix())
 
     def __try_regex(
         self, lines: str, last_year: str, license_template: list[str]
@@ -133,18 +133,18 @@ class LicenseUpdate(PipelineTask):
             return False, first_year, linesep + lines.lstrip()
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         # TODO: Remove handling for deprecated .styleguide-license file
         try:
             _, license_template = Config.read_file(
-                os.path.dirname(os.path.abspath(filename)), ".wpiformat-license"
+                filename.parent, Path(".wpiformat-license")
             )
         except OSError:
             _, license_template = Config.read_file(
-                os.path.dirname(os.path.abspath(filename)), ".styleguide-license"
+                filename.parent, Path(".styleguide-license")
             )
 
         # Get year when file was most recently modified in Git history

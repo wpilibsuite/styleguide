@@ -1,20 +1,27 @@
+from pathlib import Path
+
 from wpiformat.cidentlist import CIdentList
 
 from .test_tasktest import *
 
 
 def test_cidentlist():
+    main_c = Path("./Main.c").resolve()
+    main_cpp = Path("./Main.cpp").resolve()
+    test_cpp = Path("./Test.cpp").resolve()
+    timer_hpp = Path("./Timer.hpp").resolve()
+
     # Main.cpp: signature for C++ function
     contents = """int main() {
   return 0;
 }
 """
-    run_and_check_file(CIdentList(), "./Main.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), main_cpp, contents, contents, True)
 
     # Main.cpp: signature for C function in extern "C" block
     run_and_check_file(
         CIdentList(),
-        "./Main.cpp",
+        main_cpp,
         """extern "C" {
 int main() {
   return 0;
@@ -33,7 +40,7 @@ int main(void) {
     # Main.cpp: signature for C function marked extern "C"
     run_and_check_file(
         CIdentList(),
-        "./Main.cpp",
+        main_cpp,
         """extern "C" int main() {
   return 0;
 }
@@ -52,12 +59,12 @@ extern "C++" int main() {
 }
 }
 """
-    run_and_check_file(CIdentList(), "./Main.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), main_cpp, contents, contents, True)
 
     # Main.c: signature for C function
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """int main() {
   return 0;
 }
@@ -76,19 +83,19 @@ int main() {
 }
 }
 """
-    run_and_check_file(CIdentList(), "./Main.c", contents, contents, True)
+    run_and_check_file(CIdentList(), main_c, contents, contents, True)
 
     # Main.c: signature for C++ function marked extern "C++"
     contents = """extern "C++" int main() {
   return 0;
 }
 """
-    run_and_check_file(CIdentList(), "./Main.c", contents, contents, True)
+    run_and_check_file(CIdentList(), main_c, contents, contents, True)
 
     # Main.c: extern "C" function nested in extern "C++" block
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """extern "C++" {
 extern "C" int main() {
   return 0;
@@ -107,7 +114,7 @@ extern "C" int main(void) {
     # Don't match function calls
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """int main() {
   foo();
   return 0;
@@ -125,7 +132,7 @@ extern "C" int main(void) {
     # type)
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """int main() {
   return foo();
 }
@@ -140,7 +147,7 @@ extern "C" int main(void) {
     # Match function prototypes
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """int main();
 
 int main() {
@@ -161,7 +168,7 @@ int main(void) {
     # Make sure leaving extern block resets extern language type of parent block
     run_and_check_file(
         CIdentList(),
-        "./Main.c",
+        main_c,
         """extern "C++" {
 extern "C" int main() {
   return 0;
@@ -194,7 +201,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
 }  // extern "C"
 """
-    run_and_check_file(CIdentList(), "./Main.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), main_cpp, contents, contents, True)
 
     # Don't match a function call within a #ifdef
     contents = """ES_Event Elevator_Service_Run(ES_Event event) {
@@ -203,11 +210,11 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 #endif
 }
 """
-    run_and_check_file(CIdentList(), "./Main.c", contents, contents, True)
+    run_and_check_file(CIdentList(), main_c, contents, contents, True)
 
     run_and_check_file(
         CIdentList(),
-        "./Timer.hpp",
+        timer_hpp,
         """extern "C" void Timer1IntHandler();
 
 class Timer {
@@ -252,22 +259,22 @@ private:
   // closing }
 }
 """
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure nested comments don't mess up brace stack
     contents = "// { /* */ }\n"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
     contents = "{ // /* */ }\n"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, False)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, False)
     contents = "{ /* // */ }\n"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
     contents = "{ /* */ // }\n"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, False)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, False)
     contents = "{ // /* // */ }\n"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, False)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, False)
 
     # Ensure popping too many braces doesn't crash
-    run_and_check_file(CIdentList(), "./Test.cpp", "}\n", "}\n", False)
+    run_and_check_file(CIdentList(), test_cpp, "}\n", "}\n", False)
 
     # Ensure comments inside quoted string don't mess up brace stack
     contents = """void func() {
@@ -277,35 +284,35 @@ private:
   }
 }
 """
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure braces in double quotes don't mess up brace stack
     contents = "void func() { std::cout << '{'; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure braces in single quotes don't mess up brace stack
     contents = 'void func() { std::cout << "{"; }'
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure single quote within double quotes doesn't mess up brace stack
     contents = 'void func() { std::cout << "\'"; }'
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure double quote within single quotes doesn't mess up brace stack
     contents = "void func() { std::cout << '\"'; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure escaped double quote doesn't mess up brace stack
     contents = 'void func() { std::cout << "\\""; }'
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure escaped single quote doesn't mess up brace stack
     contents = "void func() { std::cout << '\\''; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure escaped backslash isn't considered as an escaped single quote
     contents = "void func() { std::cout << '\\\\'; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure extern "C" match containing a linesep within a singleline comment
     # still ends the comment
@@ -313,12 +320,12 @@ private:
 namespace {
 }  // namespace
 """
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure extern "C" with brace on next line gets matched
     run_and_check_file(
         CIdentList(),
-        "./Test.cpp",
+        test_cpp,
         """extern "C"
 {
   void func() {}
@@ -342,12 +349,12 @@ namespace {
   }
 }
 """
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure extern "C" function with pointer return type gets matched
     run_and_check_file(
         CIdentList(),
-        "./Test.cpp",
+        test_cpp,
         'extern "C" void* func() {}\n',
         'extern "C" void* func(void) {}\n',
         True,
@@ -355,16 +362,16 @@ namespace {
 
     # Ensure single quotes in numeric literals are ignored
     contents = "void func() { int x = 1'000; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure single quotes in hexadecimal literals are ignored
     contents = "void func() { int x = 0xffff'ffff; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure single quotes after numeric literals are not ignored
     contents = "void func() { std::cout << 1 << '0'; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)
 
     # Ensure single quotes after hexadecimal characters are not ignored
     contents = "void func() { std::cout << 1 << 'a'; }"
-    run_and_check_file(CIdentList(), "./Test.cpp", contents, contents, True)
+    run_and_check_file(CIdentList(), test_cpp, contents, contents, True)

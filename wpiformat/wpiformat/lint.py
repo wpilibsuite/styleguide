@@ -3,6 +3,7 @@
 import os
 import sys
 from contextlib import redirect_stdout
+from pathlib import Path
 
 import cpplint
 
@@ -12,11 +13,11 @@ from wpiformat.task import BatchTask
 
 class Lint(BatchTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_cpp_file(filename)
 
     @staticmethod
-    def run_batch(config_file: Config, filenames: list[str]) -> bool:
+    def run_batch(config_file: Config, filenames: list[Path]) -> bool:
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
 
@@ -53,14 +54,14 @@ class Lint(BatchTask):
         for pattern in config_file.group("cHeaderFileInclude") + config_file.group(
             "cppHeaderFileInclude"
         ):
-            basename = os.path.basename(pattern)
+            basename = Path(pattern).name
             header_exts.append(basename[basename.rfind(".") + 1 :].rstrip("$"))
 
         args = ["cpplint.py", "--filter=-" + ",-".join(exclusion_filters)]
         if header_exts:
             args.append("--headers=" + ",".join(header_exts))
         args.append("--quiet")
-        sys.argv = args + filenames
+        sys.argv = args + [f.as_posix() for f in filenames]
 
         # Run cpplint.py
         try:

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.task import Task
@@ -7,12 +7,15 @@ from .test_tasktest import *
 
 
 def test_includeguard():
-    repo_root = os.path.basename(Task.get_repo_root()).upper()
+    test_h = Path("./Test.h").resolve()
+    test_test_h = Path("./test/Test.h").resolve()
+
+    repo_root = Task.get_repo_root().name.upper()
 
     # Fix incorrect include guard
     run_and_check_file(
         IncludeGuard(),
-        "./Test.h",
+        test_h,
         """#ifndef WRONG_H
 #define WRONG_C
 
@@ -30,7 +33,7 @@ def test_includeguard():
     # include guard
     run_and_check_file(
         IncludeGuard(),
-        "./Test.h",
+        test_h,
         """#ifndef WRONG_H
 #define WRONG_C
 
@@ -56,22 +59,20 @@ def test_includeguard():
 
 #endif  // {repo_root}_TEST_H_
 """
-    run_and_check_file(IncludeGuard(), "./Test.h", contents, contents, True)
+    run_and_check_file(IncludeGuard(), test_h, contents, contents, True)
 
     # Fail on missing include guard
     run_and_check_file(
-        IncludeGuard(), "./Test.h", "// Empty file\n", "// Empty file\n", False
+        IncludeGuard(), test_h, "// Empty file\n", "// Empty file\n", False
     )
 
     # Verify pragma once counts as include guard
-    run_and_check_file(
-        IncludeGuard(), "./Test.h", "#pragma once\n", "#pragma once\n", True
-    )
+    run_and_check_file(IncludeGuard(), test_h, "#pragma once\n", "#pragma once\n", True)
 
     # Ensure include guard roots are processed correctly
     run_and_check_file(
         IncludeGuard(),
-        "./Test.h",
+        test_h,
         f"""#ifndef {repo_root}_WPIFORMAT_TEST_H_
 #define {repo_root}_WPIFORMAT_TEST_H_
 
@@ -89,7 +90,7 @@ def test_includeguard():
     # include a trailing "/" in the include guard root)
     run_and_check_file(
         IncludeGuard(),
-        "./test/Test.h",
+        test_test_h,
         f"""#ifndef {repo_root}_WPIFORMAT_TEST_TEST_H_
 #define {repo_root}_WPIFORMAT_TEST_TEST_H_
 

@@ -1,6 +1,7 @@
 """This task replaces empty C identifier lists "()" with "(void)"."""
 
 import re
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -8,15 +9,15 @@ from wpiformat.task import PipelineTask
 
 class CIdentList(PipelineTask):
     @staticmethod
-    def __print_failure(name):
+    def __print_failure(filename):
         print(
-            "error: " + name + ": unmatched curly braces when scanning for "
-            "C identifier lists. If the code compiles, this is a bug in "
+            f"error: {filename}: unmatched curly braces when scanning for C "
+            "identifier lists. If the code compiles, this is a bug in "
             "wpiformat."
         )
 
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_c_file(filename) or config_file.is_cpp_file(filename)
 
     @staticmethod
@@ -31,7 +32,7 @@ class CIdentList(PipelineTask):
         )
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 

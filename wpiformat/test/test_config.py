@@ -1,23 +1,21 @@
-import os
+from pathlib import Path
 
 from wpiformat.config import Config
 
 
 def test_config():
-    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
+    config_file = Config(Path.cwd(), Path(".wpiformat"))
     assert config_file.is_modifiable_file(
-        "." + os.sep + "wpiformat" + os.sep + "javaguidelink.png"
+        Path("./wpiformat/javaguidelink.png").resolve()
     )
     assert config_file.is_generated_file(
-        "." + os.sep + "wpiformat" + os.sep + "wpiformat" + os.sep + "cpplint.py"
+        Path("./wpiformat/wpiformat/cpplint.py").resolve()
     )
 
     assert not config_file.is_generated_file(
-        "." + os.sep + "wpiformat" + os.sep + "diff_cpplint.py"
+        Path("./wpiformat/diff_cpplint.py").resolve()
     )
     assert not config_file.is_generated_file(
-        "." + os.sep + "wpiformat" + os.sep + "update_cpplint.py"
+        Path("./wpiformat/update_cpplint.py").resolve()
     )
-    assert not config_file.is_modifiable_file(
-        "." + os.sep + "wpiformat" + os.sep + "license.txt"
-    )
+    assert not config_file.is_modifiable_file(Path("./wpiformat/license.txt").resolve())

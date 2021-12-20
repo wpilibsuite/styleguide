@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import BatchTask
@@ -9,11 +10,11 @@ from wpiformat.task import BatchTask
 
 class PyFormat(BatchTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
-        return filename.endswith(".py")
+    def should_process_file(config_file: Config, filename: Path) -> bool:
+        return filename.suffix == ".py"
 
     @staticmethod
-    def run_batch(config_file: Config, filenames: list[str]) -> bool:
+    def run_batch(config_file: Config, filenames: list[Path]) -> bool:
         try:
             args = [
                 sys.executable,
