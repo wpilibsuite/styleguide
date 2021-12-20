@@ -45,6 +45,7 @@ class LicenseUpdate(PipelineTask):
             .replace(")", r"\)")
             .replace("{year}", r"(?P<year>[0-9]+)(-[0-9]+)?")
             .replace("{padding}", "[ ]*")
+            .replace("{filename}", "")
         )
         license_rgx = re.compile(license_rgxstr, re.M)
 
@@ -184,6 +185,11 @@ class LicenseUpdate(PipelineTask):
         for line in license_template:
             # Insert copyright year range
             line = line.replace("{year}", year_range)
+
+            # Insert filename
+            line = line.replace(
+                "{filename}", filename.relative_to(super().get_repo_root()).as_posix()
+            )
 
             # Insert padding which expands to the 80th column. If there is more
             # than one padding token, the line may contain fewer than 80

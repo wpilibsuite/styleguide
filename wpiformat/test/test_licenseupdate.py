@@ -336,3 +336,33 @@ change
 
 """
         )
+
+    # Create git repo to test filename expansion
+    with OpenTemporaryDirectory():
+        subprocess.run(["git", "init", "-q"])
+
+        # Add base files
+        Path(".wpiformat-license").write_text(
+            """// Copyright (c) {year}
+// https://github.com/wpilibsuite/styleguide/blob/main/{filename}
+"""
+        )
+        Path(".wpiformat").write_text("cppSrcFileInclude {\n" + r"\.cpp$")
+        subprocess.run(["git", "add", ".wpiformat-license"])
+        subprocess.run(["git", "add", ".wpiformat"])
+        subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
+
+        # Create uncommitted empty file in subdirectory
+        file = (Path("dir") / "empty.cpp").resolve()
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.touch()
+
+        # Empty file
+        output, success = LicenseUpdate().run_pipeline(config_file, file, "")
+        assert (
+            output
+            == f"""// Copyright (c) {year}
+// https://github.com/wpilibsuite/styleguide/blob/main/dir/empty.cpp
+
+"""
+        )
