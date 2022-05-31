@@ -223,7 +223,8 @@ class Stdlib(Task):
             pos = match.start(1) + len(header.prefix) + len(match.group(1))
 
             # If function name is part of this header, substitute its name
-            if match.group(1) in header.func_names:
+            line = lines[match.start(1):lines.find("\n", match.start(1))]
+            if match.group(1) in header.func_names and "NOLINT" not in line:
                 lines = lines[0:match.start(1)] + header.prefix + \
                     match.group(1) + lines[match.end(1):]
         return lines

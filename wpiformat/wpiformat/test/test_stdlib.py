@@ -36,11 +36,21 @@ def test_stdlib():
         "  std::free(mem);" + os.linesep + \
         "}" + os.linesep, True)
 
-    # Test NOLINT
+    # Test NOLINT on #include
     test.add_input("./Main.cpp",
         "#include <cstdint>  // NOLINT" + os.linesep + \
         "#include <stdlib.h>  // NOLINT" + os.linesep)
     test.add_latest_input_as_output(True)
+
+    # Test NOLINT on function
+    test.add_input("./Main.cpp",
+        "  abs()  // NOLINT" + os.linesep + \
+        "  abs()" + os.linesep + \
+        "  abs()  // NOLINT" + os.linesep)
+    test.add_output(
+        "  abs()  // NOLINT" + os.linesep + \
+        "  std::abs()" + os.linesep + \
+        "  abs()  // NOLINT" + os.linesep, True)
 
     # FILE should be recognized as type here
     test.add_input("./Class.cpp", "static FILE* Class::file = nullptr;")
