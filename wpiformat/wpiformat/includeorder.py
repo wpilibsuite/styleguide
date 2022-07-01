@@ -7,7 +7,6 @@ from wpiformat.task import Task
 
 
 class IncludeOrder(Task):
-
     def __init__(self):
         super().__init__()
 
@@ -65,7 +64,7 @@ class IncludeOrder(Task):
             # Unsupported C headers
             "stdatomic.h",
             "stdnoreturn.h",
-            "threads.h"
+            "threads.h",
         ]
 
         # Header type 1: C system headers
@@ -82,13 +81,15 @@ class IncludeOrder(Task):
         #
         # Header type 4: Project headers
         # They use double quotes (all other headers)
-        self.header_regex = regex.compile(r"(?P<comment>//\s*)?"
-                                          r"\#include\s*"
-                                          r"(?P<header>"
-                                          r"(?P<open_bracket><|\")"
-                                          r"(?P<name>[^>\"]*)"
-                                          r"(?P<close_bracket>>|\"))"
-                                          r"(?P<postfix>.*)$")
+        self.header_regex = regex.compile(
+            r"(?P<comment>//\s*)?"
+            r"\#include\s*"
+            r"(?P<header>"
+            r"(?P<open_bracket><|\")"
+            r"(?P<name>[^>\"]*)"
+            r"(?P<close_bracket>>|\"))"
+            r"(?P<postfix>.*)$"
+        )
 
     @staticmethod
     def should_process_file(config_file, name):
@@ -115,9 +116,10 @@ class IncludeOrder(Task):
 
         # Is related if include has same base name as file name and file has a
         # source extension
-        include_is_related = include_base == file_base and \
-            (config_file.is_c_src_file(file_name) or \
-             config_file.is_cpp_src_file(file_name))
+        include_is_related = include_base == file_base and (
+            config_file.is_c_src_file(file_name)
+            or config_file.is_cpp_src_file(file_name)
+        )
 
         if include_is_related:
             return 0
@@ -146,8 +148,13 @@ class IncludeOrder(Task):
         Returns true if include name is a header.
         """
         if not config_file.is_header_file(include_name):
-            print("Error: " + file_name + ": include '" + include_name + \
-                "' has extension not in header list")
+            print(
+                "Error: "
+                + file_name
+                + ": include '"
+                + include_name
+                + "' has extension not in header list"
+            )
             return False
         else:
             return True
@@ -164,11 +171,19 @@ class IncludeOrder(Task):
         Returns include name with approriate brackets and "#include" prefix.
         """
         if 1 <= group_number <= 3:
-            output = "#include <" + name_match.group("name") + ">" + \
-                name_match.group("postfix")
+            output = (
+                "#include <"
+                + name_match.group("name")
+                + ">"
+                + name_match.group("postfix")
+            )
         else:
-            output = "#include \"" + name_match.group("name") + "\"" + \
-                name_match.group("postfix")
+            output = (
+                '#include "'
+                + name_match.group("name")
+                + '"'
+                + name_match.group("postfix")
+            )
 
         if name_match.group("comment"):
             return name_match.group("comment") + output
@@ -203,8 +218,7 @@ class IncludeOrder(Task):
 
         for i in range(5):
             if includes[i]:
-                sublist = sorted(includes[i],
-                                 key=lambda include: include.group("name"))
+                sublist = sorted(includes[i], key=lambda include: include.group("name"))
                 str_list = [self.rebuild_include(x, i) for x in sublist]
                 output_list.extend(self.dedup_list(str_list))
                 output_list.append("")  # Delimits groups of includes
@@ -218,8 +232,7 @@ class IncludeOrder(Task):
             del output_list[-1]  # Remove last newline
         return output_list
 
-    def header_sort(self, config_file, lines_list, file_name, start, end,
-                    ifdef_level):
+    def header_sort(self, config_file, lines_list, file_name, start, end, ifdef_level):
         """Recursively parses within #ifdef blocks for header includes and sorts
         them.
 
@@ -261,8 +274,13 @@ class IncludeOrder(Task):
                         ifdef = lines_list[i] + self.linesep
 
                         suboutput, inc_present, idx, valid_headers = self.header_sort(
-                            config_file, lines_list, file_name, i + 1, j,
-                            ifdef_level + 1)
+                            config_file,
+                            lines_list,
+                            file_name,
+                            i + 1,
+                            j,
+                            ifdef_level + 1,
+                        )
                         i = j
 
                         # If header failed to classify, return failure
@@ -296,7 +314,8 @@ class IncludeOrder(Task):
                             # Treat #ifdef as barrier and flush includes
                             output_list.extend(self.write_headers(includes))
                             if output_list and not output_list[-1].endswith(
-                                    self.linesep):
+                                self.linesep
+                            ):
                                 # Only add newline if content exists in
                                 # output_list that doesn't end in a newline,
                                 # which needs to be delimited from the #ifdef
@@ -335,8 +354,13 @@ class IncludeOrder(Task):
                 idx = self.classify_header(config_file, include_line, file_name)
                 if idx != -1:
                     if include_line.group("comment"):
-                        print("Warning: " + file_name + ": include '" +
-                              include_line.group("name") + "' is commented out")
+                        print(
+                            "Warning: "
+                            + file_name
+                            + ": include '"
+                            + include_line.group("name")
+                            + "' is commented out"
+                        )
                     includes[idx].append(include_line)
                     includes_present[idx] = True
                 else:
@@ -377,8 +401,11 @@ class IncludeOrder(Task):
 
         # Compile include sorting override regexes
         for group in [
-                "includeRelated", "includeCSys", "includeCppSys",
-                "includeOtherLibs", "includeProject"
+            "includeRelated",
+            "includeCSys",
+            "includeCppSys",
+            "includeOtherLibs",
+            "includeProject",
         ]:
             regex_str = config_file.regex(group)
             self.override_regexes.append(regex.compile(regex_str))
@@ -391,13 +418,15 @@ class IncludeOrder(Task):
 
         # Write lines from beginning of file to headers
         i = 0
-        while i < len(lines_list) and ("#ifdef" not in lines_list[i] and
-                                       "#include" not in lines_list[i]):
+        while i < len(lines_list) and (
+            "#ifdef" not in lines_list[i] and "#include" not in lines_list[i]
+        ):
             i += 1
         output_list = lines_list[0:i]
 
         suboutput, inc_present, idx, valid_headers = self.header_sort(
-            config_file, lines_list, file_name, i, len(lines_list), 0)
+            config_file, lines_list, file_name, i, len(lines_list), 0
+        )
         i = idx
 
         # If header failed to classify, return failure

@@ -14,7 +14,6 @@ class OutputType(Enum):
 
 
 class TaskTest:
-
     def __init__(self, task):
         """Constructor for Test object.
 
@@ -77,12 +76,14 @@ class TaskTest:
 
                 if output_type == OutputType.FILE:
                     output, success = self.task.run_pipeline(
-                        config_file, self.inputs[i][0], self.inputs[i][1])
+                        config_file, self.inputs[i][0], self.inputs[i][1]
+                    )
                 elif output_type == OutputType.STDOUT:
                     saved_stdout = sys.stdout
                     sys.stdout = io.StringIO()
                     _output, success = self.task.run_pipeline(
-                        config_file, self.inputs[i][0], self.inputs[i][1])
+                        config_file, self.inputs[i][0], self.inputs[i][1]
+                    )
                     sys.stdout.seek(0)
                     output = sys.stdout.read()
                     sys.stdout = saved_stdout

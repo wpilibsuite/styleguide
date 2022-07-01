@@ -6,7 +6,6 @@ from wpiformat.task import Task
 
 
 class UsingDeclaration(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_header_file(name)
@@ -18,8 +17,9 @@ class UsingDeclaration(Task):
         # Tokenize file as brace opens, brace closes, and "using" declarations.
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
-        token_regex = regex.compile(r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" +
-                                    linesep + r"|\{|\}|using\s[^;]*;")
+        token_regex = regex.compile(
+            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|\{|\}|using\s[^;]*;"
+        )
 
         brace_count = 0
         in_multicomment = False
@@ -46,9 +46,9 @@ class UsingDeclaration(Task):
                 # Tokens processed after this branch are ignored if they are in
                 # comments
                 continue
-            elif token == "\\\"":
+            elif token == '\\"':
                 continue
-            elif token == "\"":
+            elif token == '"':
                 if not in_char:
                     in_string = not in_string
             elif token == "\\'":
@@ -69,7 +69,13 @@ class UsingDeclaration(Task):
                     linenum = lines.count(linesep, 0, match.start()) + 1
                     if "NOLINT" not in lines.splitlines()[linenum - 1]:
                         format_succeeded = False
-                        print(name + ": " + str(linenum) + ": '" + token + \
-                              "' in global namespace")
+                        print(
+                            name
+                            + ": "
+                            + str(linenum)
+                            + ": '"
+                            + token
+                            + "' in global namespace"
+                        )
 
         return lines, format_succeeded

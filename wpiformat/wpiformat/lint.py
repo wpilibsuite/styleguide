@@ -16,7 +16,6 @@ from wpiformat.task import Task
 
 
 class Lint(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)
@@ -37,17 +36,15 @@ class Lint(Task):
             srcs = "|".join(srcs)
         else:
             srcs = "a^"
-        headers = config_file.group("cHeaderFileInclude") + \
-                  config_file.group("cppHeaderFileInclude")
+        headers = config_file.group("cHeaderFileInclude") + config_file.group(
+            "cppHeaderFileInclude"
+        )
         if headers:
             headers = "|".join(headers)
         else:
             headers = "a^"
 
-        sys.argv = ["cpplint.py",
-                    "--srcs=" + srcs,
-                    "--headers=" + headers] + \
-                   names
+        sys.argv = ["cpplint.py", "--srcs=" + srcs, "--headers=" + headers] + names
 
         # Run cpplint.py
         try:

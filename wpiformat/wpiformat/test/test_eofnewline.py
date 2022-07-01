@@ -7,14 +7,19 @@ from wpiformat.eofnewline import EofNewline
 def test_eofnewline():
     test = TaskTest(EofNewline())
 
-    file_appendix = \
-        "#pragma once" + os.linesep + \
-        os.linesep + \
-        "#include <iostream>" + os.linesep + \
-        os.linesep + \
-        "int main() {" + os.linesep + \
-        "  std::cout << \"Hello World!\";" + os.linesep + \
-        "}"
+    file_appendix = (
+        "#pragma once"
+        + os.linesep
+        + os.linesep
+        + "#include <iostream>"
+        + os.linesep
+        + os.linesep
+        + "int main() {"
+        + os.linesep
+        + '  std::cout << "Hello World!";'
+        + os.linesep
+        + "}"
+    )
 
     # Empty file
     test.add_input("./Test.h", "")

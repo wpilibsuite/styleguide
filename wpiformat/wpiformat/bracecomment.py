@@ -8,7 +8,6 @@ from wpiformat.task import Task
 
 
 class BraceComment(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
@@ -21,9 +20,14 @@ class BraceComment(Task):
         brace_postfix = r"[ \t]*/(/|\*)[^\r\n]*"
 
         brace_regex = regex.compile(
-            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|" + \
-            r"(" + brace_prefix + r"\s*)?{|"  # "{" with optional prefix
-            r"}(" + brace_postfix + r")?")  # "}" with optional comment postfix
+            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|"
+            + linesep
+            + r"|"
+            + r"("
+            + brace_prefix
+            + r"\s*)?{|"  # "{" with optional prefix
+            r"}(" + brace_postfix + r")?"
+        )  # "}" with optional comment postfix
 
         name_stack = []
         brace_count = 0
@@ -52,9 +56,9 @@ class BraceComment(Task):
                 # Tokens processed after this branch are ignored if they are in
                 # comments
                 continue
-            elif token == "\\\"":
+            elif token == '\\"':
                 continue
-            elif token == "\"":
+            elif token == '"':
                 if not in_char:
                     in_string = not in_string
             elif token == "\\'":
@@ -72,12 +76,14 @@ class BraceComment(Task):
             elif "{" in token:
                 brace_count += 1
             elif token.startswith("}"):
-                output += lines[extract_location:match.start()]
-                if len(name_stack) > 0 and name_stack[len(name_stack) -
-                                                      1][0] == brace_count:
+                output += lines[extract_location : match.start()]
+                if (
+                    len(name_stack) > 0
+                    and name_stack[len(name_stack) - 1][0] == brace_count
+                ):
                     output += "}  // " + name_stack.pop()[1]
                 else:
-                    output += lines[match.start():match.end()]
+                    output += lines[match.start() : match.end()]
                 extract_location = match.end()
                 brace_count -= 1
 
