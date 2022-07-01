@@ -41,7 +41,8 @@ def filter_ignored_files(names):
     proc = subprocess.run(
         ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
         input=encoded_names,
-        stdout=subprocess.PIPE)
+        stdout=subprocess.PIPE,
+    )
     if proc.returncode == 128:
         raise subprocess.CalledProcessError
 
@@ -51,7 +52,7 @@ def filter_ignored_files(names):
     # wraps names in quotes on Windows, and outputs "\n" line separators on all
     # platforms.
     return [
-        name[2:].lstrip().strip("\"").replace("\\\\", "\\")
+        name[2:].lstrip().strip('"').replace("\\\\", "\\")
         for name in output_list
         if name[0:2] == "::"
     ]
@@ -260,33 +261,33 @@ def run_batch(task_pipeline, args, file_batches):
 def main():
     # Parse command-line arguments
     parser = argparse.ArgumentParser(
-        description=
-        "Runs all formatting tasks on the code base. This should be invoked from a directory within the project."
+        description="Runs all formatting tasks on the code base. This should be invoked from a directory within the project."
     )
     parser.add_argument(
         "-v",
         dest="verbose1",
         action="store_true",
-        help="verbosity level 1 (prints names of processed files)")
+        help="verbosity level 1 (prints names of processed files)",
+    )
     parser.add_argument(
         "-vv",
         dest="verbose2",
         action="store_true",
-        help=
-        "verbosity level 2 (prints names of processed files and tasks run on them)"
+        help="verbosity level 2 (prints names of processed files and tasks run on them)",
     )
     list_files_group = parser.add_mutually_exclusive_group()
     list_files_group.add_argument(
         "-list-all-files",
         dest="list_all_files",
         action="store_true",
-        help="list files to be processed instead of processing them")
+        help="list files to be processed instead of processing them",
+    )
     list_files_group.add_argument(
         "-list-changed-files",
         dest="list_changed_files",
         action="store_true",
-        help=
-        "same as list-all-files, but list only files changed from main branch")
+        help="same as list-all-files, but list only files changed from main branch",
+    )
     # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
     # once, and mp uses a few internal events. Therefore, the maximum number of
@@ -297,37 +298,34 @@ def main():
         dest="jobs",
         type=int,
         default=cpu_count,
-        help="number of jobs to run (default is number of cores)")
+        help="number of jobs to run (default is number of cores)",
+    )
     parser.add_argument(
         "-clang",
         dest="clang_version",
         type=str,
         default="",
-        help=
-        "version suffix for clang-format (invokes \"clang-format-CLANG_VERSION\" or \"clang-format\" if no suffix provided)"
+        help='version suffix for clang-format (invokes "clang-format-CLANG_VERSION" or "clang-format" if no suffix provided)',
     )
     tidy_group = parser.add_mutually_exclusive_group()
     tidy_group.add_argument(
         "-tidy-changed",
         dest="tidy_changed",
         action="store_true",
-        help=
-        "also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file"
+        help="also runs clang-tidy-CLANG_VERSION on changed files; this requires a compile_commands.json file",
     )
     tidy_group.add_argument(
         "-tidy-all",
         dest="tidy_all",
         action="store_true",
-        help=
-        "also runs clang-tidy-CLANG_VERSION on all files (this takes a while); this requires a compile_commands.json file"
+        help="also runs clang-tidy-CLANG_VERSION on all files (this takes a while); this requires a compile_commands.json file",
     )
     parser.add_argument(
         "-compile-commands",
         dest="compile_commands",
         type=str,
         default="",
-        help=
-        "path to directory containing compile_commands.json; if unset will search in parent paths"
+        help="path to directory containing compile_commands.json; if unset will search in parent paths",
     )
     parser.add_argument(
         "-f",
@@ -335,13 +333,14 @@ def main():
         type=str,
         default="",
         nargs="+",
-        help=
-        "file or directory names (can be path relative to python invocation directory or absolute path)"
+        help="file or directory names (can be path relative to python invocation directory or absolute path)",
     )
-    parser.add_argument("-no-format",
-                        dest="no_format",
-                        action="store_true",
-                        help="disable formatting steps, only run linting")
+    parser.add_argument(
+        "-no-format",
+        dest="no_format",
+        action="store_true",
+        help="disable formatting steps, only run linting",
+    )
     args = parser.parse_args()
 
     # tidy requires compile_commands.json
@@ -350,7 +349,8 @@ def main():
         if not os.path.exists(ccloc):
             print(
                 f"error: clang-tidy: {ccloc} not found (try -compile-commands)",
-                file=sys.stderr)
+                file=sys.stderr,
+            )
             sys.exit(1)
 
     # All discovered files are relative to Git repo root directory, so find the
@@ -373,9 +373,7 @@ def main():
             os.remove(f)
 
         # Recursively create list of files in given directory
-        files = [
-            os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn
-        ]
+        files = [os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn]
 
         if not files:
             print("Error: no files found to format", file=sys.stderr)
@@ -385,11 +383,9 @@ def main():
         for name in args.file:
             # If a directory was specified, recursively expand it
             if os.path.isdir(name):
-                files.extend([
-                    os.path.join(dp, f)
-                    for dp, dn, fn in os.walk(name)
-                    for f in fn
-                ])
+                files.extend(
+                    [os.path.join(dp, f) for dp, dn, fn in os.walk(name) for f in fn]
+                )
             else:
                 files.append(name)
 
@@ -412,8 +408,9 @@ def main():
     branch_options = ["master", "main"]
     main_branch = ""
     for branch in branch_options:
-        proc = subprocess.run(["git", "rev-parse", "-q", "--verify", branch],
-                              stdout=subprocess.DEVNULL)
+        proc = subprocess.run(
+            ["git", "rev-parse", "-q", "--verify", branch], stdout=subprocess.DEVNULL
+        )
         if proc.returncode == 0:
             main_branch = branch
             break
@@ -426,10 +423,9 @@ def main():
 
     # Create list of all changed files
     output_list = subprocess.check_output(
-        ["git", "diff", "--name-only", main_branch], encoding="ascii").split()
-    changed_file_list = [
-        root_path + os.sep + line.strip() for line in output_list
-    ]
+        ["git", "diff", "--name-only", main_branch], encoding="ascii"
+    ).split()
+    changed_file_list = [root_path + os.sep + line.strip() for line in output_list]
 
     # Don't run tasks on modifiable or generated files
     work = []
@@ -461,9 +457,7 @@ def main():
 
     # Prepare file batches for batch tasks
     chunksize = math.ceil(len(files) / args.jobs)
-    file_batches = [
-        files[i:i + chunksize] for i in range(0, len(files), chunksize)
-    ]
+    file_batches = [files[i : i + chunksize] for i in range(0, len(files), chunksize)]
 
     if args.no_format:
         # Only run Lint

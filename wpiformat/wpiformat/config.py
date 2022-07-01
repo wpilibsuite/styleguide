@@ -6,7 +6,6 @@ import sys
 
 
 class Config:
-
     def __init__(self, directory, file_name):
         """Constructor for Config object.
 
@@ -40,14 +39,20 @@ class Config:
             try:
                 with open(directory + os.sep + file_name, "r") as file_contents:
                     file_found = True
-                    return os.path.join(
-                        directory,
-                        file_name), file_contents.read().splitlines()
+                    return (
+                        os.path.join(directory, file_name),
+                        file_contents.read().splitlines(),
+                    )
             except OSError:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
-                    print("Error: config file '" + file_name +
-                          "' not found in '" + directory + "'")
+                    print(
+                        "Error: config file '"
+                        + file_name
+                        + "' not found in '"
+                        + directory
+                        + "'"
+                    )
                     sys.exit(1)
                 directory = os.path.dirname(directory)
 
@@ -191,7 +196,7 @@ class Config:
                 in_group = True
 
                 # Group name is on same line as "{"
-                group_name = line[:line.find("{")].strip()
+                group_name = line[: line.find("{")].strip()
             elif "}" in line:
                 in_group = False
 
@@ -203,8 +208,11 @@ class Config:
 
                 # Header includes still use forward slash on Windows
                 unescaped_groups = [
-                    "includeRelated", "includeCSys", "includeCppSys",
-                    "includeOtherLibs", "includeProject"
+                    "includeRelated",
+                    "includeCSys",
+                    "includeCppSys",
+                    "includeOtherLibs",
+                    "includeProject",
                 ]
                 if group_name == "includeGuardRoots":
                     # Include guard roots use native directory separators

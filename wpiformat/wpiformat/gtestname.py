@@ -8,7 +8,6 @@ from wpiformat.task import Task
 
 
 class GTestName(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)
@@ -27,7 +26,7 @@ class GTestName(Task):
             test_case = match.group("test_case")
 
             # Write lines prior to test
-            output += lines[extract_location:match.start()]
+            output += lines[extract_location : match.start()]
 
             # Write test type
             output += test_type + "("
@@ -77,7 +76,7 @@ class GTestName(Task):
             test_case = match.group("test_case")
 
             # Write lines prior to test
-            output += lines[extract_location:match.start()]
+            output += lines[extract_location : match.start()]
             output += "INSTANTIATE_TEST_SUITE_P("
             if match.group("whitespace"):
                 output += match.group("whitespace")

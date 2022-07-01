@@ -16,7 +16,6 @@ class State(Enum):
 
 
 class IncludeGuard(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_header_file(name)
@@ -33,15 +32,16 @@ class IncludeGuard(Task):
         if_preproc_count = 0
         for i in range(len(lines_list)):
             if state == State.FINDING_IFNDEF:
-                if lines_list[i].lstrip().startswith("#ifndef ") and \
-                    lines_list[i + 1].lstrip().startswith("#define "):
+                if lines_list[i].lstrip().startswith("#ifndef ") and lines_list[
+                    i + 1
+                ].lstrip().startswith("#define "):
                     state = State.FINDING_ENDIF
 
                     guard = self.make_include_guard(config_file, name)
-                    output_list[i] = ifndef_regex.sub("#ifndef " + guard,
-                                                      lines_list[i])
+                    output_list[i] = ifndef_regex.sub("#ifndef " + guard, lines_list[i])
                     output_list[i + 1] = define_regex.sub(
-                        "#define " + guard, lines_list[i + 1])
+                        "#define " + guard, lines_list[i + 1]
+                    )
                     if_preproc_count += 1
                 elif lines_list[i].lstrip().startswith("#pragma once"):
                     state = State.DONE
@@ -61,8 +61,9 @@ class IncludeGuard(Task):
 
         # If include guard not found
         if state == State.FINDING_IFNDEF:
-            print("Error: " + name +
-                  ": doesn't contain include guard or '#pragma once'")
+            print(
+                "Error: " + name + ": doesn't contain include guard or '#pragma once'"
+            )
             return lines, False
 
         output = linesep.join(output_list).rstrip() + linesep
@@ -89,12 +90,14 @@ class IncludeGuard(Task):
         if include_roots:
             prefix = ""
             for include_root in include_roots:
-                if guard_root.startswith(
-                        include_root) and len(include_root) > len(prefix):
+                if guard_root.startswith(include_root) and len(include_root) > len(
+                    prefix
+                ):
                     prefix = include_root
-            guard_path += guard_root[len(prefix):]
-            return (regex.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() +
-                    "_").lstrip("_")
+            guard_path += guard_root[len(prefix) :]
+            return (regex.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() + "_").lstrip(
+                "_"
+            )
 
         # No include guard roots matched, so append full name
         guard_path += guard_root

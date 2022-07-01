@@ -7,7 +7,6 @@ from wpiformat.task import Task
 
 
 class ClangFormat(Task):
-
     def __init__(self, clang_version):
         """Constructor for ClangFormat task.
 
@@ -29,15 +28,15 @@ class ClangFormat(Task):
     def run_pipeline(self, config_file, name, lines):
         args = ["-style=file", "-assume-filename=" + name, "-"]
         try:
-            p = Popen([self.exec_name] + args,
-                      encoding="utf-8",
-                      stdin=PIPE,
-                      stdout=PIPE)
+            p = Popen(
+                [self.exec_name] + args, encoding="utf-8", stdin=PIPE, stdout=PIPE
+            )
             output = p.communicate(input=lines)[0]
         except FileNotFoundError:
-            print("Error: " + self.exec_name +
-                  " not found in PATH. Is it installed?",
-                  file=sys.stderr)
+            print(
+                "Error: " + self.exec_name + " not found in PATH. Is it installed?",
+                file=sys.stderr,
+            )
             return lines, False
 
         return output, True

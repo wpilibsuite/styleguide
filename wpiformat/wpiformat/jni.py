@@ -25,7 +25,6 @@ from wpiformat.task import Task
 
 
 class Jni(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_src_file(name)
@@ -64,12 +63,14 @@ class Jni(Task):
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
 
-        regex_str_sig = r"(/\*(?>(.|\n)*?\*/)\s+)?" + \
-            r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+" + \
-            r"(?P<func>Java_\w+)\s*\(\s*" + \
-            r"(?P<env_type>JNIEnv\s*\*\s*)" + \
-            r"(?P<env_name>\w+)?,\s*" + \
-            r"(?P<param_type>jclass|jobject)\s*(?P<param_name>\w*)?"
+        regex_str_sig = (
+            r"(/\*(?>(.|\n)*?\*/)\s+)?"
+            + r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+"
+            + r"(?P<func>Java_\w+)\s*\(\s*"
+            + r"(?P<env_type>JNIEnv\s*\*\s*)"
+            + r"(?P<env_name>\w+)?,\s*"
+            + r"(?P<param_type>jclass|jobject)\s*(?P<param_name>\w*)?"
+        )
         regex_sig = regex.compile(regex_str_sig)
 
         regex_str_func = r"Java_(?P<class>\w+)_(?P<method>[^_]+)$"
@@ -77,8 +78,9 @@ class Jni(Task):
 
         # Matches a comma followed by the type, an optional variable name, and
         # an optional closing parenthesis
-        regex_str_arg = (r", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*"
-                         r"(?P<trailing>{|;)")
+        regex_str_arg = (
+            r", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*" r"(?P<trailing>{|;)"
+        )
         regex_arg = regex.compile(regex_str_arg, regex.VERBOSE)
 
         output = ""
@@ -88,7 +90,7 @@ class Jni(Task):
             signature = ""
 
             if match_sig.start() > 0:
-                output += lines[pos:match_sig.start()]
+                output += lines[pos : match_sig.start()]
 
             # Add JNI-specific args
             jni_args = "  ("
@@ -103,22 +105,38 @@ class Jni(Task):
             # Write JNI function comment. Splitting at "__" removes overload
             # annotation from method comment
             match = regex_func.search(match_sig.group("func").split("__")[0])
-            comment += "/*" + linesep + \
-                " * Class:     " + match.group("class") + linesep + \
-                " * Method:    " + match.group("method") + linesep + \
-                " * Signature: ("
+            comment += (
+                "/*"
+                + linesep
+                + " * Class:     "
+                + match.group("class")
+                + linesep
+                + " * Method:    "
+                + match.group("method")
+                + linesep
+                + " * Signature: ("
+            )
 
-            signature += "JNIEXPORT " + match_sig.group("ret") + " JNICALL" + \
-                linesep + match_sig.group("func") + linesep + jni_args
+            signature += (
+                "JNIEXPORT "
+                + match_sig.group("ret")
+                + " JNICALL"
+                + linesep
+                + match_sig.group("func")
+                + linesep
+                + jni_args
+            )
 
             # Add other args
             line_length = len(jni_args)
-            for match_arg in regex_arg.finditer(lines[match_sig.end():]):
+            for match_arg in regex_arg.finditer(lines[match_sig.end() :]):
                 if ")" in match_arg.group():
                     break
                 # If args going past 80 characters
-                elif line_length + len(", ") + len(
-                        match_arg.group("arg")) + len(")") > 80:
+                elif (
+                    line_length + len(", ") + len(match_arg.group("arg")) + len(")")
+                    > 80
+                ):
                     # Put current arg on next line and set line_length to
                     # reflect that
                     signature += "," + linesep + "   " + match_arg.group("arg")
@@ -127,8 +145,13 @@ class Jni(Task):
                     signature += ", " + match_arg.group("arg")
                     line_length += len(", ") + len(match_arg.group("arg"))
                 comment += self.map_jni_type(match_arg.group("arg_type"))
-            comment += ")" + self.map_jni_type(match_sig.group("ret")) + linesep + \
-                " */" + linesep
+            comment += (
+                ")"
+                + self.map_jni_type(match_sig.group("ret"))
+                + linesep
+                + " */"
+                + linesep
+            )
 
             # Output correct trailing character for declaration vs definition
             if match_arg.group("trailing") == "{":

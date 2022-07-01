@@ -11,13 +11,15 @@ from wpiformat.task import Task
 
 
 class LicenseUpdate(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         license_regex = config_file.regex("licenseUpdateExclude")
 
-        return (config_file.is_c_file(name) or config_file.is_cpp_file(name) or
-                name.endswith(".java")) and not license_regex.search(name)
+        return (
+            config_file.is_c_file(name)
+            or config_file.is_cpp_file(name)
+            or name.endswith(".java")
+        ) and not license_regex.search(name)
 
     def __try_regex(self, lines, last_year, license_template):
         """Try finding license with regex of license template.
@@ -35,10 +37,14 @@ class LicenseUpdate(Task):
 
         # Convert the license template to a regex
         license_rgxstr = "^" + linesep.join(license_template)
-        license_rgxstr = license_rgxstr.replace("*", r"\*").replace(
-            ".", r"\.").replace("(", r"\(").replace(")", r"\)").replace(
-                "{year}",
-                r"(?P<year>[0-9]+)(-[0-9]+)?").replace("{padding}", "[ ]*")
+        license_rgxstr = (
+            license_rgxstr.replace("*", r"\*")
+            .replace(".", r"\.")
+            .replace("(", r"\(")
+            .replace(")", r"\)")
+            .replace("{year}", r"(?P<year>[0-9]+)(-[0-9]+)?")
+            .replace("{padding}", "[ ]*")
+        )
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
         first_year = last_year
@@ -52,7 +58,7 @@ class LicenseUpdate(Task):
                 pass
 
             # If comment at beginning of file is non-empty license, update it
-            return True, first_year, linesep + lines[match.end():].lstrip()
+            return True, first_year, linesep + lines[match.end() :].lstrip()
         else:
             return False, first_year, lines
 
@@ -110,8 +116,9 @@ class LicenseUpdate(Task):
         # If comment at beginning of file is non-empty license, update it
         if first_comment_is_license and license_end > 0:
             license_part = linesep.join(stripped_lines[0:license_end])
-            appendix_part = \
+            appendix_part = (
                 linesep + linesep.join(stripped_lines[license_end:]).lstrip()
+            )
 
             year_regex = regex.compile(r"Copyright \(c\)(?>.*?\s(20..))")
             for line in license_part.split(linesep):
@@ -129,7 +136,8 @@ class LicenseUpdate(Task):
         linesep = super().get_linesep(lines)
 
         _, license_template = Config.read_file(
-            os.path.dirname(os.path.abspath(name)), ".styleguide-license")
+            os.path.dirname(os.path.abspath(name)), ".styleguide-license"
+        )
 
         # Get year when file was most recently modified in Git history
         #
@@ -138,11 +146,13 @@ class LicenseUpdate(Task):
         # be used. Author dates can be older than this or even out of order in
         # the log.
         last_year = subprocess.check_output(
-            ["git", "log", "-n", "1", "--format=%ci", "--", name]).decode()[:4]
+            ["git", "log", "-n", "1", "--format=%ci", "--", name]
+        ).decode()[:4]
 
         # Check if file has uncomitted changes in the working directory
         has_uncommitted_changes = subprocess.run(
-            ["git", "diff-index", "--quiet", "HEAD", "--", name]).returncode
+            ["git", "diff-index", "--quiet", "HEAD", "--", name]
+        ).returncode
 
         # If file hasn't been committed yet or has changes in the working
         # directory, use current calendar year as end of copyright year range
@@ -150,10 +160,12 @@ class LicenseUpdate(Task):
             last_year = str(date.today().year)
 
         success, first_year, appendix = self.__try_regex(
-            lines, last_year, license_template)
+            lines, last_year, license_template
+        )
         if not success:
             success, first_year, appendix = self.__try_string_search(
-                lines, last_year, license_template)
+                lines, last_year, license_template
+            )
 
         output = ""
 

@@ -7,87 +7,158 @@ from wpiformat.stdlib import Stdlib
 def test_stdlib():
     test = TaskTest(Stdlib())
 
-    test.add_input("./Main.cpp",
-        "#include <cstdint>" + os.linesep + \
-        "#include <stdlib.h>" + os.linesep + \
-        os.linesep + \
-        "int main() {" + os.linesep + \
-        "  auto mem = static_cast<std::uint8_t*>(malloc(5));" + os.linesep + \
-        "  std::int32_t i = 4;" + os.linesep + \
-        "  int32_t a = -2;" + os.linesep + \
-        "  std::uint_fast16_t j = 5;" + os.linesep + \
-        "  std::uint_fast16_t* k = &j;" + os.linesep + \
-        "  std::uint_fast16_t** l = &k;" + os.linesep + \
-        "  std::uint_fast16_t ** m = l;" + os.linesep + \
-        "  free(mem);" + os.linesep + \
-        "}" + os.linesep)
+    test.add_input(
+        "./Main.cpp",
+        "#include <cstdint>"
+        + os.linesep
+        + "#include <stdlib.h>"
+        + os.linesep
+        + os.linesep
+        + "int main() {"
+        + os.linesep
+        + "  auto mem = static_cast<std::uint8_t*>(malloc(5));"
+        + os.linesep
+        + "  std::int32_t i = 4;"
+        + os.linesep
+        + "  int32_t a = -2;"
+        + os.linesep
+        + "  std::uint_fast16_t j = 5;"
+        + os.linesep
+        + "  std::uint_fast16_t* k = &j;"
+        + os.linesep
+        + "  std::uint_fast16_t** l = &k;"
+        + os.linesep
+        + "  std::uint_fast16_t ** m = l;"
+        + os.linesep
+        + "  free(mem);"
+        + os.linesep
+        + "}"
+        + os.linesep,
+    )
     test.add_output(
-        "#include <stdint.h>" + os.linesep + \
-        "#include <cstdlib>" + os.linesep + \
-        os.linesep + \
-        "int main() {" + os.linesep + \
-        "  auto mem = static_cast<uint8_t*>(std::malloc(5));" + os.linesep + \
-        "  int32_t i = 4;" + os.linesep + \
-        "  int32_t a = -2;" + os.linesep + \
-        "  uint_fast16_t j = 5;" + os.linesep + \
-        "  uint_fast16_t* k = &j;" + os.linesep + \
-        "  uint_fast16_t** l = &k;" + os.linesep + \
-        "  uint_fast16_t ** m = l;" + os.linesep + \
-        "  std::free(mem);" + os.linesep + \
-        "}" + os.linesep, True)
+        "#include <stdint.h>"
+        + os.linesep
+        + "#include <cstdlib>"
+        + os.linesep
+        + os.linesep
+        + "int main() {"
+        + os.linesep
+        + "  auto mem = static_cast<uint8_t*>(std::malloc(5));"
+        + os.linesep
+        + "  int32_t i = 4;"
+        + os.linesep
+        + "  int32_t a = -2;"
+        + os.linesep
+        + "  uint_fast16_t j = 5;"
+        + os.linesep
+        + "  uint_fast16_t* k = &j;"
+        + os.linesep
+        + "  uint_fast16_t** l = &k;"
+        + os.linesep
+        + "  uint_fast16_t ** m = l;"
+        + os.linesep
+        + "  std::free(mem);"
+        + os.linesep
+        + "}"
+        + os.linesep,
+        True,
+    )
 
     # Test NOLINT on #include
-    test.add_input("./Main.cpp",
-        "#include <cstdint>  // NOLINT" + os.linesep + \
-        "#include <stdlib.h>  // NOLINT" + os.linesep)
+    test.add_input(
+        "./Main.cpp",
+        "#include <cstdint>  // NOLINT"
+        + os.linesep
+        + "#include <stdlib.h>  // NOLINT"
+        + os.linesep,
+    )
     test.add_latest_input_as_output(True)
 
     # Test NOLINT on function
-    test.add_input("./Main.cpp",
-        "  abs()  // NOLINT" + os.linesep + \
-        "  abs()" + os.linesep + \
-        "  abs()  // NOLINT" + os.linesep)
+    test.add_input(
+        "./Main.cpp",
+        "  abs()  // NOLINT"
+        + os.linesep
+        + "  abs()"
+        + os.linesep
+        + "  abs()  // NOLINT"
+        + os.linesep,
+    )
     test.add_output(
-        "  abs()  // NOLINT" + os.linesep + \
-        "  std::abs()" + os.linesep + \
-        "  abs()  // NOLINT" + os.linesep, True)
+        "  abs()  // NOLINT"
+        + os.linesep
+        + "  std::abs()"
+        + os.linesep
+        + "  abs()  // NOLINT"
+        + os.linesep,
+        True,
+    )
 
     # FILE should be recognized as type here
     test.add_input("./Class.cpp", "static FILE* Class::file = nullptr;")
     test.add_output("static std::FILE* Class::file = nullptr;", True)
 
     # FILE should not be recognized as type here
-    test.add_input("./Class.cpp",
-        "static int Class::error1 = ERR_FILE;" + os.linesep + \
-        "#define FILE_LOG(level)" + os.linesep + \
-        "if (level > FILELog::ReportingLevel())" + os.linesep)
+    test.add_input(
+        "./Class.cpp",
+        "static int Class::error1 = ERR_FILE;"
+        + os.linesep
+        + "#define FILE_LOG(level)"
+        + os.linesep
+        + "if (level > FILELog::ReportingLevel())"
+        + os.linesep,
+    )
     test.add_latest_input_as_output(True)
 
     # Remove "std::" from beginning of line
-    test.add_input("./Class.cpp",
-                   "/**" + os.linesep + \
-                   " *" + os.linesep + \
-                   " */" + os.linesep + \
-                   "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                   "  uint32_t result = 0;" + os.linesep)
-    test.add_output("/**" + os.linesep + \
-                    " *" + os.linesep + \
-                    " */" + os.linesep + \
-                    "size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                    "  uint32_t result = 0;" + os.linesep, True)
+    test.add_input(
+        "./Class.cpp",
+        "/**"
+        + os.linesep
+        + " *"
+        + os.linesep
+        + " */"
+        + os.linesep
+        + "std::size_t SizeUleb128(uint64_t val) {"
+        + os.linesep
+        + "  uint32_t result = 0;"
+        + os.linesep,
+    )
+    test.add_output(
+        "/**"
+        + os.linesep
+        + " *"
+        + os.linesep
+        + " */"
+        + os.linesep
+        + "size_t SizeUleb128(uint64_t val) {"
+        + os.linesep
+        + "  uint32_t result = 0;"
+        + os.linesep,
+        True,
+    )
 
     # Remove "std::" from beginning of file
-    test.add_input("./Class.cpp",
-                   "std::size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                   "  uint32_t result = 0;" + os.linesep)
-    test.add_output("size_t SizeUleb128(uint64_t val) {" + os.linesep + \
-                    "  uint32_t result = 0;" + os.linesep, True)
+    test.add_input(
+        "./Class.cpp",
+        "std::size_t SizeUleb128(uint64_t val) {"
+        + os.linesep
+        + "  uint32_t result = 0;"
+        + os.linesep,
+    )
+    test.add_output(
+        "size_t SizeUleb128(uint64_t val) {"
+        + os.linesep
+        + "  uint32_t result = 0;"
+        + os.linesep,
+        True,
+    )
 
     # Don't prepend "std::" to function name if it's a function definition
     # "time()" in other contexts is a C standard library function.
     test.add_input(
-        "./Test.cpp",
-        "uint64_t time() const { return m_val.last_change; }" + os.linesep)
+        "./Test.cpp", "uint64_t time() const { return m_val.last_change; }" + os.linesep
+    )
     test.add_latest_input_as_output(True)
 
     # Test detection of type within static_cast<>

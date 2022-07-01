@@ -6,12 +6,13 @@ from wpiformat.task import Task
 
 
 class CIdentList(Task):
-
     @staticmethod
     def __print_failure(name):
-        print("Error: " + name + ": unmatched curly braces when scanning for "
-              "C identifier lists. If the code compiles, this is a bug in "
-              "wpiformat.")
+        print(
+            "Error: " + name + ": unmatched curly braces when scanning for "
+            "C identifier lists. If the code compiles, this is a bug in "
+            "wpiformat."
+        )
 
     @staticmethod
     def should_process_file(config_file, name):
@@ -44,9 +45,15 @@ class CIdentList(Task):
         extern_str = r"(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
         braces_str = r"\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
         postfix_str = r"(?=\s*(;|\{))"
-        token_regex = regex.compile(preproc_str + comment_str + string_str +
-                                    char_str + extern_str + braces_str +
-                                    postfix_str)
+        token_regex = regex.compile(
+            preproc_str
+            + comment_str
+            + string_str
+            + char_str
+            + extern_str
+            + braces_str
+            + postfix_str
+        )
 
         EXTRA_POP_OFFSET = 2
 
@@ -95,9 +102,9 @@ class CIdentList(Task):
                 # Tokens processed after this branch are ignored if they are in
                 # comments
                 continue
-            elif token == "\\\"":
+            elif token == '\\"':
                 continue
-            elif token == "\"":
+            elif token == '"':
                 if not in_char:
                     in_string = not in_string
             elif token == "\\'":
@@ -146,14 +153,13 @@ class CIdentList(Task):
                     extern_brace_indices.append(is_c + EXTRA_POP_OFFSET)
 
                 # Change language based on extern declaration
-                if match.group("ext_decl") == "extern \"C\"":
+                if match.group("ext_decl") == 'extern "C"':
                     is_c = True
                 else:
                     is_c = False
-            elif match.group(
-                    "paren") and "return " not in match.group() and is_c:
+            elif match.group("paren") and "return " not in match.group() and is_c:
                 # Replaces () with (void)
-                output += lines[pos:match.span("paren")[0]] + "(void)"
+                output += lines[pos : match.span("paren")[0]] + "(void)"
                 pos = match.span("paren")[0] + len("()")
 
         # Write rest of file if it wasn't all processed

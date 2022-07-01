@@ -6,7 +6,6 @@ from wpiformat.task import Task
 
 
 class JavaClass(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return name.endswith(".java")
@@ -18,8 +17,15 @@ class JavaClass(Task):
         pos = 0
 
         # Match two or more line separators
-        token_str = r"/\*|\*/|//|" + linesep + r"|{" + linesep + \
-            r"(?P<extra>(" + linesep + r")+)"
+        token_str = (
+            r"/\*|\*/|//|"
+            + linesep
+            + r"|{"
+            + linesep
+            + r"(?P<extra>("
+            + linesep
+            + r")+)"
+        )
         token_regex = regex.compile(token_str)
 
         in_multicomment = False
@@ -41,7 +47,7 @@ class JavaClass(Task):
                 # Otherwise, the token is a class
 
                 # Removes extra line separators
-                output += lines[pos:match.span("extra")[0]]
+                output += lines[pos : match.span("extra")[0]]
                 pos = match.span()[1]
 
         # Write rest of file if it wasn't all processed

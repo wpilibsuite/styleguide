@@ -6,7 +6,6 @@ from wpiformat.task import Task
 
 
 class UsingNamespaceStd(Task):
-
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)
@@ -23,8 +22,11 @@ class UsingNamespaceStd(Task):
         for match in using_regex.finditer(lines):
             linenum = lines.count(linesep, 0, match.start()) + 1
             print(
-                "Warning: " + name + ": " + str(linenum) +
-                ": avoid \"using namespace std;\" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use \"using std::thing;\" instead."
+                "Warning: "
+                + name
+                + ": "
+                + str(linenum)
+                + ': avoid "using namespace std;" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use "using std::thing;" instead.'
             )
 
         return lines, True
