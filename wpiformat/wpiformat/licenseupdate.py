@@ -142,9 +142,9 @@ class LicenseUpdate(Task):
         # Get year when file was most recently modified in Git history
         #
         # Committer date is used instead of author date (the one shown by "git
-        # log" because the year the file was last modified in the history should
-        # be used. Author dates can be older than this or even out of order in
-        # the log.
+        # log") because the year the file was last modified in the history
+        # should be used. Author dates can be older than this or even out of
+        # order in the log.
         last_year = subprocess.check_output(
             ["git", "log", "-n", "1", "--format=%ci", "--", name]
         ).decode()[:4]
