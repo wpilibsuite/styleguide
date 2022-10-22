@@ -66,8 +66,7 @@ class ClangTidy(Task):
         lines = filtered_lines
 
         if lines:
-            print("== clang-tidy " + name + " ==")
-            print("\n".join(lines))
+            print(f"== clang-tidy {name} ==\n" + "\n".join(lines))
             return False
 
         return True
