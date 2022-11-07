@@ -7,13 +7,14 @@ from wpiformat.task import Task
 
 
 class ClangTidy(Task):
-    def __init__(self, clang_version, compile_commands):
+    def __init__(self, clang_version, compile_commands, extra_args):
         """Constructor for ClangTidy task.
 
         Keyword arguments:
         clang_version -- version number of clang-tidy appended to executable
                          name
         compile_commands -- directory containing compile_commands.json
+        extra_args -- list of extra arguments to clang-tidy
         """
         super().__init__()
 
@@ -25,6 +26,12 @@ class ClangTidy(Task):
         self.args = ["--quiet"]
         if compile_commands:
             self.args += ["-p", compile_commands]
+
+        # Prepend a dash to the argument here because the main argument parser
+        # treats strings with a dash prefix as a new argument instead of the
+        # value for -extra-args
+        for arg in extra_args:
+            self.args += ["-extra-arg", "-" + arg]
 
     @staticmethod
     def should_process_file(config_file, name):

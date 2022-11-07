@@ -328,6 +328,13 @@ def main():
         help="path to directory containing compile_commands.json; if unset will search in parent paths",
     )
     parser.add_argument(
+        "-tidy-extra-args",
+        dest="tidy_extra_args",
+        type=str,
+        default="",
+        help='a comma-delimited list of extra arguments for clang-tidy (given "ARG1,ARG2", invokes "clang-tidy -extra-arg -ARG1 -extra-arg -ARG2")',
+    )
+    parser.add_argument(
         "-f",
         dest="file",
         type=str,
@@ -493,7 +500,13 @@ def main():
     if args.tidy_all or args.tidy_changed:
         if args.tidy_changed:
             files = list(set(files) & set(changed_file_list))
-        task_pipeline = [ClangTidy(args.clang_version, args.compile_commands)]
+        task_pipeline = [
+            ClangTidy(
+                args.clang_version,
+                args.compile_commands,
+                args.tidy_extra_args.split(","),
+            )
+        ]
         run_standalone(task_pipeline, args, files)
 
 
