@@ -504,7 +504,7 @@ def main():
             ClangTidy(
                 args.clang_version,
                 args.compile_commands,
-                args.tidy_extra_args.split(","),
+                args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )
         ]
         run_standalone(task_pipeline, args, files)
