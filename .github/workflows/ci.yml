@@ -63,6 +63,7 @@ jobs:
 
     - name: wpiformat - whole repo
       run: |
+        cd wpiformat
         python -m wpiformat -v
 
     - name: wpiformat - one file
@@ -73,6 +74,7 @@ jobs:
     - name: wpiformat - absolute path to file
       shell: bash
       run: |
+        cd wpiformat
         python -m wpiformat -f $GITHUB_WORKSPACE/wpiformat/wpiformat/__init__.py -v
 
     - name: wpiformat - multiple files
