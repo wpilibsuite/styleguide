@@ -7,9 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-11 removed because brew no longer has clang-format@15 and below
-        # os: [macos-11, windows-2022, ubuntu-22.04]
-        os: [windows-2022, ubuntu-22.04]
+        os: [macos-11, windows-2022, ubuntu-22.04]
         python-version: ['3.8', '3.9', '3.10']
     name: Test - ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
@@ -30,7 +28,8 @@ jobs:
         elif [ "$RUNNER_OS" == "Windows" ]; then
           choco install --allow-downgrade llvm --version 14.0.0
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install clang-format@14
+          brew install llvm@14
+          echo "/usr/local/opt/llvm@14/bin" >> $GITHUB_PATH
         else
           echo "$RUNNER_OS not supported"
           exit 1
