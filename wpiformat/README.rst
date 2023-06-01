@@ -7,9 +7,6 @@ Dependencies
 ************
 
 - `Python 3.6 or newer <https://www.python.org/downloads/>`_
-- clang-format (included with `LLVM <http://llvm.org/releases/download.html>`_)
-
-To obtain newer versions of clang-format on older Debian and Ubuntu releases, either upgrade to one that does or add the appropriate ``deb ... main`` line from `apt.llvm.org <http://apt.llvm.org/>`_ to ``/etc/apt/sources.list``. Then install ``clang-format-#`` where ``#`` is the version number.
 
 Installation
 ************

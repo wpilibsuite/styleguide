@@ -300,13 +300,6 @@ def main():
         default=cpu_count,
         help="number of jobs to run (default is number of cores)",
     )
-    parser.add_argument(
-        "-clang",
-        dest="clang_version",
-        type=str,
-        default="",
-        help='version suffix for clang-format (invokes "clang-format-CLANG_VERSION" or "clang-format" if no suffix provided)',
-    )
     tidy_group = parser.add_mutually_exclusive_group()
     tidy_group.add_argument(
         "-tidy-changed",
@@ -487,7 +480,7 @@ def main():
             UsingDeclaration(),
             UsingNamespaceStd(),
             Whitespace(),
-            ClangFormat(args.clang_version),
+            ClangFormat(),
             Jni(),  # Fixes clang-format formatting
         ]
         run_pipeline(task_pipeline, args, files)
@@ -502,7 +495,6 @@ def main():
             files = list(set(files) & set(changed_file_list))
         task_pipeline = [
             ClangTidy(
-                args.clang_version,
                 args.compile_commands,
                 args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )
