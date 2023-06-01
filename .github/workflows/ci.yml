@@ -20,21 +20,6 @@ jobs:
         git checkout -b pr
         git branch -f main origin/main
 
-    - name: Install clang-format
-      shell: bash
-      run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get install clang-format-14
-        elif [ "$RUNNER_OS" == "Windows" ]; then
-          choco install --allow-downgrade llvm --version 14.0.0
-        elif [ "$RUNNER_OS" == "macOS" ]; then
-          brew install llvm@14
-          echo "/usr/local/opt/llvm@14/bin" >> $GITHUB_PATH
-        else
-          echo "$RUNNER_OS not supported"
-          exit 1
-        fi
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:

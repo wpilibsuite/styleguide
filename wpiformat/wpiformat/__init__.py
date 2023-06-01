@@ -300,6 +300,13 @@ def main():
         default=cpu_count,
         help="number of jobs to run (default is number of cores)",
     )
+    parser.add_argument(
+        "-clang",
+        dest="clang_version",
+        type=str,
+        default="",
+        help='version suffix for system clang-format (invokes "clang-format-CLANG_VERSION" or PyPi\'s clang-format if no suffix provided)',
+    )
     tidy_group = parser.add_mutually_exclusive_group()
     tidy_group.add_argument(
         "-tidy-changed",
@@ -342,6 +349,12 @@ def main():
         help="disable formatting steps, only run linting",
     )
     args = parser.parse_args()
+
+    # TODO: Remove after deprecation cycle
+    if args.clang_version:
+        print(
+            'warning: "-clang" flag is deprecated for removal in favor of PyPI\'s clang-format and clang-tidy packages'
+        )
 
     # tidy requires compile_commands.json
     if args.tidy_all or args.tidy_changed:
@@ -480,7 +493,7 @@ def main():
             UsingDeclaration(),
             UsingNamespaceStd(),
             Whitespace(),
-            ClangFormat(),
+            ClangFormat(args.clang_version),
             Jni(),  # Fixes clang-format formatting
         ]
         run_pipeline(task_pipeline, args, files)
@@ -495,6 +508,7 @@ def main():
             files = list(set(files) & set(changed_file_list))
         task_pipeline = [
             ClangTidy(
+                args.clang_version,
                 args.compile_commands,
                 args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )

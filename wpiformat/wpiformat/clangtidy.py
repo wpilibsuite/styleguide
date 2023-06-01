@@ -9,14 +9,21 @@ from wpiformat.task import Task
 
 
 class ClangTidy(Task):
-    def __init__(self, compile_commands, extra_args):
+    def __init__(self, clang_version, compile_commands, extra_args):
         """Constructor for ClangTidy task.
 
         Keyword arguments:
+        clang_version -- version number of clang-tidy appended to executable
+                         name (deprecated for removal)
         compile_commands -- directory containing compile_commands.json
         extra_args -- list of extra arguments to clang-tidy
         """
         super().__init__()
+
+        if clang_version == "":
+            self.exec_name = clang_tidy._get_executable("clang-tidy")
+        else:
+            self.exec_name = "clang-tidy-" + clang_version
 
         self.args = ["--quiet"]
         if compile_commands:
@@ -34,7 +41,7 @@ class ClangTidy(Task):
 
     def run_standalone(self, config_file, name):
         output = subprocess.run(
-            [clang_tidy._get_executable("clang-tidy")] + self.args + [name],
+            [self.exec_name] + self.args + [name],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             encoding="utf-8",

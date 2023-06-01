@@ -9,6 +9,20 @@ from wpiformat.task import Task
 
 
 class ClangFormat(Task):
+    def __init__(self, clang_version):
+        """Constructor for ClangFormat task.
+
+        Keyword arguments:
+        clang_version -- version number of clang-format appended to executable
+                         name (deprecated for removal)
+        """
+        super().__init__()
+
+        if clang_version == "":
+            self.exec_name = clang_format._get_executable("clang-format")
+        else:
+            self.exec_name = "clang-format-" + clang_version
+
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
@@ -16,7 +30,7 @@ class ClangFormat(Task):
     def run_pipeline(self, config_file, name, lines):
         args = ["-style=file", "-assume-filename=" + name, "-"]
         p = Popen(
-            [clang_format._get_executable("clang-format")] + args,
+            [self.exec_name] + args,
             encoding="utf-8",
             stdin=PIPE,
             stdout=PIPE,
