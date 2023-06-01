@@ -69,7 +69,12 @@ setup(
     zip_safe=True,
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
-    install_requires=["regex==2022.9.13", "black==23.3.0"],
+    install_requires=[
+        "regex==2022.9.13",
+        "black==23.3.0",
+        "clang-format==16.0.4",
+        "clang-tidy==15.0.2.1",
+    ],
     license="BSD License",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

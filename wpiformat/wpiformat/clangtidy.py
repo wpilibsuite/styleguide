@@ -3,25 +3,20 @@
 import subprocess
 import sys
 
+import clang_tidy
+
 from wpiformat.task import Task
 
 
 class ClangTidy(Task):
-    def __init__(self, clang_version, compile_commands, extra_args):
+    def __init__(self, compile_commands, extra_args):
         """Constructor for ClangTidy task.
 
         Keyword arguments:
-        clang_version -- version number of clang-tidy appended to executable
-                         name
         compile_commands -- directory containing compile_commands.json
         extra_args -- list of extra arguments to clang-tidy
         """
         super().__init__()
-
-        if clang_version == "":
-            self.exec_name = "clang-tidy"
-        else:
-            self.exec_name = "clang-tidy-" + clang_version
 
         self.args = ["--quiet"]
         if compile_commands:
@@ -38,19 +33,12 @@ class ClangTidy(Task):
         return config_file.is_cpp_file(name)
 
     def run_standalone(self, config_file, name):
-        try:
-            output = subprocess.run(
-                [self.exec_name] + self.args + [name],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                encoding="utf-8",
-            ).stdout
-        except FileNotFoundError:
-            print(
-                "Error: " + self.exec_name + " not found in PATH. Is it installed?",
-                file=sys.stderr,
-            )
-            return False
+        output = subprocess.run(
+            [clang_tidy._get_executable("clang-tidy")] + self.args + [name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            encoding="utf-8",
+        ).stdout
 
         lines = [l for l in output.rstrip().split("\n") if l]
 
