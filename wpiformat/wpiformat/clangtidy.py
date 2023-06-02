@@ -40,12 +40,19 @@ class ClangTidy(Task):
         return config_file.is_cpp_file(name)
 
     def run_standalone(self, config_file, name):
-        output = subprocess.run(
-            [self.exec_name] + self.args + [name],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            encoding="utf-8",
-        ).stdout
+        try:
+            output = subprocess.run(
+                [self.exec_name] + self.args + [name],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                encoding="utf-8",
+            ).stdout
+        except FileNotFoundError:
+            print(
+                "error: " + self.exec_name + " not found in PATH. Is it installed?",
+                file=sys.stderr,
+            )
+            return False
 
         lines = [l for l in output.rstrip().split("\n") if l]
 
