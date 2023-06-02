@@ -29,12 +29,19 @@ class ClangFormat(Task):
 
     def run_pipeline(self, config_file, name, lines):
         args = ["-style=file", "-assume-filename=" + name, "-"]
-        p = Popen(
-            [self.exec_name] + args,
-            encoding="utf-8",
-            stdin=PIPE,
-            stdout=PIPE,
-        )
-        output = p.communicate(input=lines)[0]
+        try:
+            p = Popen(
+                [self.exec_name] + args,
+                encoding="utf-8",
+                stdin=PIPE,
+                stdout=PIPE,
+            )
+            output = p.communicate(input=lines)[0]
+        except FileNotFoundError:
+            print(
+                "error: " + self.exec_name + " not found in PATH. Is it installed?",
+                file=sys.stderr,
+            )
+            return lines, False
 
         return output, True
