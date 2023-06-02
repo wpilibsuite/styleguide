@@ -137,13 +137,13 @@ local.properties
 .loadpath
 
 ### Python ###
+*.egg-info/
 .eggs/
 .pytest_cache/
+.tox/
+__pycache__/
 build/
 dist/
-__pycache__
-*.egg-info/
-version.py
 
 # External tool builders
 .externalToolBuilders/
