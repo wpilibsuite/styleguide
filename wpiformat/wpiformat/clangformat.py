@@ -28,18 +28,24 @@ class ClangFormat(Task):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
     def run_pipeline(self, config_file, name, lines):
-        args = ["-style=file", "-assume-filename=" + name, "-"]
         try:
             p = Popen(
-                [self.exec_name] + args,
-                encoding="utf-8",
+                [self.exec_name, "-style=file", "-assume-filename=" + name, "-"],
                 stdin=PIPE,
                 stdout=PIPE,
+                encoding="utf-8",
             )
             output = p.communicate(input=lines)[0]
+
+            if p.returncode != 0:
+                print(
+                    f"error: {self.exec_name} returned non-zero exit status {p.returncode}",
+                    file=sys.stderr,
+                )
+                return lines, False
         except FileNotFoundError:
             print(
-                "error: " + self.exec_name + " not found in PATH. Is it installed?",
+                f"error: {self.exec_name} not found in PATH. Is it installed?",
                 file=sys.stderr,
             )
             return lines, False
