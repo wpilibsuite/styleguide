@@ -75,7 +75,8 @@ class ClangTidy(Task):
                 filtered_lines.append(l)
         lines = filtered_lines
 
-        if lines:
+        # If any lines are non-empty, print them and report an error
+        if any(len(l.rstrip()) > 0 for l in lines):
             print(f"== clang-tidy {name} ==\n" + "\n".join(lines))
             return False
 
