@@ -41,15 +41,20 @@ class ClangTidy(Task):
 
     def run_standalone(self, config_file, name):
         try:
-            output = subprocess.run(
+            output = subprocess.check_output(
                 [self.exec_name] + self.args + [name],
-                stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 encoding="utf-8",
-            ).stdout
+            )
+        except subprocess.CalledProcessError as e:
+            print(
+                f"error: {self.exec_name} returned non-zero exit status {e.returncode}",
+                file=sys.stderr,
+            )
+            return False
         except FileNotFoundError:
             print(
-                "error: " + self.exec_name + " not found in PATH. Is it installed?",
+                f"error: {self.exec_name} not found in PATH. Is it installed?",
                 file=sys.stderr,
             )
             return False
