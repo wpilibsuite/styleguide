@@ -2380,6 +2380,9 @@ def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
   # 7. End of namespaces:
   #    namespace {};
   #
+  # 8. End of concepts:
+  #    concept name = requires () {};
+  #
   #    These semicolons seems far more common than other kinds of
   #    redundant semicolons, possibly due to people converting classes
   #    to namespaces.  For now we do not warn for this case.
@@ -2453,7 +2456,7 @@ def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
         match = Match(r'^(\s*)\{', line)
 
   # Check matching closing brace
-  if match:
+  if match and not line.startswith("concept"):
     (endline, endlinenum, endpos) = CloseExpression(
         clean_lines, linenum, len(match.group(1)))
     if endpos > -1 and Match(r'^\s*;', endline[endpos:]):
