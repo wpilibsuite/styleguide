@@ -35,13 +35,14 @@ class ClangFormat(Task):
                 stdout=PIPE,
                 encoding="utf-8",
             )
-            output = p.communicate(input=lines)[0]
+            stdout, stderr = p.communicate(input=lines)
 
             if p.returncode != 0:
                 print(
                     f"error: {self.exec_name} returned non-zero exit status {p.returncode}",
                     file=sys.stderr,
                 )
+                print(stderr, file=sys.stderr)
                 return lines, False
         except FileNotFoundError:
             print(
@@ -50,4 +51,4 @@ class ClangFormat(Task):
             )
             return lines, False
 
-        return output, True
+        return stdout, True
