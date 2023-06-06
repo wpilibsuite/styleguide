@@ -2380,7 +2380,7 @@ def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
   # 7. End of namespaces:
   #    namespace {};
   #
-  # 8. End of concepts:
+  # 8. End of requires expression:
   #    concept name = requires () {};
   #
   #    These semicolons seems far more common than other kinds of
@@ -2431,7 +2431,8 @@ def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
           (func and not Search(r'\boperator\s*\[\s*\]', func.group(1))) or
           Search(r'\b(?:struct|union)\s+alignas\s*$', line_prefix) or
           Search(r'\bdecltype$', line_prefix) or
-          Search(r'\s+=\s*$', line_prefix)):
+          Search(r'\s+=\s*$', line_prefix) or
+          Search(r'\brequires$', line_prefix)):
         match = None
     if (match and
         opening_parenthesis[1] > 1 and
@@ -2456,7 +2457,7 @@ def CheckTrailingSemicolon(filename, clean_lines, linenum, error):
         match = Match(r'^(\s*)\{', line)
 
   # Check matching closing brace
-  if match and not line.startswith("concept"):
+  if match:
     (endline, endlinenum, endpos) = CloseExpression(
         clean_lines, linenum, len(match.group(1)))
     if endpos > -1 and Match(r'^\s*;', endline[endpos:]):
