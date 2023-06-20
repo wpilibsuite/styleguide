@@ -61,9 +61,9 @@ class Header:
 
             type_names = regex_prefix + r"(" + r"|".join(type_regexes) + r")"
 
-            # Followed by optional spaces and ">", ")", ",", ";", or pointer
-            # asterisks
-            lookahead = r"(?=(\s*(\>|\)|,|;|\*+))|\s)"
+            # Followed by optional spaces and ">", ")", ",", ";", pointer
+            # asterisks, or ellipses
+            lookahead = r"(?=(\s*(\>|\)|,|;|\*+|\.\.\.))|\s)"
 
             self.type_regex = regex.compile(lookbehind + type_names + lookahead)
         else:
