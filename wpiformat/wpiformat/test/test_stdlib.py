@@ -173,4 +173,16 @@ def test_stdlib():
     test.add_input("./Main.cpp", "typedef integer std::uint8_t;")
     test.add_output("typedef integer uint8_t;", True)
 
+    # Remove "std::" from variadic template argument
+    test.add_input(
+        "./Class.cpp",
+        "template <typename Char, typename Traits, std::size_t N1, std::size_t... N>"
+        + os.linesep,
+    )
+    test.add_output(
+        "template <typename Char, typename Traits, size_t N1, size_t... N>"
+        + os.linesep,
+        True,
+    )
+
     test.run(OutputType.FILE)
