@@ -38,12 +38,16 @@ class CIdentList(Task):
         #
         # "def\\s+\w+" matches preprocessor directives "#ifdef" and "#ifndef" so
         # their contents aren't used as a return type.
+        #
+        # "\w+\**\s+\w+\s*" matches a function return type with 0 or more
+        # trailing asterisks, spaces, a function name, then spaces before the
+        # open parenthesis
         preproc_str = r"#else|#endif|"
         comment_str = r"/\*|\*/|//|" + linesep + r"|"
         string_str = r"\\\\|\\\"|\"|"
         char_str = r"\\'|'|"
         extern_str = r"(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
-        braces_str = r"\{|\}|;|def\s+\w+|\w+\s+\w+\s*(?P<paren>\(\))"
+        braces_str = r"\{|\}|;|def\s+\w+|\w+\**\s+\w+\s*(?P<paren>\(\))"
         postfix_str = r"(?=\s*(;|\{))"
         token_regex = regex.compile(
             preproc_str

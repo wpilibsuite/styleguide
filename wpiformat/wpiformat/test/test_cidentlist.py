@@ -484,4 +484,14 @@ def test_cidentlist():
     )
     test.add_latest_input_as_output(True)
 
+    # Ensure extern "C" function with pointer return type gets matched
+    test.add_input(
+        "./Test.cpp",
+        'extern "C" void* func() {}' + os.linesep,
+    )
+    test.add_output(
+        'extern "C" void* func(void) {}' + os.linesep,
+        True,
+    )
+
     test.run(OutputType.FILE)
