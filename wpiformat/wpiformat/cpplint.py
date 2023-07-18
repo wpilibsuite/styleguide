@@ -3182,7 +3182,7 @@ def ExpectingFunctionArgs(clean_lines, linenum):
 
 _HEADERS_CONTAINING_TEMPLATES = (
     ('<deque>', ('deque',)),
-    ('<functional>', ('unary_function', 'binary_function',
+    ('<functional>', ('function', 'unary_function', 'binary_function',
                       'plus', 'minus', 'multiplies', 'divides', 'modulus',
                       'negate',
                       'equal_to', 'not_equal_to', 'greater', 'less',
