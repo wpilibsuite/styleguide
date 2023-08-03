@@ -136,7 +136,7 @@ class LicenseUpdate(PipelineTask):
         linesep = super().get_linesep(lines)
 
         _, license_template = Config.read_file(
-            os.path.dirname(os.path.abspath(name)), ".styleguide-license"
+            os.path.dirname(os.path.abspath(name)), ".wpiformat-license"
         )
 
         # Get year when file was most recently modified in Git history
