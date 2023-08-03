@@ -20,13 +20,13 @@ pip install wpiformat
 
 ## Project Setup
 
-To use these tools with a new project, copy `.styleguide`, and `.styleguide-license` from the examples folder into the project and create a new `.clang-format` file based on the desired C/C++ style.
+To use these tools with a new project, copy `.wpiformat`, and `.wpiformat-license` from the examples folder into the project and create a new `.clang-format` file based on the desired C/C++ style.
 
 Note: Since wpiformat already handles include ordering, it is recommended to use `SortIncludes: false` in `.clang-format`.
 
-## .styleguide
+## .wpiformat
 
-wpiformat checks the current directory for the `.styleguide` file. If one doesn't exist, all parent directories are tried as well. This file contains groups of filename regular expressions.
+wpiformat checks the current directory for the `.wpiformat` file. If one doesn't exist, all parent directories are tried as well. This file contains groups of filename regular expressions.
 ```
 groupName {
   regex_here
@@ -36,7 +36,7 @@ The regexes are matched using [re.search()](https://docs.python.org/3/library/re
 
 Empty config groups can be omitted. Directory separators must be "/", not "\\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
 
-See the `.styleguide` file in the docs/examples directory for all possible groups.
+See the `.wpiformat` file in the docs/examples directory for all possible groups.
 
 ### Specifying C/C++ files to format
 
@@ -73,17 +73,17 @@ For example, given a file at `allwpilib/src/main/native/include/wpiutil/support/
 
 The `repoRootNameOverride` group allows one to override the repository name used in include guards. This is useful for giving subprojects within one repository different repository roots in their include guards. Only specify one name in this group because subsequent names will be ignored.
 
-## .styleguide-license
+## .wpiformat-license
 
-This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. See the `.styleguide-license` file in the docs/examples directory.
+This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. See the `.wpiformat-license` file in the docs/examples directory.
 
-wpiformat checks the currently processed file's directory for a `.styleguide` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
+wpiformat checks the currently processed file's directory for a `.wpiformat` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
 
 ### License header semantics
 
 The license header is always at the beginning of the file and ends after two newlines. If there isn't one, or it doesn't contain the required copyright contents, wpiformat inserts a new one containing the current year.
 
-### `.styleguide-license` special variables
+### `.wpiformat-license` special variables
 
 `{year}` is replaced with a year range from the earliest copyright year in the file to the current year. If the earliest year is the current year, only that year will be written.
 

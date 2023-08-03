@@ -29,7 +29,7 @@ def run_and_check_file(
     input_contents = input_contents.replace("\n", os.linesep)
     expected_output_contents = expected_output_contents.replace("\n", os.linesep)
 
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
 
     if task.should_process_file(config_file, filename):
         output, success = task.run_pipeline(config_file, filename, input_contents)
@@ -59,7 +59,7 @@ def run_and_check_stdout(
     expected_output_contents -- expected output file contents
     expected_success -- whether run is expected to succeed
     """
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
 
     if task.should_process_file(config_file, filename):
         with redirect_stdout(io.StringIO()) as f:
