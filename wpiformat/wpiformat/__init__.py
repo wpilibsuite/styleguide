@@ -86,7 +86,7 @@ def proc_pipeline(name):
     Keyword arguments:
     name -- file name string
     """
-    config_file = Config(os.path.dirname(name), ".styleguide")
+    config_file = Config(os.path.dirname(name), ".wpiformat")
     if verbose1 or verbose2:
         with print_lock:
             print("Processing", name)
@@ -128,7 +128,7 @@ def proc_standalone(name):
     Keyword arguments:
     name -- file name string
     """
-    config_file = Config(os.path.dirname(name), ".styleguide")
+    config_file = Config(os.path.dirname(name), ".wpiformat")
     if verbose2:
         with print_lock:
             print("Processing", name)
@@ -178,7 +178,7 @@ def proc_batch(files):
     for subtask in task_pipeline:
         work = []
         for name in files:
-            config_file = Config(os.path.dirname(name), ".styleguide")
+            config_file = Config(os.path.dirname(name), ".wpiformat")
             if subtask.should_process_file(config_file, name):
                 work.append(name)
 
@@ -443,7 +443,7 @@ def main():
     # Don't run tasks on modifiable or generated files
     work = []
     for name in files:
-        config_file = Config(os.path.dirname(name), ".styleguide")
+        config_file = Config(os.path.dirname(name), ".wpiformat")
 
         if config_file.is_modifiable_file(name):
             continue

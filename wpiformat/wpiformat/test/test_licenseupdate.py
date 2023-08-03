@@ -307,7 +307,7 @@ def test_licenseupdate():
     )
 
     # Ensure excluded files won't be processed
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
     assert not task.should_process_file(config_file, "./Excluded.h")
 
     # Create git repo to test license years for commits
@@ -315,12 +315,12 @@ def test_licenseupdate():
         subprocess.run(["git", "init", "-q"])
 
         # Add base files
-        with open(".styleguide-license", "w") as file:
+        with open(".wpiformat-license", "w") as file:
             file.write("// Copyright (c) {year}")
-        with open(".styleguide", "w") as file:
+        with open(".wpiformat", "w") as file:
             file.write("cppSrcFileInclude {\n" + r"\.cpp$")
-        subprocess.run(["git", "add", ".styleguide-license"])
-        subprocess.run(["git", "add", ".styleguide"])
+        subprocess.run(["git", "add", ".wpiformat-license"])
+        subprocess.run(["git", "add", ".wpiformat"])
         subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Add file with commit date of last year and range through this year
