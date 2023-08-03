@@ -135,9 +135,18 @@ class LicenseUpdate(PipelineTask):
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
 
-        _, license_template = Config.read_file(
-            os.path.dirname(os.path.abspath(name)), ".wpiformat-license"
-        )
+        try:
+            _, license_template = Config.read_file(
+                os.path.dirname(os.path.abspath(name)), ".wpiformat-license"
+            )
+        except OSError:
+            # TODO: Remove handling for deprecated .styleguide-license file
+            _, license_template = Config.read_file(
+                os.path.dirname(os.path.abspath(name)), ".styleguide-license"
+            )
+            print(
+                "warning: found deprecated '.styleguide-license' file. Rename to '.wpiformat-license'."
+            )
 
         # Get year when file was most recently modified in Git history
         #

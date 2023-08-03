@@ -44,17 +44,13 @@ class Config:
                         os.path.join(directory, file_name),
                         file_contents.read().splitlines(),
                     )
-            except OSError:
+            except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
                     print(
-                        "error: config file '"
-                        + file_name
-                        + "' not found in '"
-                        + directory
-                        + "'"
+                        f"error: config file '{file_name}' not found in '{directory}'"
                     )
-                    sys.exit(1)
+                    raise e
                 directory = os.path.dirname(directory)
 
     def group(self, group_name):
