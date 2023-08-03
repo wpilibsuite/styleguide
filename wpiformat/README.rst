@@ -22,14 +22,14 @@ On Linux/OSX, execute::
 Project Setup
 *************
 
-To use these tools with a new project, copy `.styleguide`_, and `.styleguide-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
+To use these tools with a new project, copy `.wpiformat`_, and `.wpiformat-license`_ from the examples folder into the project and create a new ``.clang-format`` file based on the desired C/C++ style.
 
 Note: Since wpiformat already handles include ordering, it is recommended to use ``SortIncludes: false`` in ``.clang-format``.
 
-.styleguide
------------
+.wpiformat
+----------
 
-wpiformat checks the current directory for the ``.styleguide`` file. If one doesn't exist, all parent directories are tried as well. See the ``.styleguide`` file in the docs/examples directory for all possible groups.
+wpiformat checks the current directory for the ``.wpiformat`` file. If one doesn't exist, all parent directories are tried as well. See the ``.wpiformat`` file in the docs/examples directory for all possible groups.
 
 This file contains groups of file name regular expressions. There are two groups of regexes which prevent tasks (i.e., formatters and linters) from running on matching files:
 
@@ -54,12 +54,12 @@ The regex for C system headers produces false positives on headers from "other l
 
 ``NOLINT`` can be appended in a comment to a header include to prevent wpiformat's header include sorter from modifying it and to maintain its relative ordering with other header includes. This will, in effect, treat it as a barrier across which no header includes will be moved. Header includes on each side of the barrier will still be sorted as normal.
 
-.styleguide-license
--------------------
+.wpiformat-license
+------------------
 
-This file contains the license header template. It should contain ``Copyright (c)`` followed by the company name and the string ``{year}``. See the ``.styleguide-license`` file in the docs/examples directory.
+This file contains the license header template. It should contain ``Copyright (c)`` followed by the company name and the string ``{year}``. See the ``.wpiformat-license`` file in the docs/examples directory.
 
-wpiformat checks the currently processed file's directory for a ``.styleguide`` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
+wpiformat checks the currently processed file's directory for a ``.wpiformat`` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
 
 The license header is always at the beginning of the file and ends after two newlines. If there isn't one, or it doesn't contain the required copyright contents, wpiformat inserts a new one containing the current year.
 
