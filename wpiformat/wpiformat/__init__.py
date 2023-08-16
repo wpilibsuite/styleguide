@@ -89,6 +89,9 @@ def proc_pipeline(name):
     try:
         config_file = Config(os.path.dirname(name), ".wpiformat")
     except OSError:
+        print(
+            "Warning: '.wpiformat' file not found. Looking for deprecated '.styleguide' file."
+        )
         # TODO: Remove handling for deprecated .styleguide file
         config_file = Config(os.path.dirname(name), ".styleguide")
         print("Warning: found deprecated '.styleguide' file. Rename to '.wpiformat'.")
