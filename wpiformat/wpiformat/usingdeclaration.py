@@ -18,7 +18,7 @@ class UsingDeclaration(Task):
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
         token_regex = regex.compile(
-            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|\{|\}|using\s[^;]*;"
+            r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|\{|\}|using\b"
         )
 
         brace_count = 0
@@ -69,13 +69,12 @@ class UsingDeclaration(Task):
                     linenum = lines.count(linesep, 0, match.start()) + 1
                     if "NOLINT" not in lines.splitlines()[linenum - 1]:
                         format_succeeded = False
-                        print(
-                            name
-                            + ": "
-                            + str(linenum)
-                            + ": '"
-                            + token
-                            + "' in global namespace"
-                        )
+
+                        # Extract using declaration
+                        using_decl = lines[
+                            match.start() : lines.find(";", match.start()) + 1
+                        ]
+
+                        print(f"{name}: {linenum}: '{using_decl}' in global namespace")
 
         return lines, format_succeeded
