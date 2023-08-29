@@ -52,4 +52,20 @@ def test_usingdeclaration():
     )
     test.add_output("", True)
 
+    # "using" in comment without trailing semicolon
+    test.add_input(
+        "./Test.h",
+        "// using"
+        + os.linesep
+        + "void func() {"
+        + os.linesep
+        + "  using A = int;"
+        + os.linesep
+        + "  using B = int;"
+        + os.linesep
+        + "}"
+        + os.linesep,
+    )
+    test.add_output("", True)
+
     test.run(OutputType.STDOUT)
