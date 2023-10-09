@@ -49,9 +49,13 @@ import itertools
 import math  # for log
 import os
 import regex
-import sre_compile
 import string
 import sys
+
+try:
+    import re._compiler as sre_compile
+except ImportError:  # Python < 3.11
+    import sre_compile
 
 # if empty, use defaults
 _header_regex = regex.compile("a^")
