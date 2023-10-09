@@ -6,8 +6,8 @@ readme = "README.rst"
 dependencies = [
   "regex==2022.9.13",
   "black==23.3.0",
-  "clang-format==16.0.4",
-  "clang-tidy==15.0.2.1"
+  "clang-format==17.0.2",
+  "clang-tidy==17.0.1"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
