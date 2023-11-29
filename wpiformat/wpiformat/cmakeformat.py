@@ -9,7 +9,7 @@ from wpiformat.task import Task
 class CMakeFormat(Task):
     @staticmethod
     def should_process_file(config_file, name):
-        return name.endswith("CMakeLists.txt")
+        return name.endswith("CMakeLists.txt") or name.endswith(".cmake")
 
     @staticmethod
     def run_batch(config_file, names):
