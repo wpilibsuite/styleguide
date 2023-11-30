@@ -484,7 +484,6 @@ def main():
         task_pipeline = [
             BraceComment(),
             CIdentList(),
-            CMakeFormat(),
             EofNewline(),
             GTestName(),
             IncludeGuard(),
@@ -501,7 +500,7 @@ def main():
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
-        task_pipeline = [PyFormat(), Lint()]
+        task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
         run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
