@@ -484,7 +484,6 @@ def main():
         task_pipeline = [
             BraceComment(),
             CIdentList(),
-            CMakeFormat(),
             EofNewline(),
             GTestName(),
             IncludeGuard(),
@@ -498,10 +497,34 @@ def main():
             ClangFormat(args.clang_version),
             Jni(),  # Fixes clang-format formatting
         ]
+
+        # Check tasks are all pipeline tasks
+        invalid_tasks = [
+            type(task).__name__
+            for task in task_pipeline
+            # Pipeline tasks must override run_pipeline
+            if Task.run_pipeline == type(task).run_pipeline
+        ]
+        if invalid_tasks:
+            print(f"error: the following pipeline tasks are invalid: {invalid_tasks}")
+            return False
+
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
-        task_pipeline = [PyFormat(), Lint()]
+        task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
+
+        # Check tasks are all batch tasks
+        invalid_tasks = [
+            type(task).__name__
+            for task in task_pipeline
+            # Batch tasks must override run_batch
+            if Task.run_batch == type(task).run_batch
+        ]
+        if invalid_tasks:
+            print(f"error: the following batch tasks are invalid: {invalid_tasks}")
+            return False
+
         run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
