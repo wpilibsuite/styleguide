@@ -14,38 +14,7 @@ class CMakeFormat(Task):
     @staticmethod
     def run_batch(config_file, names):
         try:
-            args = [
-                sys.executable,
-                "-m",
-                "gersemi",
-                "-i",
-                "apriltag",
-                "cameraserver",
-                "cmake/modules",
-                "cmake/scripts",
-                "cscore",
-                "datalogtool",
-                "fieldImages",
-                "hal",
-                "imgui",
-                "ntcore",
-                "outlineviewer",
-                "roborioteamnumbersetter",
-                "romiVendordep",
-                "simulation",
-                "sysid",
-                "wpigui",
-                "wpilibc",
-                "wpilibcExamples",
-                "wpilibj",
-                "wpilibNewCommands",
-                "wpimath",
-                "wpinet",
-                "wpiunits",
-                "wpiutil",
-                "xrpVendordep",
-                "CMakeLists.txt",
-            ]
+            args = [sys.executable, "-m", "gersemi", "-i"]
             returncode = subprocess.run(args + names).returncode
         except FileNotFoundError:
             print("Error: gersemi not found in PATH. Is it installed?", file=sys.stderr)
