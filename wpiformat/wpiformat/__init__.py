@@ -387,7 +387,8 @@ def main():
             os.remove(f)
 
         # Recursively create list of files in given directory
-        files = [os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn]
+        files = [os.path.join(dp, f)
+                 for dp, dn, fn in os.walk(root_path) for f in fn]
 
         if not files:
             print("Error: no files found to format", file=sys.stderr)
@@ -398,7 +399,8 @@ def main():
             # If a directory was specified, recursively expand it
             if os.path.isdir(name):
                 files.extend(
-                    [os.path.join(dp, f) for dp, dn, fn in os.walk(name) for f in fn]
+                    [os.path.join(dp, f)
+                     for dp, dn, fn in os.walk(name) for f in fn]
                 )
             else:
                 files.append(name)
@@ -439,7 +441,8 @@ def main():
     output_list = subprocess.check_output(
         ["git", "diff", "--name-only", f"{main_branch}..."], encoding="ascii"
     ).split()
-    changed_file_list = [root_path + os.sep + line.strip() for line in output_list]
+    changed_file_list = [root_path + os.sep + line.strip()
+                         for line in output_list]
 
     # Don't run tasks on modifiable or generated files
     work = []
@@ -471,7 +474,8 @@ def main():
 
     # Prepare file batches for batch tasks
     chunksize = math.ceil(len(files) / args.jobs)
-    file_batches = [files[i : i + chunksize] for i in range(0, len(files), chunksize)]
+    file_batches = [files[i: i + chunksize]
+                    for i in range(0, len(files), chunksize)]
 
     if args.no_format:
         # Only run Lint
@@ -484,7 +488,6 @@ def main():
         task_pipeline = [
             BraceComment(),
             CIdentList(),
-            CMakeFormat(),
             EofNewline(),
             GTestName(),
             IncludeGuard(),
@@ -501,7 +504,7 @@ def main():
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
-        task_pipeline = [PyFormat(), Lint()]
+        task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
         run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
@@ -512,7 +515,8 @@ def main():
             ClangTidy(
                 args.clang_version,
                 args.compile_commands,
-                args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
+                args.tidy_extra_args.split(
+                    ",") if args.tidy_extra_args else [],
             )
         ]
         run_standalone(task_pipeline, args, files)
