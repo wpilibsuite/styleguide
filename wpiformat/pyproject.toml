@@ -7,7 +7,8 @@ dependencies = [
   "regex==2023.10.3",
   "black==23.9.1",
   "clang-format==17.0.5",
-  "clang-tidy==17.0.1"
+  "clang-tidy==17.0.1",
+  "gersemi==0.9.3"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
