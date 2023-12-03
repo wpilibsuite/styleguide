@@ -9,9 +9,7 @@ from abc import *
 import os
 
 
-class Task:
-    __metaclass__ = ABCMeta
-
+class Task(metaclass=ABCMeta):
     @staticmethod
     def get_linesep(lines):
         """Returns string containing autodetected line separator for file.
