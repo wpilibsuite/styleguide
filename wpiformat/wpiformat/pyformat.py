@@ -14,7 +14,10 @@ class PyFormat(Task):
     @staticmethod
     def run_batch(config_file, names):
         try:
-            args = [sys.executable, "-m", "black", "-q"]
+            # Force one worker because wpiformat already uses a process pool,
+            # and we need to keep the total number of multiprocessing processes
+            # below the Windows system limit.
+            args = [sys.executable, "-m", "black", "--workers", "1", "-q"]
             subprocess.run(args + names)
         except FileNotFoundError:
             print("Error: black not found in PATH. Is it installed?", file=sys.stderr)
