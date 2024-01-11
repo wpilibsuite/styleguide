@@ -15,7 +15,7 @@ class CMakeFormat(Task):
     def run_batch(config_file, names):
         try:
             args = [sys.executable, "-m", "gersemi", "-i"]
-            returncode = subprocess.run(args + names).returncode
+            subprocess.run(args + names)
         except FileNotFoundError:
             print("Error: gersemi not found in PATH. Is it installed?", file=sys.stderr)
             return False
