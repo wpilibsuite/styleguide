@@ -15,7 +15,7 @@ class PyFormat(Task):
     def run_batch(config_file, names):
         try:
             args = [sys.executable, "-m", "black", "-q"]
-            returncode = subprocess.run(args + names).returncode
+            subprocess.run(args + names)
         except FileNotFoundError:
             print("Error: black not found in PATH. Is it installed?", file=sys.stderr)
             return False
