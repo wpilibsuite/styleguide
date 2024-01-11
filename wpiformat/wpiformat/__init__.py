@@ -512,7 +512,12 @@ def main():
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
-        task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
+        # CMakeFormat doesn't work on high core count machines.
+        if mp.cpu_count() > 60:
+            task_pipeline = [PyFormat(), Lint()]
+            print("warning: Skipping CMake formatter due to too high CPU count.")
+        else:
+            task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
 
         # Check tasks are all batch tasks
         invalid_tasks = [
