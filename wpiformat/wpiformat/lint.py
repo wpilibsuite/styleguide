@@ -12,10 +12,10 @@ import os
 import sys
 
 from wpiformat import cpplint
-from wpiformat.task import Task
+from wpiformat.task import BatchTask
 
 
-class Lint(Task):
+class Lint(BatchTask):
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)

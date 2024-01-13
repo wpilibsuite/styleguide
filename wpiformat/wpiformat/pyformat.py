@@ -4,10 +4,10 @@ import multiprocessing as mp
 import subprocess
 import sys
 
-from wpiformat.task import Task
+from wpiformat.task import BatchTask
 
 
-class PyFormat(Task):
+class PyFormat(BatchTask):
     @staticmethod
     def should_process_file(config_file, name):
         return name.endswith(".py")

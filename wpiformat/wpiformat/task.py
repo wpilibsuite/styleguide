@@ -1,17 +1,10 @@
-"""Provides a task base class for use by format.py.
+"""Task base classes for wpiformat."""
 
-format.py excludes matches for the "modifiable" regex before checking for
-modifications to generated files because some of the regexes from each group
-overlap.
-"""
-
-from abc import *
+from abc import ABCMeta, abstractmethod
 import os
 
 
-class Task:
-    __metaclass__ = ABCMeta
-
+class Task(metaclass=ABCMeta):
     @staticmethod
     def get_linesep(lines):
         """Returns string containing autodetected line separator for file.
@@ -44,7 +37,6 @@ class Task:
         return ""
 
     @staticmethod
-    @abstractmethod
     def should_process_file(config_file, name):
         """Returns true if file should be processed by this task.
 
@@ -56,6 +48,8 @@ class Task:
         """
         return True
 
+
+class PipelineTask(Task):
     @abstractmethod
     def run_pipeline(self, config_file, name, lines):
         """Performs task on file with given lines.
@@ -72,6 +66,8 @@ class Task:
         """
         return ("", True)
 
+
+class BatchTask(Task):
     @staticmethod
     @abstractmethod
     def run_batch(config_file, names):
@@ -84,6 +80,22 @@ class Task:
         config_file -- Config object
         names -- list of file name strings
 
-        Returns True if task succeeded in formatting the files.
+        Returns True if task succeeded in processing the files.
+        """
+        return True
+
+
+class StandaloneTask(Task):
+    @abstractmethod
+    def run_standalone(self, config_file, name):
+        """Performs task on a file.
+
+        This function is for processing the file on its own.
+
+        Keyword arguments:
+        config_file -- Config object
+        name -- file name string
+
+        Returns True if task succeeded in processing the file.
         """
         return True

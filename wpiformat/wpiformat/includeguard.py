@@ -6,7 +6,7 @@ import os
 import regex
 
 from enum import Enum
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
 class State(Enum):
@@ -15,7 +15,7 @@ class State(Enum):
     DONE = 3
 
 
-class IncludeGuard(Task):
+class IncludeGuard(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_header_file(name)

@@ -5,10 +5,10 @@ import sys
 
 import clang_tidy
 
-from wpiformat.task import Task
+from wpiformat.task import StandaloneTask
 
 
-class ClangTidy(Task):
+class ClangTidy(StandaloneTask):
     def __init__(self, clang_version, compile_commands, extra_args):
         """Constructor for ClangTidy task.
 

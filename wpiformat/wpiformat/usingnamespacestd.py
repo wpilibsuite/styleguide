@@ -2,10 +2,10 @@
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class UsingNamespaceStd(Task):
+class UsingNamespaceStd(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_file(name)

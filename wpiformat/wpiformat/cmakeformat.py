@@ -3,10 +3,10 @@
 import subprocess
 import sys
 
-from wpiformat.task import Task
+from wpiformat.task import BatchTask
 
 
-class CMakeFormat(Task):
+class CMakeFormat(BatchTask):
     @staticmethod
     def should_process_file(config_file, name):
         return name.endswith("CMakeLists.txt") or name.endswith(".cmake")

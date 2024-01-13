@@ -23,7 +23,7 @@ from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
 from wpiformat.pyformat import PyFormat
 from wpiformat.stdlib import Stdlib
-from wpiformat.task import Task
+from wpiformat.task import BatchTask, PipelineTask, StandaloneTask, Task
 from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
@@ -212,9 +212,49 @@ def run_pipeline(task_pipeline, args, files):
     """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
+    # Check tasks are all pipeline tasks
+    invalid_tasks = [
+        type(task).__name__
+        for task in task_pipeline
+        if not issubclass(type(task), PipelineTask)
+    ]
+    if invalid_tasks:
+        print(f"error: the following pipeline tasks are invalid: {invalid_tasks}")
+        sys.exit(1)
+
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
         # Start worker processes for task pipeline
         results = pool.map(proc_pipeline, files)
+
+        if not all(results):
+            sys.exit(1)
+
+
+def run_batch(task_pipeline, args, file_batches):
+    """Spawns process pool for proc_batch().
+
+    Keyword arguments:
+    task_pipeline -- task pipeline
+    args -- command line arguments from argparse
+    file_batches -- list of file names to process
+
+    Calls sys.exit(1) if any task fails.
+    """
+    init_args = (task_pipeline, args.verbose1, args.verbose2)
+
+    # Check tasks are all batch tasks
+    invalid_tasks = [
+        type(task).__name__
+        for task in task_pipeline
+        if not issubclass(type(task), BatchTask)
+    ]
+    if invalid_tasks:
+        print(f"error: the following batch tasks are invalid: {invalid_tasks}")
+        sys.exit(1)
+
+    with mp.Pool(args.jobs, proc_init, init_args) as pool:
+        # Start worker processes for batch tasks
+        results = pool.map(proc_batch, file_batches)
 
         if not all(results):
             sys.exit(1)
@@ -232,28 +272,19 @@ def run_standalone(task_pipeline, args, files):
     """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
+    # Check tasks are all standalone tasks
+    invalid_tasks = [
+        type(task).__name__
+        for task in task_pipeline
+        if not issubclass(type(task), StandaloneTask)
+    ]
+    if invalid_tasks:
+        print(f"error: the following standalone tasks are invalid: {invalid_tasks}")
+        sys.exit(1)
+
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
-        # Start worker processes for task pipeline
+        # Start worker processes for standalone tasks
         results = pool.map(proc_standalone, files)
-
-        if not all(results):
-            sys.exit(1)
-
-
-def run_batch(task_pipeline, args, file_batches):
-    """Spawns process pool for proc_batch().
-
-    Keyword arguments:
-    task_pipeline -- task pipeline
-    args -- command line arguments from argparse
-    file_batches -- list of file names to process
-
-    """
-    init_args = (task_pipeline, args.verbose1, args.verbose2)
-
-    with mp.Pool(args.jobs, proc_init, init_args) as pool:
-        # Start worker processes for batch tasks
-        results = pool.map(proc_batch, file_batches)
 
         if not all(results):
             sys.exit(1)
@@ -497,18 +528,6 @@ def main():
             ClangFormat(args.clang_version),
             Jni(),  # Fixes clang-format formatting
         ]
-
-        # Check tasks are all pipeline tasks
-        invalid_tasks = [
-            type(task).__name__
-            for task in task_pipeline
-            # Pipeline tasks must override run_pipeline
-            if Task.run_pipeline == type(task).run_pipeline
-        ]
-        if invalid_tasks:
-            print(f"error: the following pipeline tasks are invalid: {invalid_tasks}")
-            return False
-
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
@@ -518,17 +537,6 @@ def main():
             print("warning: Skipping CMake formatter due to too high CPU count.")
         else:
             task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
-
-        # Check tasks are all batch tasks
-        invalid_tasks = [
-            type(task).__name__
-            for task in task_pipeline
-            # Batch tasks must override run_batch
-            if Task.run_batch == type(task).run_batch
-        ]
-        if invalid_tasks:
-            print(f"error: the following batch tasks are invalid: {invalid_tasks}")
-            return False
 
         run_batch(task_pipeline, args, file_batches)
 
