@@ -2,10 +2,10 @@
 
 import os
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class Whitespace(Task):
+class Whitespace(PipelineTask):
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
 

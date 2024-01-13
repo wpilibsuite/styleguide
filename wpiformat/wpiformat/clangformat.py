@@ -5,10 +5,10 @@ import sys
 
 import clang_format
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class ClangFormat(Task):
+class ClangFormat(PipelineTask):
     def __init__(self, clang_version):
         """Constructor for ClangFormat task.
 

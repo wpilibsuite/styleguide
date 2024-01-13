@@ -3,10 +3,10 @@
 import os
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class IncludeOrder(Task):
+class IncludeOrder(PipelineTask):
     def __init__(self):
         super().__init__()
 

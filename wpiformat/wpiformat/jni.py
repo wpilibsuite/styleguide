@@ -21,10 +21,10 @@ automatically generated based on the function's return type and arguments.
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class Jni(Task):
+class Jni(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_cpp_src_file(name)

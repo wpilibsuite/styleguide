@@ -2,10 +2,10 @@
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class CIdentList(Task):
+class CIdentList(PipelineTask):
     @staticmethod
     def __print_failure(name):
         print(

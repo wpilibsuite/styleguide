@@ -4,10 +4,10 @@ namespace declarations matches that of the declaration name.
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class BraceComment(Task):
+class BraceComment(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)

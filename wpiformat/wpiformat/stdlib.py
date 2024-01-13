@@ -4,7 +4,7 @@ and assert.h are exceptions.
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
 class Header:
@@ -70,7 +70,7 @@ class Header:
             self.type_regex = None
 
 
-class Stdlib(Task):
+class Stdlib(PipelineTask):
     def __init__(self):
         super().__init__()
 

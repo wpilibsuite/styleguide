@@ -2,10 +2,10 @@
 
 import regex
 
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class JavaClass(Task):
+class JavaClass(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         return name.endswith(".java")

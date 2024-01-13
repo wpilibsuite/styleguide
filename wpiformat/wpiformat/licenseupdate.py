@@ -7,10 +7,10 @@ import subprocess
 import sys
 
 from wpiformat.config import Config
-from wpiformat.task import Task
+from wpiformat.task import PipelineTask
 
 
-class LicenseUpdate(Task):
+class LicenseUpdate(PipelineTask):
     @staticmethod
     def should_process_file(config_file, name):
         license_regex = config_file.regex("licenseUpdateExclude")
