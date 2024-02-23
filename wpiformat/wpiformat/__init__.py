@@ -324,7 +324,9 @@ def main():
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
     # once, and mp uses a few internal events. Therefore, the maximum number of
     # parallel jobs is 60.
-    cpu_count = min(60, mp.cpu_count())
+    cpu_count = mp.cpu_count()
+    if sys.platform == "win32":
+        cpu_count = min(cpu_count, 60)
     parser.add_argument(
         "-j",
         dest="jobs",
@@ -531,12 +533,7 @@ def main():
         run_pipeline(task_pipeline, args, files)
 
         # Lint is run last since previous tasks can affect its output.
-        # CMakeFormat doesn't work on high core count machines.
-        if mp.cpu_count() > 60:
-            task_pipeline = [PyFormat(), Lint()]
-            print("warning: Skipping CMake formatter due to too high CPU count.")
-        else:
-            task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
+        task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
 
         run_batch(task_pipeline, args, file_batches)
 
