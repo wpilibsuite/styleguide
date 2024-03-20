@@ -22,10 +22,10 @@ class Lint(BatchTask):
 
     @staticmethod
     def run_batch(config_file, names):
-        # Handle running in either the root or styleguide directories
+        # Handle running in either the root or wpiformat directories
         cpplintPrefix = ""
-        if os.getcwd().rpartition(os.sep)[2] != "styleguide":
-            cpplintPrefix = "styleguide/"
+        if os.getcwd().rpartition(os.sep)[2] != "wpiformat":
+            cpplintPrefix = "wpiformat/"
 
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv

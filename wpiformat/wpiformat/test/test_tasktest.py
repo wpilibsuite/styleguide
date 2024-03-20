@@ -68,7 +68,7 @@ class TaskTest:
         """
         assert len(self.inputs) == len(self.outputs)
 
-        config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+        config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
 
         for i in range(len(self.inputs)):
             if self.task.should_process_file(config_file, self.inputs[i][0]):
