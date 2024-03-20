@@ -4,7 +4,7 @@ description = "Linters and formatters for ensuring WPILib's source code conforms
 dynamic = [ "version" ]
 readme = "README.rst"
 dependencies = [
-  "black==24.2.0",
+  "black==24.3.0",
   "clang-format==18.1.1",
   "clang-tidy==18.1.1",
   "gersemi==0.11.0",
