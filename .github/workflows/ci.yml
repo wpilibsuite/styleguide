@@ -17,16 +17,17 @@ jobs:
     name: Test - ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Fetch all history and metadata
       run: |
-        git fetch --prune --unshallow
         git checkout -b pr
         git branch -f main origin/main
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -121,11 +122,11 @@ jobs:
     needs: [test]
     if: ${{ github.repository_owner == 'wpilibsuite' && github.ref == 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -137,7 +138,7 @@ jobs:
         working-directory: wpiformat
 
       - name: Upload package to PyPi
-        uses: pypa/gh-action-pypi-publish@v1.4.1
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages_dir: wpiformat/dist
           password: ${{ secrets.PYPI_PASSWORD }}
