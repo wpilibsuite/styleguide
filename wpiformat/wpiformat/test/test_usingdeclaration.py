@@ -1,6 +1,4 @@
-import io
 import os
-import sys
 
 from .test_tasktest import *
 from wpiformat.usingdeclaration import UsingDeclaration

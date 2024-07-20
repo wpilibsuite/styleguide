@@ -8,7 +8,6 @@ When it was moved into a separate repository, the difference in directories
 required it to be used as a module.
 """
 
-import os
 import sys
 
 from wpiformat import cpplint
@@ -22,11 +21,6 @@ class Lint(BatchTask):
 
     @staticmethod
     def run_batch(config_file, names):
-        # Handle running in either the root or styleguide directories
-        cpplintPrefix = ""
-        if os.getcwd().rpartition(os.sep)[2] != "styleguide":
-            cpplintPrefix = "styleguide/"
-
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
 

@@ -392,8 +392,6 @@ class Stdlib(PipelineTask):
         """
         pos = 0
         while pos < len(lines):
-            old_length = len(lines)
-
             # Check for function starting at "pos"
             match = header.func_regex.search(lines, pos)
             if not match:

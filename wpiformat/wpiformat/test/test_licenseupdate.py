@@ -1,7 +1,6 @@
 from datetime import date
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 

@@ -1,7 +1,5 @@
 """This task removes trailing whitespace from the file."""
 
-import os
-
 from wpiformat.task import PipelineTask
 
 

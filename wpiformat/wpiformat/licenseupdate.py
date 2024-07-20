@@ -4,7 +4,6 @@ from datetime import date
 import os
 import regex
 import subprocess
-import sys
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
