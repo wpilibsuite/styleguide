@@ -20,6 +20,7 @@ class PyFormat(BatchTask):
                 "autoflake",
                 "--remove-all-unused-imports",
                 "--remove-unused-variables",
+                "--ignore-init-module-imports",
                 "--quiet",
                 "-i",
             ]
