@@ -1,7 +1,7 @@
 """Task base classes for wpiformat."""
 
 from abc import ABCMeta, abstractmethod
-import os
+import subprocess
 
 
 class Task(metaclass=ABCMeta):
@@ -29,12 +29,12 @@ class Task(metaclass=ABCMeta):
 
         An empty string is returned if no repository root was found.
         """
-        current_dir = os.path.abspath(os.getcwd())
-        while current_dir != os.path.dirname(current_dir):
-            if os.path.exists(current_dir + os.sep + ".git"):
-                return current_dir
-            current_dir = os.path.dirname(current_dir)
-        return ""
+        return subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            encoding="ascii",
+        ).stdout.rstrip()
 
     @staticmethod
     def should_process_file(config_file, name):
