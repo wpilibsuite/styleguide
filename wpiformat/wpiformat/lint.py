@@ -8,6 +8,7 @@ When it was moved into a separate repository, the difference in directories
 required it to be used as a module.
 """
 
+import os
 import sys
 
 from wpiformat import cpplint
@@ -24,21 +25,40 @@ class Lint(BatchTask):
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
 
-        # Prepare source file and header file regex strings
-        srcs = config_file.group("cppSrcFileInclude")
-        if srcs:
-            srcs = "|".join(srcs)
-        else:
-            srcs = "a^"
-        headers = config_file.group("cHeaderFileInclude") + config_file.group(
-            "cppHeaderFileInclude"
-        )
-        if headers:
-            headers = "|".join(headers)
-        else:
-            headers = "a^"
+        exclusion_filters = [
+            "build/c++11",
+            "build/c++17",
+            "build/header_guard",
+            "build/include_order",
+            "build/include_subdir",
+            "build/namespaces",
+            "legal/copyright",
+            "readability/check",
+            "readability/todo",
+            "runtime/references",
+            "runtime/string",
+            "whitespace/braces",
+            "whitespace/indent",
+            "whitespace/indent_namespace",
+            "whitespace/line_length",
+            "whitespace/newline",
+            "whitespace/parens",
+        ]
 
-        sys.argv = ["cpplint.py", "--srcs=" + srcs, "--headers=" + headers] + names
+        # Prepare header file extensions
+        header_exts = []
+        for pattern in config_file.group("cHeaderFileInclude") + config_file.group(
+            "cppHeaderFileInclude"
+        ):
+            basename = os.path.basename(pattern)
+            header_exts.append(basename[basename.rfind(".") + 1 :].rstrip("$"))
+
+        sys.argv = [
+            "cpplint.py",
+            "--filter=-" + ",-".join(exclusion_filters),
+            "--headers=" + ",".join(header_exts) if header_exts else "",
+            "--quiet",
+        ] + names
 
         # Run cpplint.py
         try:
