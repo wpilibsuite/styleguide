@@ -53,12 +53,11 @@ class Lint(BatchTask):
             basename = os.path.basename(pattern)
             header_exts.append(basename[basename.rfind(".") + 1 :].rstrip("$"))
 
-        sys.argv = [
-            "cpplint.py",
-            "--filter=-" + ",-".join(exclusion_filters),
-            "--headers=" + ",".join(header_exts) if header_exts else "",
-            "--quiet",
-        ] + names
+        args = ["cpplint.py", "--filter=-" + ",-".join(exclusion_filters)]
+        if header_exts:
+            args.append("--headers=" + ",".join(header_exts))
+        args.append("--quiet")
+        sys.argv = args + names
 
         # Run cpplint.py
         try:
