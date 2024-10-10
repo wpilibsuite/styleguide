@@ -494,4 +494,12 @@ def test_cidentlist():
         True,
     )
 
+    # Ensure single quotes in numeric literals are ignored
+    test.add_input("./Test.cpp", "void func() { int x = 1'000; }")
+    test.add_latest_input_as_output(True)
+
+    # Ensure single quotes after numeric literals are not ignored
+    test.add_input("./Test.cpp", "void func() { std::cout << 1 << '0'; }")
+    test.add_latest_input_as_output(True)
+
     test.run(OutputType.FILE)
