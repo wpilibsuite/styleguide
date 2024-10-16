@@ -9,7 +9,7 @@ dependencies = [
   "clang-format==18.1.1",
   "clang-tidy==18.1.1",
   "gersemi==0.11.0",
-  "regex==2023.10.3"
+  "regex==2024.9.11"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -38,7 +38,7 @@ wpiformat = "wpiformat:main"
 requires = [
   "clang-format==18.1.1",
   "clang-tidy==18.1.1",
-  "regex==2023.10.3",
+  "regex==2024.9.11",
   "setuptools>=61.0",
   "setuptools-git-versioning"
 ]
