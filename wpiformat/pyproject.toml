@@ -9,6 +9,7 @@ dependencies = [
   "clang-format==18.1.1",
   "clang-tidy==18.1.1",
   "gersemi==0.11.0",
+  "isort==5.11.2",
   "regex==2024.9.11"
 ]
 classifiers = [
