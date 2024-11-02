@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.cidentlist import CIdentList
+
+from .test_tasktest import *
 
 
 def test_cidentlist():

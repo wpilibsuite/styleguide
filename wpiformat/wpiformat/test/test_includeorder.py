@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.includeorder import IncludeOrder
+
+from .test_tasktest import *
 
 
 def test_includeorder():

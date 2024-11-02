@@ -1,7 +1,7 @@
 """This task runs clang-format on the file."""
 
-from subprocess import Popen, PIPE
 import sys
+from subprocess import PIPE, Popen
 
 import clang_format
 

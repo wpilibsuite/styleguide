@@ -1,6 +1,7 @@
 """This task sorts C/C++ includes."""
 
 import os
+
 import regex
 
 from wpiformat.task import PipelineTask

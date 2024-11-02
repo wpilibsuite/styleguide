@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.javaclass import JavaClass
+
+from .test_tasktest import *
 
 
 def test_javaclass():

@@ -1,9 +1,9 @@
 """This class is for writing unit tests for tasks."""
 
-from enum import Enum
 import io
 import os
 import sys
+from enum import Enum
 
 from wpiformat.config import Config
 

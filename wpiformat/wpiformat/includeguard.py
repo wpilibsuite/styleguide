@@ -3,9 +3,10 @@ style guide.
 """
 
 import os
+from enum import Enum
+
 import regex
 
-from enum import Enum
 from wpiformat.task import PipelineTask
 
 

@@ -1,8 +1,9 @@
 """This class is for handling wpiformat config files."""
 
 import os
-import regex
 import sys
+
+import regex
 
 
 class Config:

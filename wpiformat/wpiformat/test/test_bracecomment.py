@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.bracecomment import BraceComment
+
+from .test_tasktest import *
 
 
 def test_bracecomment():

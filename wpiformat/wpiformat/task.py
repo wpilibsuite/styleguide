@@ -1,7 +1,7 @@
 """Task base classes for wpiformat."""
 
-from abc import ABCMeta, abstractmethod
 import subprocess
+from abc import ABCMeta, abstractmethod
 
 
 class Task(metaclass=ABCMeta):

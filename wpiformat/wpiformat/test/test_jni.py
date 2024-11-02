@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.jni import Jni
+
+from .test_tasktest import *
 
 
 def test_jni():

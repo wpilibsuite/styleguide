@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.whitespace import Whitespace
+
+from .test_tasktest import *
 
 
 def test_whitespace():
