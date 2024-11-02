@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.usingdeclaration import UsingDeclaration
+
+from .test_tasktest import *
 
 
 def test_usingdeclaration():

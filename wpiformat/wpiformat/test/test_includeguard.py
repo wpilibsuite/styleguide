@@ -1,8 +1,9 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.includeguard import IncludeGuard
 from wpiformat.task import Task
+
+from .test_tasktest import *
 
 
 def test_includeguard():

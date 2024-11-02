@@ -1,12 +1,13 @@
-from datetime import date
 import os
-from pathlib import Path
 import subprocess
 import tempfile
+from datetime import date
+from pathlib import Path
 
-from .test_tasktest import *
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
+
+from .test_tasktest import *
 
 
 class OpenTemporaryDirectory:

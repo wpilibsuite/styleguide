@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.stdlib import Stdlib
+
+from .test_tasktest import *
 
 
 def test_stdlib():

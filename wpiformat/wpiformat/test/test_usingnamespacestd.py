@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.usingnamespacestd import UsingNamespaceStd
+
+from .test_tasktest import *
 
 
 def test_usingnamespacestd():

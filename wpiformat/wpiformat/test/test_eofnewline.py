@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.eofnewline import EofNewline
+
+from .test_tasktest import *
 
 
 def test_eofnewline():

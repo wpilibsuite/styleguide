@@ -1,9 +1,10 @@
 """This task updates the license header at the top of the file."""
 
-from datetime import date
 import os
-import regex
 import subprocess
+from datetime import date
+
+import regex
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask

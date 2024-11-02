@@ -1,7 +1,8 @@
 import os
 
-from .test_tasktest import *
 from wpiformat.gtestname import GTestName
+
+from .test_tasktest import *
 
 
 def test_gtestname():
