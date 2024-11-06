@@ -6,7 +6,7 @@ Provides linters and formatters for ensuring WPILib's C++, Java, and Python code
 Dependencies
 ************
 
-- `Python 3.6 or newer <https://www.python.org/downloads/>`_
+- `Python 3.9 or newer <https://www.python.org/downloads/>`_
 
 Installation
 ************
