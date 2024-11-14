@@ -29,8 +29,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Python dependencies
-      run: pip install build
+    - run: pip install build
 
     - name: Install wpiformat
       run: |
@@ -39,15 +38,14 @@ jobs:
         pip install dist/*.whl
       shell: bash
 
-    - name: Install test dependencies
-      run: pip install tox
+    - run: pip install pytest
 
     - name: Run unit tests
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
         cd wpiformat
-        tox
+        pytest
 
     - name: wpiformat - whole repo
       run: |
