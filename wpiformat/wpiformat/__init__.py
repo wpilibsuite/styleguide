@@ -439,8 +439,11 @@ def main():
     # Throw an error if any files or directories don't exist
     for f in files:
         if not os.path.exists(f):
-            print(f"error: {f}: No such file or directory")
-            sys.exit(1)
+            if not os.path.islink(f):
+                print(f"error: {f}: No such file or directory")
+                sys.exit(1)
+            else:
+                print(f"warning: {f}: Broken symlink")
 
     # Convert relative paths of files to absolute paths
     files = [os.path.abspath(name) for name in files]
