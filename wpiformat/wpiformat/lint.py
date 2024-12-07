@@ -38,11 +38,18 @@ class Lint(BatchTask):
             "runtime/references",
             "runtime/string",
             "whitespace/braces",
+            "whitespace/comma",
+            "whitespace/comments",
+            "whitespace/end_of_line",
+            "whitespace/ending_newline",
             "whitespace/indent",
             "whitespace/indent_namespace",
             "whitespace/line_length",
             "whitespace/newline",
+            "whitespace/operators",
             "whitespace/parens",
+            "whitespace/semicolon",
+            "whitespace/tab",
         ]
 
         # Prepare header file extensions
