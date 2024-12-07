@@ -436,15 +436,6 @@ def main():
             else:
                 files.append(name)
 
-    # Throw an error if any files or directories don't exist
-    for f in files:
-        if not os.path.exists(f):
-            if not os.path.islink(f):
-                print(f"error: {f}: No such file or directory")
-                sys.exit(1)
-            else:
-                print(f"warning: {f}: Broken symlink")
-
     # Convert relative paths of files to absolute paths
     files = [os.path.abspath(name) for name in files]
 
@@ -453,6 +444,15 @@ def main():
 
     # Don't check for changes in or run tasks on ignored files
     files = filter_ignored_files(files)
+
+    # Throw an error if any files or directories don't exist
+    for f in files:
+        if not os.path.exists(f):
+            if not os.path.islink(f):
+                print(f"error: {f}: No such file or directory")
+                sys.exit(1)
+            else:
+                print(f"warning: {f}: Broken symlink")
 
     # Determine name of main branch for generated file comparisons
     branch_options = ["master", "main"]
