@@ -18,6 +18,17 @@ class CIdentList(PipelineTask):
     def should_process_file(config_file, name):
         return config_file.is_c_file(name) or config_file.is_cpp_file(name)
 
+    @staticmethod
+    def is_quote_in_number(lines, i):
+        if i == 0:
+            return False
+        c = lines[i - 1]
+        return (
+            ord("0") <= ord(c) <= ord("9")
+            or ord("A") <= ord(c) <= ord("F")
+            or ord("a") <= ord(c) <= ord("f")
+        )
+
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
 
@@ -46,7 +57,6 @@ class CIdentList(PipelineTask):
         comment_str = r"/\*|\*/|//|" + linesep + r"|"
         string_str = r"\\\\|\\\"|\"|"
         char_str = r"\\'|'|"
-        digits_str = r"(?P<digits>\d+)|"
         extern_str = r"(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
         braces_str = r"\{|\}|;|def\s+\w+|\w+\**\s+\w+\s*(?P<paren>\(\))"
         postfix_str = r"(?=\s*(;|\{))"
@@ -55,7 +65,6 @@ class CIdentList(PipelineTask):
             + comment_str
             + string_str
             + char_str
-            + digits_str
             + extern_str
             + braces_str
             + postfix_str
@@ -76,7 +85,6 @@ class CIdentList(PipelineTask):
         in_singlecomment = False
         in_string = False
         in_char = False
-        last_digit_end = -1
         for match in token_regex.finditer(lines):
             token = match.group()
 
@@ -117,7 +125,9 @@ class CIdentList(PipelineTask):
             elif token == "\\'":
                 continue
             elif token == "'":
-                if not in_string and match.start() != last_digit_end:
+                if not in_string and not (
+                    not in_char and self.is_quote_in_number(lines, match.start())
+                ):
                     in_char = not in_char
             elif in_string or in_char:
                 # Tokens processed after this branch are ignored if they are in
@@ -168,8 +178,6 @@ class CIdentList(PipelineTask):
                 # Replaces () with (void)
                 output += lines[pos : match.span("paren")[0]] + "(void)"
                 pos = match.span("paren")[0] + len("()")
-            elif match.group("digits"):
-                last_digit_end = match.end()
 
         # Write rest of file if it wasn't all processed
         if pos < len(lines):
