@@ -125,10 +125,11 @@ class CIdentList(PipelineTask):
             elif token == "\\'":
                 continue
             elif token == "'":
-                if not in_string and not (
-                    not in_char and self.is_quote_in_number(lines, match.start())
-                ):
-                    in_char = not in_char
+                if in_string:
+                    continue
+                if not in_char and self.is_quote_in_number(lines, match.start()):
+                    continue
+                in_char = not in_char
             elif in_string or in_char:
                 # Tokens processed after this branch are ignored if they are in
                 # double or single quotes
