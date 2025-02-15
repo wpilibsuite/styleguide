@@ -4,7 +4,7 @@ from wpiformat.config import Config
 
 
 def test_config():
-    config_file = Config(os.path.abspath(os.getcwd()), ".styleguide")
+    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
     assert config_file.is_modifiable_file(
         "." + os.sep + "wpiformat" + os.sep + "javaguidelink.png"
     )
