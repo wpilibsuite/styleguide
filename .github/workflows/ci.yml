@@ -11,6 +11,11 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Set up main branch for versioning
+      run: |
+        git checkout -b pr
+        git branch -f main origin/main
+
     - name: Build wpiformat package
       uses: hynek/build-and-inspect-python-package@v2
       with:
