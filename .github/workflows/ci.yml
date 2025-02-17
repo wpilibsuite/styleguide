@@ -3,6 +3,24 @@ name: CI
 on: [push, pull_request]
 
 jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up main branch for versioning
+      run: |
+        git checkout -b pr
+        git branch -f main origin/main
+
+    - name: Build wpiformat package
+      uses: hynek/build-and-inspect-python-package@v2
+      with:
+        path: wpiformat
+
   test:
     strategy:
       fail-fast: false
@@ -12,6 +30,7 @@ jobs:
         exclude:
           - os: macos-14
             python-version: '3.9'
+    needs: [build]
     name: Test - ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -29,12 +48,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - run: pip install build
+    - name: Download built artifact to dist/
+      uses: actions/download-artifact@v4
+      with:
+        name: Packages
+        path: dist
 
     - name: Install wpiformat
       run: |
-        cd wpiformat
-        python -m build --wheel
         pip install dist/*.whl
       shell: bash
 
@@ -48,30 +69,25 @@ jobs:
         pytest
 
     - name: wpiformat - whole repo
-      run: |
-        cd wpiformat
-        python -m wpiformat -v
+      run: wpiformat -v
 
     - name: wpiformat - one file
       run: |
         cd wpiformat
-        python -m wpiformat -f wpiformat/__init__.py -v
+        wpiformat -f wpiformat/__init__.py -v
 
     - name: wpiformat - absolute path to file
       shell: bash
       run: |
-        cd wpiformat
-        python -m wpiformat -f $GITHUB_WORKSPACE/wpiformat/wpiformat/__init__.py -v
+        wpiformat -f $GITHUB_WORKSPACE/wpiformat/wpiformat/__init__.py -v
 
     - name: wpiformat - multiple files
       run: |
         cd wpiformat
-        python -m wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
+        wpiformat -f wpiformat/__init__.py wpiformat/__main__.py -v
 
     - name: wpiformat - directory
-      run: |
-        cd wpiformat
-        python -m wpiformat -f wpiformat -v
+      run: wpiformat -f wpiformat -v
 
     # Verify wpiformat reports an error if no master or main branch exists
     - name: Git repo with no branches
@@ -123,22 +139,11 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Download built artifact to dist/
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Install Python dependencies
-        run: pip install build
-
-      - name: Build package
-        run: python -m build
-        working-directory: wpiformat
+          name: Packages
+          path: dist
 
       - name: Upload package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: wpiformat/dist
