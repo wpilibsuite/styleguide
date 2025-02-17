@@ -51,4 +51,4 @@ version_callback = "wpiformat.version:get_version"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-testpaths = [ "wpiformat/test" ]
+testpaths = [ "test" ]
