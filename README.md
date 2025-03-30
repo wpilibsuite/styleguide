@@ -14,7 +14,7 @@ Style configuration files for IDEs are in the [ide](ide) folder. The style guide
 
 ## Setup
 
-See the `wpiformat` Python package [README](wpiformat/README.rst).
+See the `wpiformat` Python package [README](wpiformat/README.md).
 
 ## Contributing to Style Guide
 
