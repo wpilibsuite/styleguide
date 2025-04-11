@@ -24,7 +24,7 @@ def test_eofnewline():
 
     # Empty file
     test.add_input("./Test.h", "")
-    test.add_output("\n", True)
+    test.add_output("", True)
 
     test_output = file_appendix + os.linesep
 
