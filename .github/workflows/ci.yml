@@ -106,8 +106,8 @@ jobs:
         rm -rf branch-test
         mkdir branch-test && cd branch-test && git init
         git checkout -b master
-        touch .styleguide
-        git add .styleguide && git commit -q -m "Initial commit"
+        touch .wpiformat
+        git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat
 
     # Verify wpiformat reports success if "main" exists
@@ -117,8 +117,8 @@ jobs:
         rm -rf branch-test
         mkdir branch-test && cd branch-test && git init
         git checkout -b main
-        touch .styleguide
-        git add .styleguide && git commit -q -m "Initial commit"
+        touch .wpiformat
+        git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat
 
     - name: Delete branch-test folder
