@@ -5,12 +5,12 @@ dynamic = [ "version" ]
 readme = "README.md"
 dependencies = [
   "autoflake==2.3.1",
-  "black==24.3.0",
-  "clang-format==18.1.1",
-  "clang-tidy==18.1.1",
-  "gersemi==0.11.0",
-  "isort==5.11.2",
-  "regex==2024.9.11"
+  "black==25.1.0",
+  "clang-format==20.1.8",
+  "clang-tidy==20.1.0",
+  "gersemi==0.21.0",
+  "isort==6.0.1",
+  "regex==2024.11.6"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",

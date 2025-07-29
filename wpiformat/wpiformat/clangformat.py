@@ -19,7 +19,7 @@ class ClangFormat(PipelineTask):
         super().__init__()
 
         if clang_version == "":
-            self.exec_name = clang_format._get_executable("clang-format")
+            self.exec_name = clang_format.get_executable("clang-format")
         else:
             self.exec_name = "clang-format-" + clang_version
 
