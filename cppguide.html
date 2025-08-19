@@ -32,7 +32,7 @@
         </p>
         <p>
           There are two main overarching purposes to this guide. The first is
-          to act as a normal C++ style guide (both in terms fo formatting and
+          to act as a normal C++ style guide (both in terms of formatting and
           programming practices) for C++ developers of WPILib. The other
           purpose is to help Java programmers who may know a moderate amount of
           C++ but may not be fully up to date with things like C++11 and so may
@@ -43,33 +43,33 @@
           "http://google-styleguide.googlecode.com/svn/trunk/cppguide.html">Google
           C++ Style Guide</a>. The Google Style Guide has a lot of good points
           and is a good read, but in order to cut the style guide down to a
-          more readable size and to focus mroe on WPILib-specific information,
-          we have altetered the original style guide in several ways.
+          more readable size and to focus more on WPILib-specific information,
+          we have altered the original style guide in several ways.
         </p>
         <p>
           One way in which we <em>haven't</em> done much to alter the original
           style guide is to keep the vast majority of the
           formatting/naming/etc. related information intact. This is both so
           that we do not have to write up our own standards and so that
-          existing tools such as clang-format and the Google eclipse format
+          existing tools such as clang-format and the Google Eclipse format
           configuration files can work out of the box. All of these things
           should be relatively non-controversial and do not require much
           discussion.
         </p>
         <p>
           Where we deviate more from the original guide is in the style of the
-          code itself. At the moment (ie, when we first created this modified
+          code itself. At the moment (i.e., when we first created this modified
           version), we deleted all of the sections of the original guide which
           mandate particular programming practices such as forbidding
           exceptions, multiple inheritance, etc. However, as time goes on, we
-          gradually add in more information along this lines, either by copying
+          gradually add in more information along those lines, either by copying
           directly from Google's Style Guide or by writing our own decisions
           and best practices, some of which may be very WPILib-specific.
         </p>
         <p>
           As the original guide makes very clear, consistency is extremely
           important to keeping the code base manageable, and so we encourage
-          that, wherever reasonable, that you keep everything consistent with
+          that, wherever reasonable, you keep everything consistent with
           whatever the standard style is.
         </p>
         <p>
@@ -78,10 +78,10 @@
           consistent and easier for users, we ask that, in general, Java and
           C++ be kept as consistent with one another as reasonable. This
           includes everything from using two spaces for indentation in both
-          language to keeping the inheritance structure essentially the same in
+          languages to keeping the inheritance structure essentially the same in
           both. Although the two do not have to be precisely the same, it does
           mean that if there is something that you are doing which will be
-          imposssible to reproduce in some way in Java, then you may want to
+          impossible to reproduce in some way in Java, then you may want to
           reconsider.
         </p>
         <p>
@@ -129,13 +129,13 @@
         </p>
         <ul>
           <li>
-            <code>std::unique_ptr</code> Should be used when you still need to
+            <code>std::unique_ptr</code> should be used when you still need to
             use a pointer, but you only need one entity to own the pointer. The
             <code>std::unique_ptr</code> will automatically be deleted when
             there are no more references to it.
           </li>
           <li>
-            <code>std::shared_ptr</code> Should be used when you still need to
+            <code>std::shared_ptr</code> should be used when you still need to
             use a pointer and you need many references to the object. When
             there are zero remaining references to the object, it will be
             deleted. Use <code>std::weak_ptr</code> where necessary to avoid
@@ -1299,7 +1299,7 @@ bool success = CalculateSomething(interesting_value,
           <p>
             Note that you should <em>never</em> describe the code itself.
             Assume that the person reading the code knows C++ better than you
-            do, even though he or she does not know what you are trying to do:
+            do, even though they do not know what you are trying to do:
           </p>
           <pre class="badcode">
           // Now go through the b array and make sure that if i occurs,
