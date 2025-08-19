@@ -1037,7 +1037,7 @@ OpenFileOrDie()
         </div>
         <div class="stylebody">
           <pre>
-          // Iterates over the contents of a GargantuanTable.  Sample usage:
+// Iterates over the contents of a GargantuanTable.  Sample usage:
 //    GargantuanTableIterator* iter = table-&gt;NewIterator();
 //    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
 //      process(iter-&gt;key(), iter-&gt;value());
@@ -1195,7 +1195,7 @@ bool IsTableFull();
             describing what they are and what they are used for. For example:
           </p>
           <pre>
-          // The total number of tests cases that we run through in this regression test.
+// The total number of tests cases that we run through in this regression test.
 const int kNumTestCases = 6;
 </pre>
         </div>
@@ -1247,7 +1247,7 @@ if (mmap_budget &gt;= data_size_ &amp;& !MmapData(mmap_chunk_bytes, mlock))
             more readable to line them up:
           </p>
           <pre>
-          DoSomething();                  // Comment here so the comments line up.
+DoSomething();                  // Comment here so the comments line up.
 DoSomethingElseThatIsLonger();  // Two spaces between the code and the comment.
 { // One space before comment when opening a new scope is allowed,
   // thus the comment lines up with the following comments and code.
@@ -1354,7 +1354,7 @@ bool success = CalculateSomething(interesting_value,
           </p>
           <div>
             <pre>
-            // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+// TODO(kl@gmail.com): Use a "*" here for concatenation operator.
 // TODO(Zeke) change this to use relations.
 </pre>
           </div>
@@ -1545,7 +1545,7 @@ bool success = CalculateSomething(interesting_value,
             Functions look like this:
           </p>
           <pre>
-          ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
+ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
   DoSomething();
   ...
 }
@@ -1554,7 +1554,7 @@ bool success = CalculateSomething(interesting_value,
             If you have too much text to fit on one line:
           </p>
           <pre>
-          ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
+ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
                                              Type par_name3) {
   DoSomething();
   ...
@@ -1726,7 +1726,7 @@ bool retval = DoSomething(my_heuristic, x, y, z);
             comment:
           </p>
           <pre>
-          bool retval = DoSomething(scores[x] * y + bases[x],  // Score heuristic.
+bool retval = DoSomething(scores[x] * y + bases[x],  // Score heuristic.
                           x, y, z);
 </pre>
           <p>
@@ -1836,7 +1836,7 @@ MyType m = {  // Here, you could also break before {.
             using one.
           </p>
           <pre class="badcode">
-          if(condition) {   // Bad - space missing after IF.
+if(condition) {   // Bad - space missing after IF.
 if (condition){   // Bad - space missing before {.
 if(condition){    // Doubly bad.
 </pre>
@@ -1854,7 +1854,7 @@ if (x == kBar) return new Bar();
             This is not allowed when the if statement has an <code>else</code>:
           </p>
           <pre class="badcode">
-          // Not allowed - IF statement on one line when there is an ELSE clause
+// Not allowed - IF statement on one line when there is an ELSE clause
 if (x) DoThis();
 else DoThat();
 </pre>
@@ -1970,7 +1970,7 @@ for (int i = 0; i &lt; kSomeNumber; ++i) {}  // Good - empty body.
 while (condition) continue;  // Good - continue indicates no logic.
 </pre>
           <pre class="badcode">
-          while (condition);  // Bad - looks like part of do/while loop.
+while (condition);  // Bad - looks like part of do/while loop.
 </pre>
         </div>
         <h3 id="Pointer_and_Reference_Expressions">
@@ -2071,13 +2071,13 @@ const string & str;  // Bad - spaces on both sides of &
             use them in <code>x = expr;</code>.
           </p>
           <pre>
-          return result;                  // No parentheses in the simple case.
+return result;                  // No parentheses in the simple case.
 // Parentheses OK to make a complex expression more readable.
 return (some_long_condition &amp;&
         another_condition);
 </pre>
           <pre class="badcode">
-          return (value);                // You wouldn't write var = (value);
+return (value);                // You wouldn't write var = (value);
 return(result);                // return is not a function!
 </pre>
         </div>
@@ -2236,7 +2236,7 @@ MyClass::MyClass(int var) : some_var_(var), some_other_var_(var + 1) {}
             or
           </p>
           <pre>
-          // When it requires multiple lines, indent 4 spaces, putting the colon on
+// When it requires multiple lines, indent 4 spaces, putting the colon on
 // the first initializer line:
 MyClass::MyClass(int var)
     : some_var_(var),             // 4 space indent
@@ -2302,7 +2302,7 @@ namespace bar {
             General
           </h4>
           <pre>
-          void f(bool b) {  // Open braces should always have a space before them.
+void f(bool b) {  // Open braces should always have a space before them.
   ...
 int i = 0;  // Semicolons usually have no space before them.
 // Spaces inside braces for braced-init-list are optional.  If you use them,
@@ -2330,7 +2330,7 @@ class Foo : public Bar {
             Loops and Conditionals
           </h4>
           <pre>
-          if (b) {          // Space after the keyword in conditions and loops.
+if (b) {          // Space after the keyword in conditions and loops.
 } else {          // Spaces around else.
 }
 while (test) {}   // There is usually no space inside parentheses.
