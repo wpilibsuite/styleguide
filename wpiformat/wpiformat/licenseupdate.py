@@ -21,10 +21,11 @@ class LicenseUpdate(PipelineTask):
             or name.endswith(".java")
         ) and not license_regex.search(name)
 
-    def __try_regex(self, lines, last_year, license_template):
+    def __try_regex(self, repo_relative_name, lines, last_year, license_template):
         """Try finding license with regex of license template.
 
         Keyword arguments:
+        repo_relative_name -- repo-relative filename
         lines -- lines of file
         last_year -- last year in copyright range
         license_template -- license_template string
@@ -44,6 +45,7 @@ class LicenseUpdate(PipelineTask):
             .replace(")", r"\)")
             .replace("{year}", r"(?P<year>[0-9]+)(-[0-9]+)?")
             .replace("{padding}", "[ ]*")
+            .replace("{filename}", "")
         )
         license_rgx = regex.compile(license_rgxstr, regex.M)
 
@@ -135,6 +137,8 @@ class LicenseUpdate(PipelineTask):
     def run_pipeline(self, config_file, name, lines):
         linesep = super().get_linesep(lines)
 
+        repo_relative_name = name[len(Task.get_repo_root()) + 1 :]
+
         _, license_template = Config.read_file(
             os.path.dirname(os.path.abspath(name)), ".styleguide-license"
         )
@@ -160,7 +164,7 @@ class LicenseUpdate(PipelineTask):
             last_year = str(date.today().year)
 
         success, first_year, appendix = self.__try_regex(
-            lines, last_year, license_template
+            repo_relative_name, lines, last_year, license_template
         )
         if not success:
             success, first_year, appendix = self.__try_string_search(
@@ -178,6 +182,9 @@ class LicenseUpdate(PipelineTask):
         for line in license_template:
             # Insert copyright year range
             line = line.replace("{year}", year_range)
+
+            # Insert filename
+            line = line.replace("{filename}", repo_relative_name)
 
             # Insert padding which expands to the 80th column. If there is more
             # than one padding token, the line may contain fewer than 80
