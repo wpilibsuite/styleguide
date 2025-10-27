@@ -22,7 +22,6 @@ from wpiformat.jni import Jni
 from wpiformat.licenseupdate import LicenseUpdate
 from wpiformat.lint import Lint
 from wpiformat.pyformat import PyFormat
-from wpiformat.stdlib import Stdlib
 from wpiformat.task import BatchTask, PipelineTask, StandaloneTask, Task
 from wpiformat.usingdeclaration import UsingDeclaration
 from wpiformat.usingnamespacestd import UsingNamespaceStd
@@ -514,9 +513,8 @@ def main():
         task_pipeline = [Lint()]
         run_batch(task_pipeline, args, file_batches)
     else:
-        # IncludeOrder is run after Stdlib so any C std headers changed to C++
-        # or vice versa are sorted properly. ClangFormat is run after the other
-        # tasks so it can clean up their formatting.
+        # ClangFormat is run after the other tasks so it can clean up their
+        # formatting.
         task_pipeline = [
             BraceComment(),
             CIdentList(),
@@ -525,7 +523,6 @@ def main():
             IncludeGuard(),
             LicenseUpdate(),
             JavaClass(),
-            Stdlib(),
             IncludeOrder(),
             UsingDeclaration(),
             UsingNamespaceStd(),
