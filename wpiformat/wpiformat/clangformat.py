@@ -9,19 +9,11 @@ from wpiformat.task import PipelineTask
 
 
 class ClangFormat(PipelineTask):
-    def __init__(self, clang_version):
-        """Constructor for ClangFormat task.
-
-        Keyword arguments:
-        clang_version -- version number of clang-format appended to executable
-                         name (deprecated for removal)
-        """
+    def __init__(self):
+        """Constructor for ClangFormat task."""
         super().__init__()
 
-        if clang_version == "":
-            self.exec_name = clang_format.get_executable("clang-format")
-        else:
-            self.exec_name = "clang-format-" + clang_version
+        self.exec_name = clang_format.get_executable("clang-format")
 
     @staticmethod
     def should_process_file(config_file, name):
