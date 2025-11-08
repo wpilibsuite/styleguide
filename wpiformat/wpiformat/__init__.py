@@ -320,6 +320,13 @@ def main():
         action="store_true",
         help="same as -list-all-files, but list only files changed from default branch",
     )
+    parser.add_argument(
+        "-default-branch",
+        dest="default_branch",
+        type=str,
+        default="",
+        help="branch with respect to which changed files list is generated",
+    )
     # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
     # once, and mp uses a few internal events. Therefore, the maximum number of
@@ -442,21 +449,21 @@ def main():
                 print(f"warning: {f}: Broken symlink")
 
     # Determine name of default branch for generated file comparisons
-    branch_options = ["origin/HEAD", "main", "master"]
-    default_branch = ""
-    for branch in branch_options:
-        proc = subprocess.run(
-            ["git", "rev-parse", "-q", "--verify", branch], stdout=subprocess.DEVNULL
-        )
-        if proc.returncode == 0:
-            default_branch = branch
-            break
-
-    if not default_branch:
-        print(
-            f"error: One of the following branches is required for generated file comparisons, but none exist: {branch_options}."
-        )
-        sys.exit(1)
+    if not (default_branch := args.default_branch):
+        branch_options = ["origin/HEAD", "main", "master"]
+        for branch in branch_options:
+            proc = subprocess.run(
+                ["git", "rev-parse", "-q", "--verify", branch],
+                stdout=subprocess.DEVNULL,
+            )
+            if proc.returncode == 0:
+                default_branch = branch
+                break
+        if not default_branch:
+            print(
+                f"error: no default branch provided, and none of the following default branches exist: {branch_options}."
+            )
+            sys.exit(1)
 
     # Create list of all changed files
     changed_file_list = [

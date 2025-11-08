@@ -96,15 +96,36 @@ jobs:
           exit 1
         fi
 
+    # Verify wpiformat reports an error if default branch exists but wasn't provided
+    - name: Git repo with default branch not provided
+      shell: bash
+      run: |
+        rm -rf branch-test
+        git config --global init.defaultBranch develop
+        mkdir branch-test && cd branch-test && git init
+        touch .styleguide && git add .styleguide && git commit -q -m "Initial commit"
+        if wpiformat; then
+          exit 1
+        fi
+
+    # Verify wpiformat reports success if default branch exists and was provided
+    - name: Git repo with default branch provided
+      shell: bash
+      run: |
+        rm -rf branch-test
+        git config --global init.defaultBranch develop
+        mkdir branch-test && cd branch-test && git init
+        touch .styleguide && git add .styleguide && git commit -q -m "Initial commit"
+        wpiformat -default-branch develop
+
     # Verify wpiformat reports success if main branch exists
     - name: Git repo with main branch
       shell: bash
       run: |
         rm -rf branch-test
+        git config --global init.defaultBranch main
         mkdir branch-test && cd branch-test && git init
-        git checkout -b main
-        touch .styleguide
-        git add .styleguide && git commit -q -m "Initial commit"
+        touch .styleguide && git add .styleguide && git commit -q -m "Initial commit"
         wpiformat
 
     # Verify wpiformat reports success if master branch exists
@@ -112,10 +133,9 @@ jobs:
       shell: bash
       run: |
         rm -rf branch-test
+        git config --global init.defaultBranch master
         mkdir branch-test && cd branch-test && git init
-        git checkout -b master
-        touch .styleguide
-        git add .styleguide && git commit -q -m "Initial commit"
+        touch .styleguide && git add .styleguide && git commit -q -m "Initial commit"
         wpiformat
 
     - name: Delete branch-test folder
