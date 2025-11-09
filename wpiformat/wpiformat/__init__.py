@@ -44,7 +44,9 @@ def filter_ignored_files(names):
         stdout=subprocess.PIPE,
     )
     if proc.returncode == 128:
-        raise subprocess.CalledProcessError
+        raise subprocess.CalledProcessError(
+            proc.returncode, proc.args, proc.stdout, proc.stderr
+        )
 
     output_list = proc.stdout.decode().split("\n")
 
