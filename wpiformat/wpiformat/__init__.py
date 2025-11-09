@@ -16,7 +16,6 @@ from wpiformat.config import Config
 from wpiformat.eofnewline import EofNewline
 from wpiformat.gtestname import GTestName
 from wpiformat.includeguard import IncludeGuard
-from wpiformat.includeorder import IncludeOrder
 from wpiformat.javaclass import JavaClass
 from wpiformat.jni import Jni
 from wpiformat.licenseupdate import LicenseUpdate
@@ -512,7 +511,6 @@ def main():
             IncludeGuard(),
             LicenseUpdate(),
             JavaClass(),
-            IncludeOrder(),
             UsingDeclaration(),
             UsingNamespaceStd(),
             Whitespace(),

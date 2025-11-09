@@ -30,19 +30,3 @@ licenseUpdateExclude {
 
 includeGuardRoots {
 }
-
-includeRelated {
-}
-
-includeCSys {
-}
-
-includeCppSys {
-}
-
-includeOtherLibs {
-}
-
-includeProject {
-  ^ctre/
-}

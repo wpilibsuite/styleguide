@@ -26,8 +26,3 @@ includeGuardRoots {
   wpiformat/
   wpiformat/Test/
 }
-
-# Used by unit tests
-includeProject {
-  ^ctre/
-}
