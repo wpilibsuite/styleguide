@@ -459,10 +459,12 @@ def main():
         sys.exit(1)
 
     # Create list of all changed files
-    output_list = subprocess.check_output(
-        ["git", "diff", "--name-only", f"{main_branch}..."], encoding="ascii"
-    ).split()
-    changed_file_list = [root_path + os.sep + line.strip() for line in output_list]
+    changed_file_list = [
+        root_path + os.sep + os.path.normpath(line.rstrip())
+        for line in subprocess.check_output(
+            ["git", "diff", "--name-only", f"{main_branch}..."], encoding="ascii"
+        ).split()
+    ]
 
     # Don't run tasks on modifiable or generated files
     work = []
