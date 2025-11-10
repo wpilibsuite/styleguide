@@ -23,7 +23,7 @@ def test_usingnamespacestd():
         + "}"
         + os.linesep,
     )
-    test.add_output("Warning: ./Main.cpp: 1: " + warning_str, True)
+    test.add_output("warning: ./Main.cpp: 1: " + warning_str, True)
 
     # Inside braces and not first line
     test.add_input(
@@ -37,7 +37,7 @@ def test_usingnamespacestd():
         + "}"
         + os.linesep,
     )
-    test.add_output("Warning: ./Main.cpp: 2: " + warning_str, True)
+    test.add_output("warning: ./Main.cpp: 2: " + warning_str, True)
 
     # std::chrono
     test.add_input(
@@ -55,7 +55,7 @@ def test_usingnamespacestd():
         + "}"
         + os.linesep,
     )
-    test.add_output("Warning: ./Main.cpp: 4: " + warning_str, True)
+    test.add_output("warning: ./Main.cpp: 4: " + warning_str, True)
 
     # Ignore std::literals
     test.add_input("./Main.cpp", "using namespace std::literals;" + os.linesep)

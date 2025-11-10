@@ -22,7 +22,7 @@ class UsingNamespaceStd(PipelineTask):
         for match in using_regex.finditer(lines):
             linenum = lines.count(linesep, 0, match.start()) + 1
             print(
-                "Warning: "
+                "warning: "
                 + name
                 + ": "
                 + str(linenum)
