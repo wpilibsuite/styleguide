@@ -73,20 +73,6 @@ For example, given a file at `allwpilib/src/main/native/include/wpiutil/support/
 
 The `repoRootNameOverride` group allows one to override the repository name used in include guards. This is useful for giving subprojects within one repository different repository roots in their include guards. Only specify one name in this group because subsequent names will be ignored.
 
-### Include sorting
-
-The following groups correspond to the header groups in the style guide. If a header name matches a regex in one of the groups, it overrides the default ordering and is placed in the corresponding group. The groups of regexes are checked in order of include group precedence (the order shown below).
-
-- `includeRelated` (headers related to a .cpp file, like `File.h` included by `File.cpp`)
-- `includeCSys` (C system headers)
-- `includeCppSys` (C++ system headers)
-- `includeOtherLibs` (headers from thirdparty libraries or other monorepo subprojects)
-- `includeProject` (headers from the current subproject)
-
-`includeCSys` produces false positives on headers from "other libraries". Regexes for them should be added to `includeOtherLibs`. Libraries with many headers generally group them within a folder, so a regex for just the folder will suffice.
-
-Appending a `// NOLINT` comment to a header include to prevent wpiformat's header include sorter from modifying it and to maintain its relative ordering with other header includes. This will, in effect, treat it as a barrier across which no header includes will be moved. Header includes on each side of the barrier will still be sorted as normal.
-
 ## .styleguide-license
 
 This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. See the `.styleguide-license` file in the docs/examples directory.
