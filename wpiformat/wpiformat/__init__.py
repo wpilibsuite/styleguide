@@ -318,7 +318,7 @@ def main():
         "-list-changed-files",
         dest="list_changed_files",
         action="store_true",
-        help="same as list-all-files, but list only files changed from main branch",
+        help="same as -list-all-files, but list only files changed from default branch",
     )
     # mp.Pool() uses WaitForMultipleObjects() to wait for subprocess completion
     # on Windows. WaitForMultipleObjects() cannot wait on more then 64 events at
@@ -441,18 +441,18 @@ def main():
             else:
                 print(f"warning: {f}: Broken symlink")
 
-    # Determine name of main branch for generated file comparisons
-    branch_options = ["master", "main"]
-    main_branch = ""
+    # Determine name of default branch for generated file comparisons
+    branch_options = ["origin/HEAD", "main", "master"]
+    default_branch = ""
     for branch in branch_options:
         proc = subprocess.run(
             ["git", "rev-parse", "-q", "--verify", branch], stdout=subprocess.DEVNULL
         )
         if proc.returncode == 0:
-            main_branch = branch
+            default_branch = branch
             break
 
-    if not main_branch:
+    if not default_branch:
         print(
             f"error: One of the following branches is required for generated file comparisons, but none exist: {branch_options}."
         )
@@ -462,7 +462,7 @@ def main():
     changed_file_list = [
         root_path + os.sep + os.path.normpath(line.rstrip())
         for line in subprocess.check_output(
-            ["git", "diff", "--name-only", f"{main_branch}..."], encoding="ascii"
+            ["git", "diff", "--name-only", f"{default_branch}..."], encoding="ascii"
         ).split()
     ]
 
