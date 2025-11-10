@@ -17,6 +17,6 @@ class CMakeFormat(BatchTask):
             args = [sys.executable, "-m", "gersemi", "-i", "--no-color", "-q"]
             subprocess.run(args + names)
         except FileNotFoundError:
-            print("Error: gersemi not found in PATH. Is it installed?", file=sys.stderr)
+            print("error: gersemi not found in PATH. Is it installed?", file=sys.stderr)
             return False
         return True

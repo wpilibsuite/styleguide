@@ -9,7 +9,7 @@ class CIdentList(PipelineTask):
     @staticmethod
     def __print_failure(name):
         print(
-            "Error: " + name + ": unmatched curly braces when scanning for "
+            "error: " + name + ": unmatched curly braces when scanning for "
             "C identifier lists. If the code compiles, this is a bug in "
             "wpiformat."
         )

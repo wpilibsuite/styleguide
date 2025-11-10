@@ -63,7 +63,7 @@ class IncludeGuard(PipelineTask):
         # If include guard not found
         if state == State.FINDING_IFNDEF:
             print(
-                "Error: " + name + ": doesn't contain include guard or '#pragma once'"
+                "error: " + name + ": doesn't contain include guard or '#pragma once'"
             )
             return lines, False
 

@@ -391,7 +391,7 @@ def main():
     # root.
     root_path = Task.get_repo_root()
     if root_path == "":
-        print("Error: not invoked within a Git repository", file=sys.stderr)
+        print("error: not invoked within a Git repository", file=sys.stderr)
         sys.exit(1)
 
     # If no files explicitly specified
@@ -410,7 +410,7 @@ def main():
         files = [os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn]
 
         if not files:
-            print("Error: no files found to format", file=sys.stderr)
+            print("error: no files found to format", file=sys.stderr)
             sys.exit(1)
     else:
         files = []
@@ -480,7 +480,7 @@ def main():
                 and not args.list_all_files
                 and not args.list_changed_files
             ):
-                print("Warning: generated file '" + name + "' modified")
+                print("warning: generated file '" + name + "' modified")
             continue
 
         work.append(name)

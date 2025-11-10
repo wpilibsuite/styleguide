@@ -45,7 +45,7 @@ class GTestName(PipelineTask):
             # Fix test case name
             if test_case == "Test" or test_case == "Tests":
                 print(
-                    f"Error: {name}: undescriptive test case name '{test_case}' in '{test_suite}.{test_case}'"
+                    f"error: {name}: undescriptive test case name '{test_case}' in '{test_suite}.{test_case}'"
                 )
                 success = False
             else:
