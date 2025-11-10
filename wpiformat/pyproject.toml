@@ -3,6 +3,8 @@ name = "wpiformat"
 description = "Linters and formatters for ensuring WPILib's source code conforms to its style guide"
 dynamic = [ "version" ]
 readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
 dependencies = [
   "autoflake==2.3.1",
   "black==25.9.0",
@@ -16,14 +18,10 @@ classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Education",
-  "License :: OSI Approved :: BSD License",
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering",
   "Programming Language :: Python :: 3"
 ]
-
-  [project.license]
-  text = "BSD-3-Clause"
 
   [[project.maintainers]]
   name = "Tyler Veness"
