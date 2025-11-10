@@ -1,5 +1,6 @@
 """Task base classes for wpiformat."""
 
+import os
 import subprocess
 from abc import ABCMeta, abstractmethod
 
@@ -29,12 +30,11 @@ class Task(metaclass=ABCMeta):
 
         An empty string is returned if no repository root was found.
         """
-        return subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            encoding="ascii",
-        ).stdout.rstrip()
+        return os.path.normpath(
+            subprocess.check_output(
+                ["git", "rev-parse", "--show-toplevel"], encoding="ascii"
+            ).rstrip()
+        )
 
     @staticmethod
     def should_process_file(config_file, name):
