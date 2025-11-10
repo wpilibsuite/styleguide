@@ -475,7 +475,11 @@ def main():
             continue
         if config_file.is_generated_file(name):
             # Emit warning if a generated file was editted
-            if name in changed_file_list:
+            if (
+                name in changed_file_list
+                and not args.list_all_files
+                and not args.list_changed_files
+            ):
                 print("Warning: generated file '" + name + "' modified")
             continue
 
