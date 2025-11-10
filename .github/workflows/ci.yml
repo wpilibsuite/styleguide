@@ -86,7 +86,7 @@ jobs:
     - name: wpiformat - directory
       run: wpiformat -f wpiformat -v
 
-    # Verify wpiformat reports an error if no master or main branch exists
+    # Verify wpiformat reports an error if no default branch exists
     - name: Git repo with no branches
       shell: bash
       run: |
@@ -96,24 +96,24 @@ jobs:
           exit 1
         fi
 
-    # Verify wpiformat reports success if "master" exists
-    - name: Git repo with master branch
-      shell: bash
-      run: |
-        rm -rf branch-test
-        mkdir branch-test && cd branch-test && git init
-        git checkout -b master
-        touch .styleguide
-        git add .styleguide && git commit -q -m "Initial commit"
-        wpiformat
-
-    # Verify wpiformat reports success if "main" exists
+    # Verify wpiformat reports success if main branch exists
     - name: Git repo with main branch
       shell: bash
       run: |
         rm -rf branch-test
         mkdir branch-test && cd branch-test && git init
         git checkout -b main
+        touch .styleguide
+        git add .styleguide && git commit -q -m "Initial commit"
+        wpiformat
+
+    # Verify wpiformat reports success if master branch exists
+    - name: Git repo with master branch
+      shell: bash
+      run: |
+        rm -rf branch-test
+        mkdir branch-test && cd branch-test && git init
+        git checkout -b master
         touch .styleguide
         git add .styleguide && git commit -q -m "Initial commit"
         wpiformat
