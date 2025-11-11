@@ -1,12 +1,14 @@
 """This class is for handling wpiformat config files."""
 
 import os
-import sys
 
 import regex
 
 
 class Config:
+    # Dict from filepath to file contents
+    config_cache: dict[str, list[str]] = {}
+
     def __init__(self, directory, file_name):
         """Constructor for Config object.
 
@@ -35,26 +37,23 @@ class Config:
         Returns tuple of file name and list containing file contents or triggers
         program exit.
         """
-        file_found = False
-        while not file_found:
+        while True:
+            filepath = os.path.join(directory, file_name)
             try:
-                with open(directory + os.sep + file_name, "r") as file_contents:
-                    file_found = True
-                    return (
-                        os.path.join(directory, file_name),
-                        file_contents.read().splitlines(),
-                    )
-            except OSError:
+                # If filepath in config cache, return cached version instead
+                if filepath in Config.config_cache:
+                    return filepath, Config.config_cache[filepath]
+
+                with open(filepath, "r") as file_contents:
+                    contents = file_contents.read().splitlines()
+                    Config.config_cache[filepath] = contents
+                    return filepath, contents
+            except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
-                    print(
-                        "error: config file '"
-                        + file_name
-                        + "' not found in '"
-                        + directory
-                        + "'"
-                    )
-                    sys.exit(1)
+                    raise OSError(
+                        f"config file '{file_name}' not found in '{directory}'"
+                    ) from e
                 directory = os.path.dirname(directory)
 
     def group(self, group_name):
