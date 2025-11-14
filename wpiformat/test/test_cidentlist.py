@@ -1,5 +1,3 @@
-import os
-
 from wpiformat.cidentlist import CIdentList
 
 from .test_tasktest import *
@@ -11,161 +9,134 @@ def test_cidentlist():
     # Main.cpp: signature for C++ function
     test.add_input(
         "./Main.cpp",
-        "int main() {" + os.linesep + "  return 0;" + os.linesep + "}" + os.linesep,
+        """int main() {
+  return 0;
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Main.cpp: signature for C function in extern "C" block
     test.add_input(
         "./Main.cpp",
-        'extern "C" {'
-        + os.linesep
-        + "int main() {"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C" {
+int main() {
+  return 0;
+}
+}
+""",
     )
     test.add_output(
-        'extern "C" {'
-        + os.linesep
-        + "int main(void) {"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C" {
+int main(void) {
+  return 0;
+}
+}
+""",
         True,
     )
 
     # Main.cpp: signature for C function marked extern "C"
     test.add_input(
         "./Main.cpp",
-        'extern "C" int main() {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C" int main() {
+  return 0;
+}
+""",
     )
     test.add_output(
-        'extern "C" int main(void) {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C" int main(void) {
+  return 0;
+}
+""",
         True,
     )
 
     # Main.cpp: extern "C++" function nested in extern "C" block
     test.add_input(
         "./Main.cpp",
-        'extern "C" {'
-        + os.linesep
-        + 'extern "C++" int main() {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C" {
+extern "C++" int main() {
+  return 0;
+}
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Main.c: signature for C function
     test.add_input(
         "./Main.c",
-        "int main() {" + os.linesep + "  return 0;" + os.linesep + "}" + os.linesep,
+        """int main() {
+  return 0;
+}
+""",
     )
     test.add_output(
-        "int main(void) {" + os.linesep + "  return 0;" + os.linesep + "}" + os.linesep,
+        """int main(void) {
+  return 0;
+}
+""",
         True,
     )
 
     # Main.c: signature for C++ function in extern "C++" block
     test.add_input(
         "./Main.c",
-        'extern "C++" {'
-        + os.linesep
-        + "int main() {"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" {
+int main() {
+  return 0;
+}
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Main.c: signature for C++ function marked extern "C++"
     test.add_input(
         "./Main.c",
-        'extern "C++" int main() {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" int main() {
+  return 0;
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Main.c: extern "C" function nested in extern "C++" block
     test.add_input(
         "./Main.c",
-        'extern "C++" {'
-        + os.linesep
-        + 'extern "C" int main() {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" {
+extern "C" int main() {
+  return 0;
+}
+}
+""",
     )
     test.add_output(
-        'extern "C++" {'
-        + os.linesep
-        + 'extern "C" int main(void) {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" {
+extern "C" int main(void) {
+  return 0;
+}
+}
+""",
         True,
     )
 
     # Don't match function calls
     test.add_input(
         "./Main.c",
-        "int main() {"
-        + os.linesep
-        + "  foo();"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """int main() {
+  foo();
+  return 0;
+}
+""",
     )
     test.add_output(
-        "int main(void) {"
-        + os.linesep
-        + "  foo();"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """int main(void) {
+  foo();
+  return 0;
+}
+""",
         True,
     )
 
@@ -173,45 +144,38 @@ def test_cidentlist():
     # type)
     test.add_input(
         "./Main.c",
-        "int main() {" + os.linesep + "  return foo();" + os.linesep + "}" + os.linesep,
+        """int main() {
+  return foo();
+}
+""",
     )
     test.add_output(
-        "int main(void) {"
-        + os.linesep
-        + "  return foo();"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """int main(void) {
+  return foo();
+}
+""",
         True,
     )
 
     # Match function prototypes
     test.add_input(
         "./Main.c",
-        "int main();"
-        + os.linesep
-        + os.linesep
-        + "int main() {"
-        + os.linesep
-        + "  foo();"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """int main();
+
+int main() {
+  foo();
+  return 0;
+}
+""",
     )
     test.add_output(
-        "int main(void);"
-        + os.linesep
-        + os.linesep
-        + "int main(void) {"
-        + os.linesep
-        + "  foo();"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """int main(void);
+
+int main(void) {
+  foo();
+  return 0;
+}
+""",
         True,
     )
 
@@ -219,182 +183,136 @@ def test_cidentlist():
     # parent block
     test.add_input(
         "./Main.c",
-        'extern "C++" {'
-        + os.linesep
-        + 'extern "C" int main() {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "int func() {"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" {
+extern "C" int main() {
+  return 0;
+}
+int func() {
+  return 0;
+}
+}
+""",
     )
     test.add_output(
-        'extern "C++" {'
-        + os.linesep
-        + 'extern "C" int main(void) {'
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "int func() {"
-        + os.linesep
-        + "  return 0;"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """extern "C++" {
+extern "C" int main(void) {
+  return 0;
+}
+int func() {
+  return 0;
+}
+}
+""",
         True,
     )
 
     # Don't match lambda function that takes no arguments
     test.add_input(
         "./Main.cpp",
-        'extern "C" {'
-        + os.linesep
-        + os.linesep
-        + "HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {"
-        + os.linesep
-        + "  std::atexit([]() {"
-        + os.linesep
-        + "    // Unregister our new data condition variable."
-        + os.linesep
-        + "  });"
-        + os.linesep
-        + "}"
-        + os.linesep
-        + os.linesep
-        + '}  // extern "C"'
-        + os.linesep,
+        """extern "C" {
+
+HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  std::atexit([]() {
+    // Unregister our new data condition variable.
+  });
+}
+
+}  // extern "C"
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Don't match a function call within a #ifdef
     test.add_input(
         "./Main.c",
-        "ES_Event Elevator_Service_Run(ES_Event event) {"
-        + os.linesep
-        + "#ifdef USE_TATTLETALE"
-        + os.linesep
-        + "    ES_Tail(); // trace call stack end"
-        + os.linesep
-        + "#endif"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """ES_Event Elevator_Service_Run(ES_Event event) {
+#ifdef USE_TATTLETALE
+    ES_Tail(); // trace call stack end
+#endif
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     test.add_input(
         "./Timer.hpp",
-        'extern "C" void Timer1IntHandler();'
-        + os.linesep
-        + os.linesep
-        + "class Timer {"
-        + os.linesep
-        + "public:"
-        + os.linesep
-        + "    void Set(uint32_t newTime);"
-        + os.linesep
-        + os.linesep
-        + "    void Start();"
-        + os.linesep
-        + os.linesep
-        + "    void Stop();"
-        + os.linesep
-        + os.linesep
-        + "    uint16_t GetID() const;"
-        + os.linesep
-        + os.linesep
-        + "    static uint32_t GetTime();"
-        + os.linesep
-        + os.linesep
-        + "private:"
-        + os.linesep
-        + "    friend void Timer1IntHandler();"
-        + os.linesep
-        + "};"
-        + os.linesep,
+        """extern "C" void Timer1IntHandler();
+
+class Timer {
+public:
+    void Set(uint32_t newTime);
+
+    void Start();
+
+    void Stop();
+
+    uint16_t GetID() const;
+
+    static uint32_t GetTime();
+
+private:
+    friend void Timer1IntHandler();
+};
+""",
     )
     test.add_output(
-        'extern "C" void Timer1IntHandler(void);'
-        + os.linesep
-        + os.linesep
-        + "class Timer {"
-        + os.linesep
-        + "public:"
-        + os.linesep
-        + "    void Set(uint32_t newTime);"
-        + os.linesep
-        + os.linesep
-        + "    void Start();"
-        + os.linesep
-        + os.linesep
-        + "    void Stop();"
-        + os.linesep
-        + os.linesep
-        + "    uint16_t GetID() const;"
-        + os.linesep
-        + os.linesep
-        + "    static uint32_t GetTime();"
-        + os.linesep
-        + os.linesep
-        + "private:"
-        + os.linesep
-        + "    friend void Timer1IntHandler();"
-        + os.linesep
-        + "};"
-        + os.linesep,
+        """extern "C" void Timer1IntHandler(void);
+
+class Timer {
+public:
+    void Set(uint32_t newTime);
+
+    void Start();
+
+    void Stop();
+
+    uint16_t GetID() const;
+
+    static uint32_t GetTime();
+
+private:
+    friend void Timer1IntHandler();
+};
+""",
         True,
     )
 
     # Ensure comments with } in them don't mess up brace stack
     test.add_input(
         "./Test.cpp",
-        "void func() {" + os.linesep + "  // closing }" + os.linesep + "}" + os.linesep,
+        """void func() {
+  // closing }
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Ensure nested comments don't mess up brace stack
-    test.add_input("./Test.cpp", "// { /* */ }" + os.linesep)
+    test.add_input("./Test.cpp", "// { /* */ }\n")
     test.add_latest_input_as_output(True)
-    test.add_input("./Test.cpp", "{ // /* */ }" + os.linesep)
+    test.add_input("./Test.cpp", "{ // /* */ }\n")
     test.add_latest_input_as_output(False)
-    test.add_input("./Test.cpp", "{ /* // */ }" + os.linesep)
+    test.add_input("./Test.cpp", "{ /* // */ }\n")
     test.add_latest_input_as_output(True)
-    test.add_input("./Test.cpp", "{ /* */ // }" + os.linesep)
+    test.add_input("./Test.cpp", "{ /* */ // }\n")
     test.add_latest_input_as_output(False)
-    test.add_input("./Test.cpp", "{ // /* // */ }" + os.linesep)
+    test.add_input("./Test.cpp", "{ // /* // */ }\n")
     test.add_latest_input_as_output(False)
 
     # Ensure popping too many braces doesn't crash
-    test.add_input("./Test.cpp", "}" + os.linesep)
+    test.add_input("./Test.cpp", "}\n")
     test.add_latest_input_as_output(False)
 
     # Ensure comments inside quoted string don't mess up brace stack
     test.add_input(
         "./Test.cpp",
-        "void func() {"
-        + os.linesep
-        + '  // "//"'
-        + os.linesep
-        + '  if (!query.startswith("//")) {'
-        + os.linesep
-        + "    return;"
-        + os.linesep
-        + "  }"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """void func() {
+  // "//"
+  if (!query.startswith("//")) {
+    return;
+  }
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
@@ -430,68 +348,53 @@ def test_cidentlist():
     # still ends the comment
     test.add_input(
         "./Test.cpp",
-        'extern "C" {}  // extern "C"'
-        + os.linesep
-        + "namespace {"
-        + os.linesep
-        + "}  // namespace"
-        + os.linesep,
+        """extern "C" {}  // extern "C"
+namespace {
+}  // namespace
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Ensure extern "C" with brace on next line gets matched
     test.add_input(
         "./Test.cpp",
-        'extern "C"'
-        + os.linesep
-        + "{"
-        + os.linesep
-        + "  void func() {}"
-        + os.linesep
-        + '}  // extern "C"'
-        + os.linesep,
+        """extern "C"
+{
+  void func() {}
+}  // extern "C"
+""",
     )
     test.add_output(
-        'extern "C"'
-        + os.linesep
-        + "{"
-        + os.linesep
-        + "  void func(void) {}"
-        + os.linesep
-        + '}  // extern "C"'
-        + os.linesep,
+        """extern "C"
+{
+  void func(void) {}
+}  // extern "C"
+""",
         True,
     )
 
     # Test logic for deduplicating braces within #ifdef
     test.add_input(
         "./Test.cpp",
-        "void func() {"
-        + os.linesep
-        + "#ifdef _WIN32"
-        + os.linesep
-        + "  if (errno == WSAEWOULDBLOCK) {"
-        + os.linesep
-        + "#else"
-        + os.linesep
-        + "  if (errno == EWOULDBLOCK) {"
-        + os.linesep
-        + "#endif"
-        + os.linesep
-        + "  }"
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """void func() {
+#ifdef _WIN32
+  if (errno == WSAEWOULDBLOCK) {
+#else
+  if (errno == EWOULDBLOCK) {
+#endif
+  }
+}
+""",
     )
     test.add_latest_input_as_output(True)
 
     # Ensure extern "C" function with pointer return type gets matched
     test.add_input(
         "./Test.cpp",
-        'extern "C" void* func() {}' + os.linesep,
+        'extern "C" void* func() {}\n',
     )
     test.add_output(
-        'extern "C" void* func(void) {}' + os.linesep,
+        'extern "C" void* func(void) {}\n',
         True,
     )
 
