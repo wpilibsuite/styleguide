@@ -1,17 +1,11 @@
-"""This task runs cpplint.py on a C++ source file.
-
-The `update-cpplint.py` script downloads the latest cpplint.py and edits it for
-use by lint.py.
-
-cpplint.py was originally spawned as a subprocess whose output was filtered.
-When it was moved into a separate repository, the difference in directories
-required it to be used as a module.
-"""
+"""This task runs cpplint.py on a C++ source file."""
 
 import os
 import sys
+from contextlib import redirect_stdout
 
-from wpiformat import cpplint
+import cpplint
+
 from wpiformat.task import BatchTask
 
 
@@ -33,6 +27,7 @@ class Lint(BatchTask):
             "build/include_subdir",
             "build/namespaces",
             "legal/copyright",
+            "readability/braces",
             "readability/check",
             "readability/todo",
             "runtime/references",
@@ -68,7 +63,8 @@ class Lint(BatchTask):
 
         # Run cpplint.py
         try:
-            cpplint.main()
+            with open(os.devnull, "w") as devnull, redirect_stdout(devnull):
+                cpplint.main()
         except SystemExit as e:
             # Restore original arguments
             sys.argv = saved_argv
