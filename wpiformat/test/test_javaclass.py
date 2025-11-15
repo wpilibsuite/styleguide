@@ -4,32 +4,31 @@ from .test_tasktest import *
 
 
 def test_javaclass():
-    test = TaskTest(JavaClass())
-
     # No line separators at beginning of class
-    test.add_input("./Test.java", "public class ExampleCommand extends Command {}\n")
-    test.add_latest_input_as_output(True)
+    run_and_check_file(
+        JavaClass(),
+        "./Test.java",
+        "public class ExampleCommand extends Command {}\n",
+        "public class ExampleCommand extends Command {}\n",
+        True,
+    )
 
     # One line separator at beginning of class
-    test.add_input(
-        "./Test.java",
-        """public class ExampleCommand extends Command {
+    contents = """public class ExampleCommand extends Command {
   public ExampleCommand() {}
 }
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(JavaClass(), "./Test.java", contents, contents, True)
 
     # Two line separators at beginning of class
-    test.add_input(
+    run_and_check_file(
+        JavaClass(),
         "./Test.java",
         """public class ExampleCommand extends Command {
 
   public ExampleCommand() {}
 }
 """,
-    )
-    test.add_output(
         """public class ExampleCommand extends Command {
   public ExampleCommand() {}
 }
@@ -38,7 +37,8 @@ def test_javaclass():
     )
 
     # Three line separators at beginning of class
-    test.add_input(
+    run_and_check_file(
+        JavaClass(),
         "./Test.java",
         """public class ExampleCommand extends Command {
 
@@ -46,8 +46,6 @@ def test_javaclass():
   public ExampleCommand() {}
 }
 """,
-    )
-    test.add_output(
         """public class ExampleCommand extends Command {
   public ExampleCommand() {}
 }
@@ -57,7 +55,8 @@ def test_javaclass():
 
     # class keyword in preceding comment to ensure regex matching it doesn't
     # continue past end of comment
-    test.add_input(
+    run_and_check_file(
+        JavaClass(),
         "./Test.java",
         """import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
@@ -69,8 +68,6 @@ final class ContainerHelper {
 
   private final ShuffleboardContainer m_container;
 """,
-    )
-    test.add_output(
         """import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 
@@ -82,5 +79,3 @@ final class ContainerHelper {
 """,
         True,
     )
-
-    test.run(OutputType.FILE)
