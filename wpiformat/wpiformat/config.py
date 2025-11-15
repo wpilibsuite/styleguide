@@ -3,7 +3,6 @@
 import os
 import re
 import sys
-from typing import Dict
 
 
 class Config:
@@ -164,7 +163,7 @@ class Config:
 
     def __parse_config_file(
         self, directory: str, filename: str
-    ) -> Dict[str, list[str]]:
+    ) -> dict[str, list[str]]:
         """Parse values from config file.
 
         Checks current directory for config file. If one doesn't exist, try all
