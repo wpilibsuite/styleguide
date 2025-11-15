@@ -5,6 +5,9 @@ import re
 
 
 class Config:
+    # Dict from filepath to file contents
+    config_cache: dict[str, list[str]] = {}
+
     def __init__(self, directory: str, filename: str):
         """Constructor for Config object.
 
@@ -33,15 +36,17 @@ class Config:
         Returns tuple of filename and list containing file contents or triggers
         program exit.
         """
-        file_found = False
-        while not file_found:
+        while True:
+            filepath = os.path.join(directory, filename)
             try:
-                with open(directory + os.sep + filename, "r") as file_contents:
-                    file_found = True
-                    return (
-                        os.path.join(directory, filename),
-                        file_contents.read().splitlines(),
-                    )
+                # If filepath in config cache, return cached version instead
+                if config_file := Config.config_cache.get(filepath):
+                    return filepath, config_file
+
+                with open(filepath, "r") as file_contents:
+                    contents = file_contents.read().splitlines()
+                    Config.config_cache[filepath] = contents
+                    return filepath, contents
             except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
@@ -49,7 +54,6 @@ class Config:
                         f"config file '{filename}' not found in '{directory}'"
                     ) from e
                 directory = os.path.dirname(directory)
-        return "", []
 
     def group(self, group_name: str) -> list[str]:
         """Returns value from config dictionary given key string.
