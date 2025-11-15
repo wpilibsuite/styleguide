@@ -4,54 +4,57 @@ from .test_tasktest import *
 
 
 def test_usingdeclaration():
-    test = TaskTest(UsingDeclaration())
-
     # Before class block
-    test.add_input(
+    run_and_check_stdout(
+        UsingDeclaration(),
         "./Test.h",
         """using std::chrono;
 class Test {
 }
 """,
-    )
-    test.add_verbatim_output(
-        "./Test.h: 1: 'using std::chrono;' in global namespace\n", False
+        "./Test.h: 1: 'using std::chrono;' in global namespace\n",
+        False,
     )
 
     # Inside enum block
-    test.add_input(
+    run_and_check_stdout(
+        UsingDeclaration(),
         "./Test.h",
         """enum Test {
   using std::chrono;
 }
 """,
+        "",
+        True,
     )
-    test.add_output("", True)
 
     # After { block
-    test.add_input(
+    run_and_check_stdout(
+        UsingDeclaration(),
         "./Test.h",
         """{
 }
 using std::chrono;
 """,
-    )
-    test.add_verbatim_output(
-        "./Test.h: 3: 'using std::chrono;' in global namespace\n", False
+        "./Test.h: 3: 'using std::chrono;' in global namespace\n",
+        False,
     )
 
     # Before class block with NOLINT
-    test.add_input(
+    run_and_check_stdout(
+        UsingDeclaration(),
         "./Test.h",
         """using std::chrono;  // NOLINT
 class Test {
 }
 """,
+        "",
+        True,
     )
-    test.add_output("", True)
 
     # "using" in comment without trailing semicolon
-    test.add_input(
+    run_and_check_stdout(
+        UsingDeclaration(),
         "./Test.h",
         """// using
 void func() {
@@ -59,7 +62,6 @@ void func() {
   using B = int;
 }
 """,
+        "",
+        True,
     )
-    test.add_output("", True)
-
-    test.run(OutputType.STDOUT)

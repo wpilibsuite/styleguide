@@ -4,16 +4,13 @@ from .test_tasktest import *
 
 
 def test_jni():
-    test = TaskTest(Jni())
-
     # Input args go to next line even if they fit on same line
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL
 Java_TestJNI_testFunc(JNIEnv* env, jclass) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     TestJNI
  * Method:    testFunc
@@ -28,15 +25,14 @@ Java_TestJNI_testFunc
     )
 
     # Input aligned to "(" and args past end of line
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent(JNIEnv* env,
                                                                  jclass,
                                                                  jint source) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    setCameraExposureHoldCurrent
@@ -51,13 +47,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent
     )
 
     # Args in input on line after "(" and args length > 80 characters
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame(
     JNIEnv *env, jclass, jint source, jlong imageNativeObj) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    putSourceFrame
@@ -72,14 +67,13 @@ Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame
     )
 
     # Args > 80 characters long
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty(
     JNIEnv *env, jclass, jint source, jstring name, jint kind, jint minimum,
     jint maximum, jint step, jint defaultValue, jint value) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    createSourceProperty
@@ -95,14 +89,13 @@ Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
     )
 
     # Ensure fixes clang-format output aligned with "("
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance(JNIEnv*,
                                                                  jclass) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
@@ -117,9 +110,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
     )
 
     # Idempotence for same code
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
  * Signature: ()I
@@ -128,14 +119,11 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   (JNIEnv*, jclass)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Idempotence for same code with named jclass variable
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
  * Signature: ()I
@@ -144,12 +132,12 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   (JNIEnv*, jclass class)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Check signature that breaks verbose regexes
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./NetworkTablesJNI.cpp",
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
@@ -161,8 +149,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry(JNIEnv* env, jclass,
                                                            jint inst,
                                                            jstring key) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getEntry
@@ -177,7 +163,8 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
     )
 
     # Function with array type as argument
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./NetworkTablesJNI.cpp",
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
@@ -190,8 +177,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries(JNIEnv* env,
                                                              jstring prefix,
                                                              jint types) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getEntries
@@ -206,9 +191,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries
     )
 
     # Ensure functions with overloads are handled correctly
-    test.add_input(
-        "./NetworkTablesJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    setRaw
  * Signature: (IJ[BZ)Z
@@ -218,13 +201,13 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ
   (JNIEnv* env, jclass, jint entry, jlong time, jbyteArray value,
    jboolean force)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./NetworkTablesJNI.cpp", contents, contents, True)
 
     # Ensure text before JNIEXPORT and after args and ")" is handled correctly
     # as well as two JNI functions in a row
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """/**
  *
@@ -243,8 +226,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   return nt::CreateInstance();
 }
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getDefaultInstance
@@ -273,9 +254,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
     )
 
     # Handle function declarations properly
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getDefaultInstance
  * Signature: ()I
@@ -295,12 +274,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
 {
   return nt::CreateInstance();
 }
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Handle functions whose arguments don't have variable names properly
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./DigitalGlitchFilterJNI.cpp",
         """/*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
@@ -313,8 +292,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cle
   HAL_CleanFilter(handle);
 }
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    cleanFilter
@@ -331,13 +308,12 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cleanFilter
     )
 
     # Input args go to next line even if they fit on same line
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL
 Java_TestJNI_testFunc(JNIEnv* env, jobject) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     TestJNI
  * Method:    testFunc
@@ -352,15 +328,14 @@ Java_TestJNI_testFunc
     )
 
     # Input aligned to "(" and args past end of line
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL
 Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent(JNIEnv* env,
                                                                  jobject,
                                                                  jint source) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    setCameraExposureHoldCurrent
@@ -375,13 +350,12 @@ Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent
     )
 
     # Args in input on line after "(" and args length > 80 characters
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame(
     JNIEnv *env, jobject, jint source, jlong imageNativeObj) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    putSourceFrame
@@ -396,14 +370,13 @@ Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame
     )
 
     # Args > 80 characters long
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty(
     JNIEnv *env, jobject, jint source, jstring name, jint kind, jint minimum,
     jint maximum, jint step, jint defaultValue, jint value) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    createSourceProperty
@@ -419,14 +392,13 @@ Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
     )
 
     # Ensure fixes clang-format output aligned with "("
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance(JNIEnv*,
                                                                  jobject) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
@@ -441,9 +413,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
     )
 
     # Idempotence for same code
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
  * Signature: ()I
@@ -452,14 +422,11 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   (JNIEnv*, jobject)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Idempotence for same code with named jobject variable
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    createInstance
  * Signature: ()I
@@ -468,12 +435,12 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   (JNIEnv*, jobject class)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Check signature that breaks verbose regexes
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./NetworkTablesJNI.cpp",
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
@@ -485,8 +452,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry(JNIEnv* env, jobject,
                                                            jint inst,
                                                            jstring key) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getEntry
@@ -501,7 +466,8 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntry
     )
 
     # Function with array type as argument
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./NetworkTablesJNI.cpp",
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
@@ -514,8 +480,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries(JNIEnv* env,
                                                              jstring prefix,
                                                              jint types) {
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getEntries
@@ -530,9 +494,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntries
     )
 
     # Ensure functions with overloads are handled correctly
-    test.add_input(
-        "./NetworkTablesJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    setRaw
  * Signature: (IJ[BZ)Z
@@ -542,13 +504,13 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_setRaw__IJ_3BZ
   (JNIEnv* env, jobject, jint entry, jlong time, jbyteArray value,
    jboolean force)
 {
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./NetworkTablesJNI.cpp", contents, contents, True)
 
     # Ensure text before JNIEXPORT and after args and ")" is handled correctly
     # as well as two JNI functions in a row
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./TestJNI.cpp",
         """/**
  *
@@ -567,8 +529,6 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
   return nt::CreateInstance();
 }
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getDefaultInstance
@@ -597,9 +557,7 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
     )
 
     # Handle function declarations properly
-    test.add_input(
-        "./TestJNI.cpp",
-        """/*
+    contents = """/*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    getDefaultInstance
  * Signature: ()I
@@ -619,12 +577,12 @@ Java_edu_wpi_first_networktables_NetworkTablesJNI_createInstance
 {
   return nt::CreateInstance();
 }
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(Jni(), "./TestJNI.cpp", contents, contents, True)
 
     # Handle functions whose arguments don't have variable names properly
-    test.add_input(
+    run_and_check_file(
+        Jni(),
         "./DigitalGlitchFilterJNI.cpp",
         """/*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
@@ -637,8 +595,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cle
   HAL_CleanFilter(handle);
 }
 """,
-    )
-    test.add_output(
         """/*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    cleanFilter
@@ -653,5 +609,3 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cleanFilter
 """,
         True,
     )
-
-    test.run(OutputType.FILE)

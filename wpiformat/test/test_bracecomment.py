@@ -4,16 +4,13 @@ from .test_tasktest import *
 
 
 def test_bracecomment():
-    test = TaskTest(BraceComment())
-
     # Empty anonymous namespace
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """namespace {
 }// comment
 """,
-    )
-    test.add_output(
         """namespace {
 }  // namespace
 """,
@@ -21,14 +18,13 @@ def test_bracecomment():
     )
 
     # Anonymous namespace containing comment
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """namespace {
   // comment
 }// comment
 """,
-    )
-    test.add_output(
         """namespace {
   // comment
 }  // namespace
@@ -37,14 +33,13 @@ def test_bracecomment():
     )
 
     # namespace
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """namespace hal {
   // comment
 }// comment
 """,
-    )
-    test.add_output(
         """namespace hal {
   // comment
 }  // namespace hal
@@ -53,7 +48,8 @@ def test_bracecomment():
     )
 
     # namespace with leftover input
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """// comment before namespace
 namespace hal {
@@ -61,8 +57,6 @@ namespace hal {
 }// comment
 // comment after namespace
 """,
-    )
-    test.add_output(
         """// comment before namespace
 namespace hal {
   // comment
@@ -73,7 +67,8 @@ namespace hal {
     )
 
     # Braces within namespace
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """namespace {
 
@@ -86,8 +81,6 @@ struct AnalogGyro {
 
 }
 """,
-    )
-    test.add_output(
         """namespace {
 
 struct AnalogGyro {
@@ -103,14 +96,13 @@ struct AnalogGyro {
     )
 
     # extern "C"
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """extern "C" {
     // nothing
 }// comment
 """,
-    )
-    test.add_output(
         """extern "C" {
     // nothing
 }  // extern "C"
@@ -119,9 +111,7 @@ struct AnalogGyro {
     )
 
     # Nested brackets should be handled properly
-    test.add_input(
-        "./Test.cpp",
-        """extern "C" {
+    contents = """extern "C" {
 void func() {
   if (1) {
   } else if (1) {
@@ -129,19 +119,17 @@ void func() {
   }
 }
 }  // extern "C"
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(BraceComment(), "./Test.cpp", contents, contents, True)
 
     # Nested brackets on same line
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.cpp",
         """namespace wpi {
 {{}}
 }  // namespace java
 """,
-    )
-    test.add_output(
         """namespace wpi {
 {{}}
 }  // namespace wpi
@@ -150,11 +138,17 @@ void func() {
     )
 
     # Handle single-line statements correctly
-    test.add_input("./Test.cpp", "namespace hal { Type typeName; }\n")
-    test.add_output("namespace hal { Type typeName; }  // namespace hal\n", True)
+    run_and_check_file(
+        BraceComment(),
+        "./Test.cpp",
+        "namespace hal { Type typeName; }\n",
+        "namespace hal { Type typeName; }  // namespace hal\n",
+        True,
+    )
 
     # Two incorrect comments
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Test.h",
         """namespace {
     // nothing
@@ -163,8 +157,6 @@ namespace Name {
     // nothing
 }
 """,
-    )
-    test.add_output(
         """namespace {
     // nothing
 }  // namespace
@@ -176,17 +168,15 @@ namespace Name {
     )
 
     # Don't touch correct comment
-    test.add_input(
-        "./Test.h",
-        """namespace {
+    contents = """namespace {
     // nothing
 }  // namespace
-""",
-    )
-    test.add_latest_input_as_output(True)
+"""
+    run_and_check_file(BraceComment(), "./Test.h", contents, contents, True)
 
     # Handle braces in comments properly
-    test.add_input(
+    run_and_check_file(
+        BraceComment(),
         "./Path.h",
         """#ifndef ALLWPILIB_WPI_PATH_H_
 #define ALLWPILIB_WPI_PATH_H_
@@ -203,8 +193,6 @@ namespace path {
 
 #endif  // ALLWPILIB_WPI_PATH_H_
 """,
-    )
-    test.add_output(
         """#ifndef ALLWPILIB_WPI_PATH_H_
 #define ALLWPILIB_WPI_PATH_H_
 
@@ -222,5 +210,3 @@ namespace path {
 """,
         True,
     )
-
-    test.run(OutputType.FILE)
