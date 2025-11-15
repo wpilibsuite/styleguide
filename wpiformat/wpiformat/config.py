@@ -2,7 +2,6 @@
 
 import os
 import re
-import sys
 
 
 class Config:
@@ -43,11 +42,12 @@ class Config:
                         os.path.join(directory, filename),
                         file_contents.read().splitlines(),
                     )
-            except OSError:
+            except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
-                    print(f"error: config file '{filename}' not found in '{directory}'")
-                    sys.exit(1)
+                    raise OSError(
+                        f"config file '{filename}' not found in '{directory}'"
+                    ) from e
                 directory = os.path.dirname(directory)
         return "", []
 
