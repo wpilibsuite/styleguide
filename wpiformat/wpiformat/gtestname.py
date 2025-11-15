@@ -4,15 +4,18 @@
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class GTestName(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         output = ""
         success = True
 
@@ -45,7 +48,7 @@ class GTestName(PipelineTask):
             # Fix test case name
             if test_case == "Test" or test_case == "Tests":
                 print(
-                    f"error: {name}: undescriptive test case name '{test_case}' in '{test_suite}.{test_case}'"
+                    f"error: {filename}: undescriptive test case name '{test_case}' in '{test_suite}.{test_case}'"
                 )
                 success = False
             else:

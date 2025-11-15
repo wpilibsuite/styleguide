@@ -6,6 +6,7 @@ import multiprocessing as mp
 import os
 import subprocess
 import sys
+from typing import Any, Generator
 
 from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
@@ -27,15 +28,15 @@ from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
 
 
-def filter_ignored_files(names):
+def filter_ignored_files(filenames: list[str]) -> list[str]:
     """Returns list of files not in .gitignore.
 
     Keyword arguments:
-    names -- list of files to filter
+    filenames -- list of filenames to filter
     """
     # "git check-ignore" misbehaves when the names are separated by "\r\n" on
     # Windows, so os.linesep isn't used here.
-    encoded_names = "\n".join(names).encode()
+    encoded_names = "\n".join(filenames).encode()
 
     proc = subprocess.run(
         ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
@@ -78,32 +79,32 @@ def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
     print_lock = mp.Lock()
 
 
-def proc_pipeline(name):
+def proc_pipeline(filename: str) -> bool:
     """Runs the contents of each file through the task pipeline.
 
     If the contents were modified at any point, the result is written back out
     to the file.
 
     Keyword arguments:
-    name -- file name string
+    filename -- filename
     """
-    config_file = Config(os.path.dirname(name), ".styleguide")
+    config_file = Config(os.path.dirname(filename), ".styleguide")
     if verbose1 or verbose2:
         with print_lock:
-            print("Processing", name)
+            print("Processing", filename)
             if verbose2:
-                print("  with config " + config_file.file_name)
+                print("  with config " + config_file.filename)
                 for subtask in task_pipeline:
-                    if subtask.should_process_file(config_file, name):
+                    if subtask.should_process_file(config_file, filename):
                         print("  with " + type(subtask).__name__)
 
     lines = ""
-    with open(name, "r", encoding="utf8") as file:
+    with open(filename, "r", encoding="utf8") as file:
         try:
             lines = file.read()
         except UnicodeDecodeError:
             print(
-                f"error: {name} contains characters not in UTF-8. Should this be considered a generated file?"
+                f"error: {filename} contains characters not in UTF-8. Should this be considered a generated file?"
             )
             return False
 
@@ -112,43 +113,43 @@ def proc_pipeline(name):
 
     output = lines
     for subtask in task_pipeline:
-        if subtask.should_process_file(config_file, name):
-            output, success = subtask.run_pipeline(config_file, name, output)
+        if subtask.should_process_file(config_file, filename):
+            output, success = subtask.run_pipeline(config_file, filename, output)
             all_success &= success
 
     if lines != output:
-        with open(name, "wb") as file:
+        with open(filename, "wb") as file:
             file.write(output.encode())
 
     return all_success
 
 
-def proc_standalone(name):
+def proc_standalone(filename: str) -> bool:
     """Runs each task on each file.
 
     Keyword arguments:
-    name -- file name string
+    filename -- filename
     """
-    config_file = Config(os.path.dirname(name), ".styleguide")
+    config_file = Config(os.path.dirname(filename), ".styleguide")
     if verbose2:
         with print_lock:
-            print("Processing", name)
+            print("Processing", filename)
             for subtask in task_pipeline:
-                if subtask.should_process_file(config_file, name):
+                if subtask.should_process_file(config_file, filename):
                     print("  with " + type(subtask).__name__)
 
     # The success flag is aggregated across multiple file processing results
     all_success = True
 
     for subtask in task_pipeline:
-        if subtask.should_process_file(config_file, name):
-            success = subtask.run_standalone(config_file, name)
+        if subtask.should_process_file(config_file, filename):
+            success = subtask.run_standalone(config_file, filename)
             all_success &= success
 
     return all_success
 
 
-def chunks(l, max_len):
+def chunks(l: list[Any], max_len: int) -> Generator[list[Any], None, None]:
     """Yield successive chunks from l whose content lengths sum to less than
     max_len.
     """
@@ -163,14 +164,14 @@ def chunks(l, max_len):
             size = 0
 
 
-def proc_batch(files):
+def proc_batch(filenames: list[str]) -> bool:
     """Runs each task in the pipeline on batches of files.
 
     These tasks read and write to the files directly. They are given a list of
     all files at once to avoid spawning too many subprocesses.
 
     Keyword arguments:
-    files -- list of file names
+    filenames -- list of filenames
 
     Returns true if all tasks succeeded.
     """
@@ -178,16 +179,16 @@ def proc_batch(files):
 
     for subtask in task_pipeline:
         work = []
-        for name in files:
-            config_file = Config(os.path.dirname(name), ".styleguide")
-            if subtask.should_process_file(config_file, name):
-                work.append(name)
+        for filename in filenames:
+            config_file = Config(os.path.dirname(filename), ".styleguide")
+            if subtask.should_process_file(config_file, filename):
+                work.append(filename)
 
         if work:
             # Conservative estimate for max argument length. 32767 is from the
             # Win32 docs for CreateProcessA(), but the limit appears to be lower
             # than that in practice.
-            MAX_WIN32_ARGS_LEN = 32767 * 7 / 8
+            MAX_WIN32_ARGS_LEN = int(32767 * 7 / 8)
 
             for subwork in chunks(work, MAX_WIN32_ARGS_LEN):
                 if verbose1 or verbose2:
@@ -200,13 +201,13 @@ def proc_batch(files):
     return all_success
 
 
-def run_pipeline(task_pipeline, args, files):
+def run_pipeline(task_pipeline, args, filenames: list[str]):
     """Spawns process pool for proc_pipeline().
 
     Keyword arguments:
     task_pipeline -- task pipeline
     args -- command line arguments from argparse
-    files -- list of file names to process
+    filenames -- list of filenames to process
 
     Calls sys.exit(1) if any task fails.
     """
@@ -224,19 +225,19 @@ def run_pipeline(task_pipeline, args, files):
 
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
         # Start worker processes for task pipeline
-        results = pool.map(proc_pipeline, files)
+        results = pool.map(proc_pipeline, filenames)
 
         if not all(results):
             sys.exit(1)
 
 
-def run_batch(task_pipeline, args, file_batches):
+def run_batch(task_pipeline, args, filename_batches: list[list[str]]):
     """Spawns process pool for proc_batch().
 
     Keyword arguments:
     task_pipeline -- task pipeline
     args -- command line arguments from argparse
-    file_batches -- list of file names to process
+    filename_batches -- list of batches of filenames to process
 
     Calls sys.exit(1) if any task fails.
     """
@@ -254,19 +255,19 @@ def run_batch(task_pipeline, args, file_batches):
 
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
         # Start worker processes for batch tasks
-        results = pool.map(proc_batch, file_batches)
+        results = pool.map(proc_batch, filename_batches)
 
         if not all(results):
             sys.exit(1)
 
 
-def run_standalone(task_pipeline, args, files):
+def run_standalone(task_pipeline, args, filenames: list[str]):
     """Spawns process pool for proc_standalone().
 
     Keyword arguments:
     task_pipeline -- task pipeline
     args -- command line arguments from argparse
-    files -- list of file names to process
+    filenames -- list of filenames to process
 
     Calls sys.exit(1) if any task fails.
     """
@@ -284,7 +285,7 @@ def run_standalone(task_pipeline, args, files):
 
     with mp.Pool(args.jobs, proc_init, init_args) as pool:
         # Start worker processes for standalone tasks
-        results = pool.map(proc_standalone, files)
+        results = pool.map(proc_standalone, filenames)
 
         if not all(results):
             sys.exit(1)

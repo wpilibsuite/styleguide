@@ -12,22 +12,24 @@ from wpiformat.task import PipelineTask
 
 class LicenseUpdate(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
+    def should_process_file(config_file: Config, filename: str) -> bool:
         license_regex = config_file.regex("licenseUpdateExclude")
 
         return (
-            config_file.is_c_file(name)
-            or config_file.is_cpp_file(name)
-            or name.endswith(".java")
-        ) and not license_regex.search(name)
+            config_file.is_c_file(filename)
+            or config_file.is_cpp_file(filename)
+            or filename.endswith(".java")
+        ) and not license_regex.search(filename)
 
-    def __try_regex(self, lines, last_year, license_template):
+    def __try_regex(
+        self, lines: str, last_year: str, license_template: list[str]
+    ) -> tuple[bool, str, str]:
         """Try finding license with regex of license template.
 
         Keyword arguments:
         lines -- lines of file
         last_year -- last year in copyright range
-        license_template -- license_template string
+        license_template -- license template
 
         Returns:
         Tuple of whether license was found, first year in copyright range, and
@@ -62,13 +64,12 @@ class LicenseUpdate(PipelineTask):
         else:
             return False, first_year, lines
 
-    def __try_string_search(self, lines, last_year, license_template):
+    def __try_string_search(self, lines: str, last_year: str) -> tuple[bool, str, str]:
         """Try finding license with string search.
 
         Keyword arguments:
         lines -- lines of file
         last_year -- last year in copyright range
-        license_template -- license_template string
 
         Returns:
         Tuple of whether license was found, first year in copyright range, and
@@ -132,11 +133,13 @@ class LicenseUpdate(PipelineTask):
         else:
             return False, first_year, linesep + lines.lstrip()
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         _, license_template = Config.read_file(
-            os.path.dirname(os.path.abspath(name)), ".styleguide-license"
+            os.path.dirname(os.path.abspath(filename)), ".styleguide-license"
         )
 
         # Get year when file was most recently modified in Git history
@@ -146,12 +149,12 @@ class LicenseUpdate(PipelineTask):
         # should be used. Author dates can be older than this or even out of
         # order in the log.
         last_year = subprocess.check_output(
-            ["git", "log", "-n", "1", "--format=%ci", "--", name]
+            ["git", "log", "-n", "1", "--format=%ci", "--", filename]
         ).decode()[:4]
 
         # Check if file has uncomitted changes in the working directory
         has_uncommitted_changes = subprocess.run(
-            ["git", "diff-index", "--quiet", "HEAD", "--", name]
+            ["git", "diff-index", "--quiet", "HEAD", "--", filename]
         ).returncode
 
         # If file hasn't been committed yet or has changes in the working
@@ -163,9 +166,7 @@ class LicenseUpdate(PipelineTask):
             lines, last_year, license_template
         )
         if not success:
-            success, first_year, appendix = self.__try_string_search(
-                lines, last_year, license_template
-            )
+            success, first_year, appendix = self.__try_string_search(lines, last_year)
 
         output = ""
 

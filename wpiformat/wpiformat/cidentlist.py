@@ -2,6 +2,7 @@
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
@@ -15,11 +16,11 @@ class CIdentList(PipelineTask):
         )
 
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_c_file(name) or config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_c_file(filename) or config_file.is_cpp_file(filename)
 
     @staticmethod
-    def is_quote_in_number(lines, i):
+    def is_quote_in_number(lines: str, i: int) -> bool:
         if i == 0:
             return False
         c = lines[i - 1]
@@ -29,14 +30,16 @@ class CIdentList(PipelineTask):
             or ord("a") <= ord(c) <= ord("f")
         )
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         output = ""
         pos = 0
 
         # C files use C linkage by default
-        is_c = config_file.is_c_file(name)
+        is_c: int = 1 if config_file.is_c_file(filename) else 0
 
         # Tokenize as extern "C" or extern "C++" with optional {, open brace,
         # close brace, or () folllowed by { to disambiguate function calls.
@@ -140,7 +143,7 @@ class CIdentList(PipelineTask):
                 is_c = extern_brace_indices.pop()
 
                 if len(extern_brace_indices) == 0:
-                    self.__print_failure(name)
+                    self.__print_failure(filename)
                     return lines, False
 
                 # If the next stack frame is from an extern without braces, pop
@@ -150,7 +153,7 @@ class CIdentList(PipelineTask):
                     extern_brace_indices.pop()
             elif token == ";":
                 if len(extern_brace_indices) == 0:
-                    self.__print_failure(name)
+                    self.__print_failure(filename)
                     return lines, False
 
                 # If the next stack frame is from an extern without braces, pop
@@ -187,6 +190,6 @@ class CIdentList(PipelineTask):
         # Invariant: extern_brace_indices has one entry
         success = len(extern_brace_indices) == 1
         if not success:
-            self.__print_failure(name)
+            self.__print_failure(filename)
 
         return output, success

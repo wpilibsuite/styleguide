@@ -21,16 +21,17 @@ automatically generated based on the function's return type and arguments.
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class Jni(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_src_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_src_file(filename)
 
     @staticmethod
-    def map_jni_type(type_name):
+    def map_jni_type(type_name: str) -> str:
         ret = ""
         if type_name.endswith("*") or type_name.endswith("Array"):
             ret += "["
@@ -60,7 +61,9 @@ class Jni(PipelineTask):
         else:
             return ret + "?"
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         regex_str_sig = (
@@ -105,26 +108,19 @@ class Jni(PipelineTask):
             # Write JNI function comment. Splitting at "__" removes overload
             # annotation from method comment
             match = regex_func.search(match_sig.group("func").split("__")[0])
-            comment += (
-                "/*"
-                + linesep
-                + " * Class:     "
-                + match.group("class")
-                + linesep
-                + " * Method:    "
-                + match.group("method")
-                + linesep
-                + " * Signature: ("
+            if not match:
+                return lines, False
+            comment += f"""/*
+ * Class:     {match.group("class")}
+ * Method:    {match.group("method")}
+ * Signature: (""".replace(
+                "\n", linesep
             )
 
-            signature += (
-                "JNIEXPORT "
-                + match_sig.group("ret")
-                + " JNICALL"
-                + linesep
-                + match_sig.group("func")
-                + linesep
-                + jni_args
+            signature += f"""JNIEXPORT {match_sig.group("ret")} JNICALL
+{match_sig.group("func")}
+{jni_args}""".replace(
+                "\n", linesep
             )
 
             # Add other args
@@ -145,17 +141,15 @@ class Jni(PipelineTask):
                     signature += ", " + match_arg.group("arg")
                     line_length += len(", ") + len(match_arg.group("arg"))
                 comment += self.map_jni_type(match_arg.group("arg_type"))
-            comment += (
-                ")"
-                + self.map_jni_type(match_sig.group("ret"))
-                + linesep
-                + " */"
-                + linesep
+            comment += f"""){self.map_jni_type(match_sig.group("ret"))}
+ */
+""".replace(
+                "\n", linesep
             )
 
             # Output correct trailing character for declaration vs definition
             if match_arg.group("trailing") == "{":
-                signature += ")" + linesep + "{"
+                signature += f"){linesep}{{"
             else:
                 signature += ");"
 

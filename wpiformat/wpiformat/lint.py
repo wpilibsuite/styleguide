@@ -6,16 +6,17 @@ from contextlib import redirect_stdout
 
 import cpplint
 
+from wpiformat.config import Config
 from wpiformat.task import BatchTask
 
 
 class Lint(BatchTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_file(filename)
 
     @staticmethod
-    def run_batch(config_file, names):
+    def run_batch(config_file: Config, filenames: list[str]) -> bool:
         # Prepare arguments to cpplint.py
         saved_argv = sys.argv
 
@@ -59,7 +60,7 @@ class Lint(BatchTask):
         if header_exts:
             args.append("--headers=" + ",".join(header_exts))
         args.append("--quiet")
-        sys.argv = args + names
+        sys.argv = args + filenames
 
         # Run cpplint.py
         try:
@@ -71,3 +72,4 @@ class Lint(BatchTask):
 
             # Report success if error code is 0 (False)
             return e.code == False
+        return False

@@ -7,6 +7,7 @@ from enum import Enum
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
@@ -18,10 +19,12 @@ class State(Enum):
 
 class IncludeGuard(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_header_file(name)
+    def should_process_file(config_file: Config, filename: str):
+        return config_file.is_header_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
         lines_list = lines.split(linesep)
         output_list = lines_list
@@ -38,7 +41,7 @@ class IncludeGuard(PipelineTask):
                 ].lstrip().startswith("#define "):
                     state = State.FINDING_ENDIF
 
-                    guard = self.make_include_guard(config_file, name)
+                    guard = self.make_include_guard(config_file, filename)
                     output_list[i] = ifndef_regex.sub("#ifndef " + guard, lines_list[i])
                     output_list[i + 1] = define_regex.sub(
                         "#define " + guard, lines_list[i + 1]
@@ -62,26 +65,24 @@ class IncludeGuard(PipelineTask):
 
         # If include guard not found
         if state == State.FINDING_IFNDEF:
-            print(
-                "error: " + name + ": doesn't contain include guard or '#pragma once'"
-            )
+            print(f"error: {filename}: doesn't contain include guard or '#pragma once'")
             return lines, False
 
         output = linesep.join(output_list).rstrip() + linesep
         return output, True
 
-    def make_include_guard(self, config_file, name):
+    def make_include_guard(self, config_file: Config, filename: str) -> str:
         """Returns properly formatted include guard based on repository root and
-        file name.
+        filename.
 
         Keyword arguments:
         config_file -- Config object
-        name -- file name string
+        filename -- filename
         """
         repo_root_name_override = config_file.group("repoRootNameOverride")
 
         repo_root = super().get_repo_root()
-        guard_root = os.path.relpath(name, repo_root)
+        guard_root = os.path.relpath(filename, repo_root)
         if not repo_root_name_override:
             guard_path = os.path.basename(repo_root) + os.sep
         else:

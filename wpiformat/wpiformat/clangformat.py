@@ -5,6 +5,7 @@ from subprocess import PIPE, Popen
 
 import clang_format
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
@@ -16,13 +17,15 @@ class ClangFormat(PipelineTask):
         self.exec_name = clang_format.get_executable("clang-format")
 
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_c_file(name) or config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_c_file(filename) or config_file.is_cpp_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         try:
             p = Popen(
-                [self.exec_name, "-style=file", "-assume-filename=" + name, "-"],
+                [self.exec_name, "-style=file", f"-assume-filename={filename}", "-"],
                 stdin=PIPE,
                 stdout=PIPE,
                 encoding="utf-8",
