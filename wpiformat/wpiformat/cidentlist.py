@@ -1,6 +1,6 @@
 """This task replaces empty C identifier lists "()" with "(void)"."""
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -63,7 +63,7 @@ class CIdentList(PipelineTask):
         extern_str = r"(?P<ext_decl>extern \"C(\+\+)?\")\s+(?P<ext_brace>\{)?|"
         braces_str = r"\{|\}|;|def\s+\w+|\w+\**\s+\w+\s*(?P<paren>\(\))"
         postfix_str = r"(?=\s*(;|\{))"
-        token_regex = regex.compile(
+        token_regex = re.compile(
             preproc_str
             + comment_str
             + string_str
