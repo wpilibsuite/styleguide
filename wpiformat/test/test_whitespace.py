@@ -1,5 +1,3 @@
-import os
-
 from wpiformat.whitespace import Whitespace
 
 from .test_tasktest import *
@@ -8,20 +6,14 @@ from .test_tasktest import *
 def test_whitespace():
     test = TaskTest(Whitespace())
 
-    file_appendix = (
-        "#pragma once"
-        + os.linesep
-        + os.linesep
-        + "#include <iostream>"
-        + os.linesep
-        + os.linesep
-        + "int main() {"
-        + os.linesep
-        + '  std::cout << "Hello World!";'
-        + os.linesep
-        + "}"
-        + os.linesep
-    )
+    file_appendix = """#pragma once
+
+#include <iostream>
+
+int main() {
+  std::cout << "Hello World!";
+}
+"""
 
     # Empty file
     test.add_input("./Test.h", "")
@@ -34,36 +26,27 @@ def test_whitespace():
     # Two spaces trailing
     test.add_input(
         "./Test.h",
-        "#pragma once"
-        + os.linesep
-        + os.linesep
-        + "#include <iostream>"
-        + os.linesep
-        + os.linesep
-        + "int main() {  "
-        + os.linesep
-        + '  std::cout << "Hello World!";  '
-        + os.linesep
-        + "}"
-        + os.linesep,
+        "#pragma once\n"
+        + "\n"
+        + "#include <iostream>\n"
+        + "\n"
+        + "int main() {  \n"
+        + '  std::cout << "Hello World!";  \n'
+        + "}\n",
     )
     test.add_output(file_appendix, True)
 
     # Two tabs trailing
     test.add_input(
         "./Test.h",
-        "#pragma once"
-        + os.linesep
-        + os.linesep
-        + "#include <iostream>"
-        + os.linesep
-        + os.linesep
-        + "int main() {\t\t"
-        + os.linesep
-        + '  std::cout << "Hello World!";\t\t'
-        + os.linesep
-        + "}"
-        + os.linesep,
+        """#pragma once
+
+#include <iostream>
+
+int main() {\t\t
+  std::cout << "Hello World!";\t\t
+}
+""",
     )
     test.add_output(file_appendix, True)
 

@@ -8,25 +8,19 @@ from .test_tasktest import *
 def test_eofnewline():
     test = TaskTest(EofNewline())
 
-    file_appendix = (
-        "#pragma once"
-        + os.linesep
-        + os.linesep
-        + "#include <iostream>"
-        + os.linesep
-        + os.linesep
-        + "int main() {"
-        + os.linesep
-        + '  std::cout << "Hello World!";'
-        + os.linesep
-        + "}"
-    )
+    file_appendix = """#pragma once
+
+#include <iostream>
+
+int main() {
+  std::cout << "Hello World!";
+}"""
 
     # Empty file
     test.add_input("./Test.h", "")
     test.add_output("", True)
 
-    test_output = file_appendix + os.linesep
+    test_output = f"{file_appendix}\n"
 
     # No newline
     test.add_input("./Test.h", file_appendix)
@@ -37,11 +31,15 @@ def test_eofnewline():
     test.add_latest_input_as_output(True)
 
     # Two newlines
-    test.add_input("./Test.h", test_output + os.linesep)
+    test.add_input("./Test.h", f"{test_output}\n")
     test.add_output(test_output, True)
 
     # .bat file with no "./" prefix
-    test.add_input("test.bat", file_appendix.replace(os.linesep, "\r\n"))
-    test.add_output(test_output.replace(os.linesep, "\r\n"), True)
+    if os.linesep == "\r\n":
+        test.add_input("test.bat", file_appendix)
+        test.add_output(test_output, True)
+    else:
+        test.add_input("test.bat", file_appendix.replace("\n", "\r\n"))
+        test.add_output(test_output.replace("\n", "\r\n"), True)
 
     test.run(OutputType.FILE)

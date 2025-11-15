@@ -36,11 +36,21 @@ class TaskTest:
         file_name -- file name string
         contents -- file contents string
         """
-        self.inputs.append((file_name, contents))
+        self.inputs.append((file_name, contents.replace("\n", os.linesep)))
 
     def add_output(self, contents, succeeded):
         """Adds the given file contents and whether processing of the input list
         was successful.
+
+        Keyword arguments:
+        contents -- file contents string
+        succeeded -- whether processing of the input list was successful
+        """
+        self.outputs.append((contents.replace("\n", os.linesep), succeeded))
+
+    def add_verbatim_output(self, contents, succeeded):
+        """Adds the given file contents and whether processing of the input list
+        was successful, without replacing the line separator.
 
         Keyword arguments:
         contents -- file contents string
@@ -54,7 +64,7 @@ class TaskTest:
         Keyword arguments:
         succeeded -- whether processing of the input list was successful
         """
-        self.add_output(self.inputs[len(self.inputs) - 1][1], succeeded)
+        self.outputs.append((self.inputs[-1][1], succeeded))
 
     def run(self, output_type):
         """Runs the task on each input list element, then compares the resulting
