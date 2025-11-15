@@ -1,6 +1,6 @@
 """This task disallows "using" declarations in global namespaces in headers."""
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -20,7 +20,7 @@ class UsingDeclaration(PipelineTask):
         # Tokenize file as brace opens, brace closes, and "using" declarations.
         # "using" declarations are scoped, so content inside any bracket pair is
         # considered outside the global namespace.
-        token_regex = regex.compile(
+        token_regex = re.compile(
             r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|" + linesep + r"|\{|\}|using\b"
         )
 
