@@ -2,7 +2,7 @@
 "TEST(ThingTest, Thing)".
 """
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -19,7 +19,7 @@ class GTestName(PipelineTask):
         output = ""
         success = True
 
-        test_name_rgx = regex.compile(
+        test_name_rgx = re.compile(
             r"\b(?P<test_type>TEST(_F|_P)?)\((?P<whitespace>\s*)(?P<test_suite>\w+), (?P<test_case>\w+)\)"
         )
         extract_location = 0
@@ -70,7 +70,7 @@ class GTestName(PipelineTask):
         lines = output
         output = ""
 
-        inst_rgx = regex.compile(
+        inst_rgx = re.compile(
             r"INSTANTIATE_TEST_SUITE_P\((?P<whitespace>\s*)(?P<test_suite>\w+), (?P<test_case>\w+)"
         )
         extract_location = 0

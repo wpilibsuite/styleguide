@@ -19,7 +19,7 @@ The preceding comment containing the Class, Method, and Signature is also
 automatically generated based on the function's return type and arguments.
 """
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -67,24 +67,24 @@ class Jni(PipelineTask):
         linesep = super().get_linesep(lines)
 
         regex_str_sig = (
-            r"(/\*(?>(.|\n)*?\*/)\s+)?"
+            r"(/\*(.|\n)*?\*/\s+)?"
             + r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+"
             + r"(?P<func>Java_\w+)\s*\(\s*"
             + r"(?P<env_type>JNIEnv\s*\*\s*)"
             + r"(?P<env_name>\w+)?,\s*"
             + r"(?P<param_type>jclass|jobject)\s*(?P<param_name>\w*)?"
         )
-        regex_sig = regex.compile(regex_str_sig)
+        regex_sig = re.compile(regex_str_sig)
 
         regex_str_func = r"Java_(?P<class>\w+)_(?P<method>[^_]+)$"
-        regex_func = regex.compile(regex_str_func)
+        regex_func = re.compile(regex_str_func)
 
         # Matches a comma followed by the type, an optional variable name, and
         # an optional closing parenthesis
         regex_str_arg = (
             r", \s* (?P<arg>(?P<arg_type>[\w\*]+)(\s+ \w+)?)|\)\s*" r"(?P<trailing>{|;)"
         )
-        regex_arg = regex.compile(regex_str_arg, regex.VERBOSE)
+        regex_arg = re.compile(regex_str_arg, re.VERBOSE)
 
         output = ""
         pos = 0

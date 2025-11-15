@@ -1,6 +1,6 @@
 """This task warns against "using namespace std;"."""
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -18,7 +18,7 @@ class UsingNamespaceStd(PipelineTask):
 
         # Find instances of "using namespace std;" or subnamespaces of "std",
         # but not std::literals or std::chrono_literals.
-        using_regex = regex.compile(
+        using_regex = re.compile(
             r"using\s+namespace\s+std(;|::(?!(chrono_|string_view_)?literals|placeholders))"
         )
 

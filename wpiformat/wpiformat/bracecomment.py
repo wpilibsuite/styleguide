@@ -2,7 +2,7 @@
 namespace declarations matches that of the declaration name.
 """
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -22,7 +22,7 @@ class BraceComment(PipelineTask):
         brace_prefix = r"(?P<prefix>(extern|namespace)\s+[\w\"]*)"
         brace_postfix = r"[ \t]*/(/|\*)[^\r\n]*"
 
-        brace_regex = regex.compile(
+        brace_regex = re.compile(
             r"/\*|\*/|//|\\\\|\\\"|\"|\\'|'|"
             + linesep
             + r"|"
