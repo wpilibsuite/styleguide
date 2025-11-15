@@ -1,10 +1,9 @@
 """This class is for handling wpiformat config files."""
 
 import os
+import re
 import sys
 from typing import Dict
-
-import regex
 
 
 class Config:
@@ -67,7 +66,7 @@ class Config:
         except KeyError:
             return []
 
-    def regex(self, *args) -> regex.Pattern:
+    def regex(self, *args) -> re.Pattern:
         """Converts contents of group from config file into regex.
 
         Keyword arguments:
@@ -86,9 +85,9 @@ class Config:
 
         if len(group_contents) == 0:
             # If regex string is empty, make regex match nothing
-            return regex.compile(r"a^")
+            return re.compile(r"a^")
         else:
-            return regex.compile(r"|".join(group_contents))
+            return re.compile(r"|".join(group_contents))
 
     def is_c_file(self, filename: str) -> bool:
         """Returns True if file is either C header or C source file.

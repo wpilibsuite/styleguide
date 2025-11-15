@@ -1,6 +1,6 @@
 """This task removes extra newlines after the line containing "class"."""
 
-import regex
+import re
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -29,7 +29,7 @@ class JavaClass(PipelineTask):
             + linesep
             + r")+)"
         )
-        token_regex = regex.compile(token_str)
+        token_regex = re.compile(token_str)
 
         in_multicomment = False
         in_comment = False

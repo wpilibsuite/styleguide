@@ -1,10 +1,9 @@
 """This task updates the license header at the top of the file."""
 
 import os
+import re
 import subprocess
 from datetime import date
-
-import regex
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -47,7 +46,7 @@ class LicenseUpdate(PipelineTask):
             .replace("{year}", r"(?P<year>[0-9]+)(-[0-9]+)?")
             .replace("{padding}", "[ ]*")
         )
-        license_rgx = regex.compile(license_rgxstr, regex.M)
+        license_rgx = re.compile(license_rgxstr, re.M)
 
         first_year = last_year
 
@@ -87,7 +86,7 @@ class LicenseUpdate(PipelineTask):
         license_end = 0
 
         # Regex for tokenizing on comment boundaries
-        token_regex = regex.compile(r"/\*|\*/|^//")
+        token_regex = re.compile(r"/\*|\*/|^//")
 
         in_multiline_comment = False
         for line in stripped_lines:
@@ -121,7 +120,7 @@ class LicenseUpdate(PipelineTask):
                 linesep + linesep.join(stripped_lines[license_end:]).lstrip()
             )
 
-            year_regex = regex.compile(r"Copyright \(c\)(?>.*?\s(20..))")
+            year_regex = re.compile(r"Copyright \(c\).*?\s(20..)")
             for line in license_part.split(linesep):
                 match = year_regex.search(line)
                 # If license contains copyright pattern, extract the first year
