@@ -1,7 +1,7 @@
 """This task runs clang-format on the file."""
 
+import subprocess
 import sys
-from subprocess import PIPE, Popen
 
 import clang_format
 
@@ -24,10 +24,10 @@ class ClangFormat(PipelineTask):
         self, config_file: Config, filename: str, lines: str
     ) -> tuple[str, bool]:
         try:
-            p = Popen(
+            p = subprocess.Popen(
                 [self.exec_name, "-style=file", f"-assume-filename={filename}", "-"],
-                stdin=PIPE,
-                stdout=PIPE,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
                 encoding="utf-8",
             )
             stdout, stderr = p.communicate(input=lines)
