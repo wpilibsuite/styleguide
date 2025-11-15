@@ -2,7 +2,7 @@ import subprocess
 from datetime import date
 
 
-def get_version():
+def get_version() -> str:
     proc = subprocess.run(
         [
             "git",

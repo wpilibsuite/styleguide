@@ -2,15 +2,18 @@
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class UsingNamespaceStd(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         # Find instances of "using namespace std;" or subnamespaces of "std",
@@ -22,11 +25,7 @@ class UsingNamespaceStd(PipelineTask):
         for match in using_regex.finditer(lines):
             linenum = lines.count(linesep, 0, match.start()) + 1
             print(
-                "warning: "
-                + name
-                + ": "
-                + str(linenum)
-                + ': avoid "using namespace std;" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use "using std::thing;" instead.'
+                f'warning: {filename}: {linenum}: avoid "using namespace std;" in production software. While it is used in introductory C++, it pollutes the global namespace with standard library symbols. Be more specific and use "using std::thing;" instead.'
             )
 
         return lines, True

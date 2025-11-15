@@ -2,15 +2,18 @@
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class JavaClass(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return name.endswith(".java")
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return filename.endswith(".java")
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
         output = ""

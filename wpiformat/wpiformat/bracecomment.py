@@ -4,15 +4,18 @@ namespace declarations matches that of the declaration name.
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class BraceComment(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_c_file(name) or config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_c_file(filename) or config_file.is_cpp_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
         output = ""
 

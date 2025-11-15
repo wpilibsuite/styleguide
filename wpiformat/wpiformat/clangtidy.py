@@ -5,11 +5,12 @@ import sys
 
 import clang_tidy
 
+from wpiformat.config import Config
 from wpiformat.task import StandaloneTask
 
 
 class ClangTidy(StandaloneTask):
-    def __init__(self, compile_commands, extra_args):
+    def __init__(self, compile_commands: str, extra_args: list[str]):
         """Constructor for ClangTidy task.
 
         Keyword arguments:
@@ -31,13 +32,13 @@ class ClangTidy(StandaloneTask):
             self.args += ["-extra-arg", "-" + arg]
 
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_file(filename)
 
-    def run_standalone(self, config_file, name):
+    def run_standalone(self, config_file: Config, filename: str) -> bool:
         try:
             stdout = subprocess.run(
-                [self.exec_name] + self.args + [name],
+                [self.exec_name] + self.args + [filename],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 encoding="utf-8",
@@ -72,7 +73,7 @@ class ClangTidy(StandaloneTask):
 
         # If any lines are non-empty, print them and report an error
         if any(len(l.rstrip()) > 0 for l in lines):
-            print(f"== clang-tidy {name} ==\n" + "\n".join(lines))
+            print(f"== clang-tidy {filename} ==\n" + "\n".join(lines))
             return False
 
         return True

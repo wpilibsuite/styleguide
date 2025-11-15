@@ -2,15 +2,18 @@
 
 import regex
 
+from wpiformat.config import Config
 from wpiformat.task import PipelineTask
 
 
 class UsingDeclaration(PipelineTask):
     @staticmethod
-    def should_process_file(config_file, name):
-        return config_file.is_cpp_header_file(name)
+    def should_process_file(config_file: Config, filename: str) -> bool:
+        return config_file.is_cpp_header_file(filename)
 
-    def run_pipeline(self, config_file, name, lines):
+    def run_pipeline(
+        self, config_file: Config, filename: str, lines: str
+    ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
         format_succeeded = True
 
@@ -75,6 +78,8 @@ class UsingDeclaration(PipelineTask):
                             match.start() : lines.find(";", match.start()) + 1
                         ]
 
-                        print(f"{name}: {linenum}: '{using_decl}' in global namespace")
+                        print(
+                            f"{filename}: {linenum}: '{using_decl}' in global namespace"
+                        )
 
         return lines, format_succeeded

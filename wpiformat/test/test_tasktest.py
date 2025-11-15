@@ -6,6 +6,7 @@ import sys
 from enum import Enum
 
 from wpiformat.config import Config
+from wpiformat.task import Task
 
 
 class OutputType(Enum):
@@ -14,7 +15,7 @@ class OutputType(Enum):
 
 
 class TaskTest:
-    def __init__(self, task):
+    def __init__(self, task: Task):
         """Constructor for Test object.
 
         Keyword arguments:
@@ -29,36 +30,36 @@ class TaskTest:
         self.inputs = []
         self.outputs = []
 
-    def add_input(self, file_name, contents):
+    def add_input(self, filename: str, contents: str):
         """Adds the given file and its contents to the input list.
 
         Keyword arguments:
-        file_name -- file name string
-        contents -- file contents string
+        filename -- filename
+        contents -- file contents
         """
-        self.inputs.append((file_name, contents.replace("\n", os.linesep)))
+        self.inputs.append((filename, contents.replace("\n", os.linesep)))
 
-    def add_output(self, contents, succeeded):
+    def add_output(self, contents: str, succeeded: bool):
         """Adds the given file contents and whether processing of the input list
         was successful.
 
         Keyword arguments:
-        contents -- file contents string
+        contents -- file contents
         succeeded -- whether processing of the input list was successful
         """
         self.outputs.append((contents.replace("\n", os.linesep), succeeded))
 
-    def add_verbatim_output(self, contents, succeeded):
+    def add_verbatim_output(self, contents: str, succeeded: bool):
         """Adds the given file contents and whether processing of the input list
         was successful, without replacing the line separator.
 
         Keyword arguments:
-        contents -- file contents string
+        contents -- file contents
         succeeded -- whether processing of the input list was successful
         """
         self.outputs.append((contents, succeeded))
 
-    def add_latest_input_as_output(self, succeeded):
+    def add_latest_input_as_output(self, succeeded: bool):
         """Adds the latest input to the output list.
 
         Keyword arguments:
@@ -66,7 +67,7 @@ class TaskTest:
         """
         self.outputs.append((self.inputs[-1][1], succeeded))
 
-    def run(self, output_type):
+    def run(self, output_type: OutputType):
         """Runs the task on each input list element, then compares the resulting
         output against the corresponding output list element.
 

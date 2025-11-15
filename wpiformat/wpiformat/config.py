@@ -2,19 +2,20 @@
 
 import os
 import sys
+from typing import Dict
 
 import regex
 
 
 class Config:
-    def __init__(self, directory, file_name):
+    def __init__(self, directory: str, filename: str):
         """Constructor for Config object.
 
         Keyword arguments:
         directory -- directory in which to start search for file
-        file_name -- file name string
+        filename -- filename
         """
-        self.__config_dict = self.__parse_config_file(directory, file_name)
+        self.__config_dict = self.__parse_config_file(directory, filename)
         self.__c_header_include_regex = self.regex("cHeaderFileInclude")
         self.__cpp_header_include_regex = self.regex("cppHeaderFileInclude")
         self.__cpp_src_include_regex = self.regex("cppSrcFileInclude")
@@ -22,7 +23,7 @@ class Config:
         self.__modifiable_exclude_regex = self.regex("modifiableFileExclude")
 
     @staticmethod
-    def read_file(directory, file_name):
+    def read_file(directory: str, filename: str) -> tuple[str, list[str]]:
         """Find file and return contents.
 
         Checks current directory for file. If one doesn't exist, try all parent
@@ -30,34 +31,29 @@ class Config:
 
         Keyword arguments:
         directory -- current directory from which to start search
-        file_name -- file name string
+        filename -- filename
 
-        Returns tuple of file name and list containing file contents or triggers
+        Returns tuple of filename and list containing file contents or triggers
         program exit.
         """
         file_found = False
         while not file_found:
             try:
-                with open(directory + os.sep + file_name, "r") as file_contents:
+                with open(directory + os.sep + filename, "r") as file_contents:
                     file_found = True
                     return (
-                        os.path.join(directory, file_name),
+                        os.path.join(directory, filename),
                         file_contents.read().splitlines(),
                     )
             except OSError:
                 # .git files are ignored, which are created within submodules
                 if os.path.isdir(directory + os.sep + ".git"):
-                    print(
-                        "error: config file '"
-                        + file_name
-                        + "' not found in '"
-                        + directory
-                        + "'"
-                    )
+                    print(f"error: config file '{filename}' not found in '{directory}'")
                     sys.exit(1)
                 directory = os.path.dirname(directory)
+        return "", []
 
-    def group(self, group_name):
+    def group(self, group_name: str) -> list[str]:
         """Returns value from config dictionary given key string.
 
         Keyword arguments:
@@ -71,7 +67,7 @@ class Config:
         except KeyError:
             return []
 
-    def regex(self, *args):
+    def regex(self, *args) -> regex.Pattern:
         """Converts contents of group from config file into regex.
 
         Keyword arguments:
@@ -94,80 +90,82 @@ class Config:
         else:
             return regex.compile(r"|".join(group_contents))
 
-    def is_c_file(self, name):
+    def is_c_file(self, filename: str) -> bool:
         """Returns True if file is either C header or C source file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.is_c_header_file(name) or self.is_c_src_file(name)
+        return self.is_c_header_file(filename) or self.is_c_src_file(filename)
 
-    def is_c_header_file(self, name):
+    def is_c_header_file(self, filename: str) -> bool:
         """Returns True if file is C header file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.__c_header_include_regex.search(name) is not None
+        return self.__c_header_include_regex.search(filename) is not None
 
     @staticmethod
-    def is_c_src_file(name):
+    def is_c_src_file(filename: str) -> bool:
         """Returns True if file is C source file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return name.endswith(".c")
+        return filename.endswith(".c")
 
-    def is_cpp_file(self, name):
+    def is_cpp_file(self, filename: str) -> bool:
         """Returns True if file is either C++ header or C++ source file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.is_cpp_header_file(name) or self.is_cpp_src_file(name)
+        return self.is_cpp_header_file(filename) or self.is_cpp_src_file(filename)
 
-    def is_cpp_header_file(self, name):
+    def is_cpp_header_file(self, filename: str) -> bool:
         """Returns True if file is C++ header file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.__cpp_header_include_regex.search(name) is not None
+        return self.__cpp_header_include_regex.search(filename) is not None
 
-    def is_cpp_src_file(self, name):
+    def is_cpp_src_file(self, filename: str) -> bool:
         """Returns True if file is C++ source file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.__cpp_src_include_regex.search(name) is not None
+        return self.__cpp_src_include_regex.search(filename) is not None
 
-    def is_header_file(self, name):
+    def is_header_file(self, filename: str) -> bool:
         """Returns True if file is either C or C++ header file.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.is_c_header_file(name) or self.is_cpp_header_file(name)
+        return self.is_c_header_file(filename) or self.is_cpp_header_file(filename)
 
-    def is_generated_file(self, name):
+    def is_generated_file(self, filename: str) -> bool:
         """Returns True if file is generated (generated files are skipped).
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.__generated_exclude_regex.search(name) is not None
+        return self.__generated_exclude_regex.search(filename) is not None
 
-    def is_modifiable_file(self, name):
+    def is_modifiable_file(self, filename: str) -> bool:
         """Returns True if file is modifiable but should be skipped.
 
         Keyword arguments:
-        name -- file name string
+        filename -- filename
         """
-        return self.__modifiable_exclude_regex.search(name) is not None
+        return self.__modifiable_exclude_regex.search(filename) is not None
 
-    def __parse_config_file(self, directory, file_name):
+    def __parse_config_file(
+        self, directory: str, filename: str
+    ) -> Dict[str, list[str]]:
         """Parse values from config file.
 
         Checks current directory for config file. If one doesn't exist, try all
@@ -175,7 +173,7 @@ class Config:
 
         Keyword arguments:
         directory -- current directory from which to start search
-        file_name -- config file name string
+        filename -- config filename
 
         Returns dictionary of groups (group name -> list of values).
         """
@@ -184,9 +182,9 @@ class Config:
         group_name = ""
         group_elements = []
 
-        self.file_name, lines = self.read_file(directory, file_name)
+        self.filename, lines = self.read_file(directory, filename)
         if not lines:
-            return None
+            return {}
 
         for line in lines:
             # Skip empty lines
