@@ -210,3 +210,39 @@ namespace path {
 """,
         True,
     )
+
+    # Comment in macro
+    run_and_check_file(
+        BraceComment(),
+        "./Test.cpp",
+        """#define TEST(namespaceName, name, ...) \\
+  namespace namespaceName { \\
+  using name = __VA_ARGS__; \\
+  } \\
+  using name = namespaceName::name;
+""",
+        """#define TEST(namespaceName, name, ...) \\
+  namespace namespaceName { \\
+  using name = __VA_ARGS__; \\
+  }  /* namespace namespaceName */ \\
+  using name = namespaceName::name;
+""",
+        True,
+    )
+    run_and_check_file(
+        BraceComment(),
+        "./Test.cpp",
+        """#define TEST(namespaceName, name, ...) \\
+  namespace namespaceName { \\
+  using name = __VA_ARGS__; \\
+  } /* namespaceName */\\
+  using name = namespaceName::name;
+""",
+        """#define TEST(namespaceName, name, ...) \\
+  namespace namespaceName { \\
+  using name = __VA_ARGS__; \\
+  }  /* namespace namespaceName */ \\
+  using name = namespaceName::name;
+""",
+        True,
+    )

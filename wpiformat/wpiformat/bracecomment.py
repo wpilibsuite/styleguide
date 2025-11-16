@@ -84,10 +84,19 @@ class BraceComment(PipelineTask):
                     len(name_stack) > 0
                     and name_stack[len(name_stack) - 1][0] == brace_count
                 ):
-                    output += "}  // " + name_stack.pop()[1]
+                    # If there's a line continuation, use a multiline comment
+                    # instead
+                    end_of_line = lines.find(linesep, match.start())
+                    rest_of_line = lines[match.start() : end_of_line]
+                    if rest_of_line.endswith("\\"):
+                        output += f"}}  /* {name_stack.pop()[1]} */ "
+                        extract_location = end_of_line - 1
+                    else:
+                        output += f"}}  // {name_stack.pop()[1]}"
+                        extract_location = match.end()
                 else:
                     output += lines[match.start() : match.end()]
-                extract_location = match.end()
+                    extract_location = match.end()
                 brace_count -= 1
 
         # If input has unprocessed lines, write them to output
