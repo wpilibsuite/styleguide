@@ -6,7 +6,7 @@ import re
 
 class Config:
     # Dict from filepath to file contents
-    config_cache: dict[str, list[str]] = {}
+    __config_cache: dict[str, list[str]] = {}
 
     def __init__(self, directory: str, filename: str):
         """Constructor for Config object.
@@ -40,12 +40,12 @@ class Config:
             filepath = os.path.join(directory, filename)
             try:
                 # If filepath in config cache, return cached version instead
-                if config_file := Config.config_cache.get(filepath):
+                if config_file := Config.__config_cache.get(filepath):
                     return filepath, config_file
 
                 with open(filepath, "r") as file_contents:
                     contents = file_contents.read().splitlines()
-                    Config.config_cache[filepath] = contents
+                    Config.__config_cache[filepath] = contents
                     return filepath, contents
             except OSError as e:
                 # .git files are ignored, which are created within submodules
