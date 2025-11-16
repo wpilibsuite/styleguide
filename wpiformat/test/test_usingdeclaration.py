@@ -12,7 +12,7 @@ def test_usingdeclaration():
 class Test {
 }
 """,
-        "./Test.h: 1: 'using std::chrono;' in global namespace\n",
+        "warning: ./Test.h: 1: 'using std::chrono;' in global namespace\n",
         False,
     )
 
@@ -36,7 +36,7 @@ class Test {
 }
 using std::chrono;
 """,
-        "./Test.h: 3: 'using std::chrono;' in global namespace\n",
+        "warning: ./Test.h: 3: 'using std::chrono;' in global namespace\n",
         False,
     )
 

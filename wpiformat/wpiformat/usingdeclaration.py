@@ -79,7 +79,7 @@ class UsingDeclaration(PipelineTask):
                         ]
 
                         print(
-                            f"{filename}: {linenum}: '{using_decl}' in global namespace"
+                            f"warning: {filename}: {linenum}: '{using_decl}' in global namespace"
                         )
 
         return lines, format_succeeded
