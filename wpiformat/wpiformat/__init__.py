@@ -36,11 +36,9 @@ def filter_ignored_files(filenames: list[str]) -> list[str]:
     """
     # "git check-ignore" misbehaves when the names are separated by "\r\n" on
     # Windows, so os.linesep isn't used here.
-    encoded_names = "\n".join(filenames).encode()
-
     proc = subprocess.run(
         ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
-        input=encoded_names,
+        input="\n".join(filenames).encode(),
         stdout=subprocess.PIPE,
     )
     if proc.returncode == 128:
@@ -48,15 +46,13 @@ def filter_ignored_files(filenames: list[str]) -> list[str]:
             proc.returncode, proc.args, proc.stdout, proc.stderr
         )
 
-    output_list = proc.stdout.decode().split("\n")
-
     # "git check-ignore" prefixes the names of non-ignored files with "::",
     # wraps names in quotes on Windows, and outputs "\n" line separators on all
     # platforms.
     return [
-        name[2:].lstrip().strip('"').replace("\\\\", "\\")
-        for name in output_list
-        if name[0:2] == "::"
+        filename[2:].lstrip().strip('"').replace("\\\\", "\\")
+        for filename in proc.stdout.decode().split("\n")
+        if filename[0:2] == "::"
     ]
 
 
