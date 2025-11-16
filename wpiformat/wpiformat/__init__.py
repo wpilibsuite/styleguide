@@ -28,7 +28,7 @@ from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
 
 
-def filter_ignored_files(filenames: list[str]) -> list[str]:
+def filter_for_unignored_files(filenames: list[str]) -> list[str]:
     """Returns list of files not in .gitignore.
 
     Keyword arguments:
@@ -94,7 +94,7 @@ def proc_pipeline(filename: str) -> bool:
         with print_lock:
             print("Processing", filename)
             if verbose2:
-                print("  with config " + config_file.filename)
+                print(f"  with config {config_file.filename}")
                 for subtask in task_pipeline:
                     if subtask.should_process_file(config_file, filename):
                         print("  with " + type(subtask).__name__)
@@ -184,7 +184,7 @@ def proc_batch(filenames: list[str]) -> bool:
     all_success = True
 
     for subtask in task_pipeline:
-        work = []
+        work: list[str] = []
         for filename in filenames:
             # TODO: Remove handling for deprecated .styleguide file
             try:
@@ -398,61 +398,61 @@ def main():
 
     # tidy requires compile_commands.json
     if args.tidy_all or args.tidy_changed:
-        ccloc = os.path.join(args.compile_commands, "compile_commands.json")
-        if not os.path.exists(ccloc):
+        compile_commands_filename = os.path.join(
+            args.compile_commands, "compile_commands.json"
+        )
+        if not os.path.exists(compile_commands_filename):
             print(
-                f"error: clang-tidy: {ccloc} not found (try -compile-commands)",
+                f"error: clang-tidy: {compile_commands_filename} not found (try -compile-commands)",
                 file=sys.stderr,
             )
             sys.exit(1)
 
-    # All discovered files are relative to Git repo root directory, so find the
-    # root.
-    root_path = Task.get_repo_root()
-    if root_path == "":
-        print("error: not invoked within a Git repository", file=sys.stderr)
-        sys.exit(1)
+    # Find Git repo root directory that all discovered files are relative to
+    repo_root = Task.get_repo_root()
 
     # If no files explicitly specified
     if not args.file:
         # Delete temporary files from previous incomplete run
-        files = [
+        filenames: list[str] = [
             os.path.join(dp, f)
-            for dp, dn, fn in os.walk(root_path)
+            for dp, dn, fn in os.walk(repo_root)
             for f in fn
             if f.endswith(".tmp")
         ]
-        for f in files:
+        for f in filenames:
             os.remove(f)
 
         # Recursively create list of files in given directory
-        files = [os.path.join(dp, f) for dp, dn, fn in os.walk(root_path) for f in fn]
+        filenames: list[str] = [
+            os.path.join(dp, f) for dp, dn, fn in os.walk(repo_root) for f in fn
+        ]
 
-        if not files:
+        if not filenames:
             print("error: no files found to format", file=sys.stderr)
             sys.exit(1)
     else:
-        files = []
-        for name in args.file:
+        filenames: list[str] = []
+        for elem in args.file:
             # If a directory was specified, recursively expand it
-            if os.path.isdir(name):
-                files.extend(
-                    [os.path.join(dp, f) for dp, dn, fn in os.walk(name) for f in fn]
+            if os.path.isdir(elem):
+                filenames.extend(
+                    [os.path.join(dp, f) for dp, dn, fn in os.walk(elem) for f in fn]
                 )
             else:
-                files.append(name)
+                filenames.append(elem)
 
-    # Convert relative paths of files to absolute paths
-    files = [os.path.abspath(name) for name in files]
+    # Convert relative filepaths to absolute
+    filenames: list[str] = [os.path.abspath(name) for name in filenames]
 
-    # Don't run tasks on Git metadata
-    files = [name for name in files if os.sep + ".git" + os.sep not in name]
+    # Skip Git metadata
+    filenames: list[str] = [f for f in filenames if os.sep + ".git" + os.sep not in f]
 
-    # Don't check for changes in or run tasks on ignored files
-    files = filter_ignored_files(files)
+    # Skip ignored files
+    filenames: list[str] = filter_for_unignored_files(filenames)
 
     # Throw an error if any files or directories don't exist
-    for f in files:
+    for f in filenames:
         if not os.path.exists(f):
             if not os.path.islink(f):
                 print(f"error: {f}: No such file or directory")
@@ -478,52 +478,54 @@ def main():
             sys.exit(1)
 
     # Create list of all changed files
-    changed_file_list = [
-        root_path + os.sep + os.path.normpath(line.rstrip())
+    changed_file_list: list[str] = [
+        os.path.normpath(repo_root + os.sep + line.rstrip())
         for line in subprocess.check_output(
             ["git", "diff", "--name-only", f"{default_branch}..."], encoding="ascii"
         ).split()
     ]
 
-    # Don't run tasks on modifiable or generated files
-    work = []
-    for name in files:
+    # Skip modifiable or generated files
+    work: list[str] = []
+    for filename in filenames:
         # TODO: Remove handling for deprecated .styleguide file
         try:
-            config_file = Config(os.path.dirname(name), ".wpiformat")
+            config_file = Config(os.path.dirname(filename), ".wpiformat")
         except OSError:
-            config_file = Config(os.path.dirname(name), ".styleguide")
+            config_file = Config(os.path.dirname(filename), ".styleguide")
 
-        if config_file.is_modifiable_file(name):
+        if config_file.is_modifiable_file(filename):
             continue
-        if config_file.is_generated_file(name):
+        if config_file.is_generated_file(filename):
             # Emit warning if a generated file was editted
             if (
-                name in changed_file_list
+                filename in changed_file_list
                 and not args.list_all_files
                 and not args.list_changed_files
             ):
-                print("warning: generated file '" + name + "' modified")
+                print(f"warning: generated file '{filename}' modified")
             continue
 
-        work.append(name)
-    files = work
+        work.append(filename)
+    filenames = work
 
     # If there are no files left, do nothing
-    if len(files) == 0:
+    if len(filenames) == 0:
         sys.exit(0)
 
     # Handle list-all-files and list-changed-files options
     if args.list_all_files or args.list_changed_files:
         if args.list_changed_files:
-            files = list(set(files) & set(changed_file_list))
-        for file in files:
-            print(file)
+            filenames = list(set(filenames) & set(changed_file_list))
+        for f in filenames:
+            print(f)
         sys.exit(0)
 
     # Prepare file batches for batch tasks
-    chunksize = math.ceil(len(files) / args.jobs)
-    file_batches = [files[i : i + chunksize] for i in range(0, len(files), chunksize)]
+    chunksize = math.ceil(len(filenames) / args.jobs)
+    file_batches = [
+        filenames[i : i + chunksize] for i in range(0, len(filenames), chunksize)
+    ]
 
     if args.no_format:
         # Only run Lint
@@ -546,7 +548,7 @@ def main():
             ClangFormat(),
             Jni(),  # Fixes clang-format formatting
         ]
-        run_pipeline(task_pipeline, args, files)
+        run_pipeline(task_pipeline, args, filenames)
 
         # Lint is run last since previous tasks can affect its output.
         task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
@@ -556,14 +558,14 @@ def main():
     # ClangTidy is run last of all; it needs the actual files
     if args.tidy_all or args.tidy_changed:
         if args.tidy_changed:
-            files = list(set(files) & set(changed_file_list))
+            filenames = list(set(filenames) & set(changed_file_list))
         task_pipeline = [
             ClangTidy(
                 args.compile_commands,
                 args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )
         ]
-        run_standalone(task_pipeline, args, files)
+        run_standalone(task_pipeline, args, filenames)
 
 
 if __name__ == "__main__":
