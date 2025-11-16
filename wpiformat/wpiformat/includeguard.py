@@ -78,26 +78,20 @@ class IncludeGuard(PipelineTask):
         config_file -- Config object
         filename -- filename
         """
-        repo_root_name_override = config_file.group("repoRootNameOverride")
-
         repo_root = super().get_repo_root()
-        guard_root = os.path.relpath(filename, repo_root)
-        if not repo_root_name_override:
-            guard_path = os.path.basename(repo_root) + os.sep
+
+        if repo_root_override := config_file.group("repoRootNameOverride"):
+            guard_path = repo_root_override[0] + os.sep
         else:
-            guard_path = repo_root_name_override[0] + os.sep
-        include_roots = config_file.group("includeGuardRoots")
+            guard_path = os.path.basename(repo_root) + os.sep
 
-        if include_roots:
-            prefix = ""
-            for include_root in include_roots:
-                if guard_root.startswith(include_root) and len(include_root) > len(
-                    prefix
-                ):
-                    prefix = include_root
-            guard_path += guard_root[len(prefix) :]
-            return (re.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() + "_").lstrip("_")
+        # Use include root that results in shortest include guard
+        guard_root = os.path.relpath(filename, repo_root)
+        for include_root in sorted(
+            config_file.group("includeGuardRoots"), key=len, reverse=True
+        ):
+            if guard_root.startswith(include_root):
+                guard_path += guard_root[len(include_root) :]
+                break
 
-        # No include guard roots matched, so append full name
-        guard_path += guard_root
-        return re.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper() + "_"
+        return re.sub(r"[^a-zA-Z0-9]", "_", guard_path).upper().lstrip("_") + "_"

@@ -89,7 +89,7 @@ def test_includeguard():
     # include a trailing "/" in the include guard root)
     run_and_check_file(
         IncludeGuard(),
-        "./Test/Test.h",
+        "./test/Test.h",
         f"""#ifndef {repo_root}_WPIFORMAT_TEST_TEST_H_
 #define {repo_root}_WPIFORMAT_TEST_TEST_H_
 
