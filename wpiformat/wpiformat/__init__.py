@@ -88,7 +88,12 @@ def proc_pipeline(filename: str) -> bool:
     Keyword arguments:
     filename -- filename
     """
-    config_file = Config(os.path.dirname(filename), ".styleguide")
+    # TODO: Remove handling for deprecated .styleguide file
+    try:
+        config_file = Config(os.path.dirname(filename), ".wpiformat")
+    except OSError:
+        config_file = Config(os.path.dirname(filename), ".styleguide")
+
     if verbose1 or verbose2:
         with print_lock:
             print("Processing", filename)
@@ -130,7 +135,12 @@ def proc_standalone(filename: str) -> bool:
     Keyword arguments:
     filename -- filename
     """
-    config_file = Config(os.path.dirname(filename), ".styleguide")
+    # TODO: Remove handling for deprecated .styleguide file
+    try:
+        config_file = Config(os.path.dirname(filename), ".wpiformat")
+    except OSError:
+        config_file = Config(os.path.dirname(filename), ".styleguide")
+
     if verbose2:
         with print_lock:
             print("Processing", filename)
@@ -180,7 +190,12 @@ def proc_batch(filenames: list[str]) -> bool:
     for subtask in task_pipeline:
         work = []
         for filename in filenames:
-            config_file = Config(os.path.dirname(filename), ".styleguide")
+            # TODO: Remove handling for deprecated .styleguide file
+            try:
+                config_file = Config(os.path.dirname(filename), ".wpiformat")
+            except OSError:
+                config_file = Config(os.path.dirname(filename), ".styleguide")
+
             if subtask.should_process_file(config_file, filename):
                 work.append(filename)
 
@@ -477,7 +492,11 @@ def main():
     # Don't run tasks on modifiable or generated files
     work = []
     for name in files:
-        config_file = Config(os.path.dirname(name), ".styleguide")
+        # TODO: Remove handling for deprecated .styleguide file
+        try:
+            config_file = Config(os.path.dirname(name), ".wpiformat")
+        except OSError:
+            config_file = Config(os.path.dirname(name), ".styleguide")
 
         if config_file.is_modifiable_file(name):
             continue

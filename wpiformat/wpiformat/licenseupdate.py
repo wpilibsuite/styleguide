@@ -137,9 +137,15 @@ class LicenseUpdate(PipelineTask):
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 
-        _, license_template = Config.read_file(
-            os.path.dirname(os.path.abspath(filename)), ".styleguide-license"
-        )
+        # TODO: Remove handling for deprecated .styleguide-license file
+        try:
+            _, license_template = Config.read_file(
+                os.path.dirname(os.path.abspath(filename)), ".wpiformat-license"
+            )
+        except OSError:
+            _, license_template = Config.read_file(
+                os.path.dirname(os.path.abspath(filename)), ".styleguide-license"
+            )
 
         # Get year when file was most recently modified in Git history
         #
