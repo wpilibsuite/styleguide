@@ -3,6 +3,7 @@
 import io
 import os
 from contextlib import redirect_stdout
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import Task
@@ -10,7 +11,7 @@ from wpiformat.task import Task
 
 def run_and_check_file(
     task: Task,
-    filename: str,
+    filename: Path,
     input_contents: str,
     expected_output_contents: str,
     expected_success: bool,
@@ -29,7 +30,7 @@ def run_and_check_file(
     input_contents = input_contents.replace("\n", os.linesep)
     expected_output_contents = expected_output_contents.replace("\n", os.linesep)
 
-    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
+    config_file = Config(Path.cwd(), Path(".wpiformat"))
 
     if task.should_process_file(config_file, filename):
         output, success = task.run_pipeline(config_file, filename, input_contents)
@@ -43,7 +44,7 @@ def run_and_check_file(
 
 def run_and_check_stdout(
     task: Task,
-    filename: str,
+    filename: Path,
     input_contents: str,
     expected_output_contents: str,
     expected_success: bool,
@@ -59,7 +60,7 @@ def run_and_check_stdout(
     expected_output_contents -- expected output file contents
     expected_success -- whether run is expected to succeed
     """
-    config_file = Config(os.path.abspath(os.getcwd()), ".wpiformat")
+    config_file = Config(Path.cwd(), Path(".wpiformat"))
 
     if task.should_process_file(config_file, filename):
         with redirect_stdout(io.StringIO()) as f:

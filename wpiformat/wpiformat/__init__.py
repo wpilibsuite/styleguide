@@ -3,10 +3,10 @@
 import argparse
 import math
 import multiprocessing as mp
-import os
 import subprocess
 import sys
-from typing import Any, Generator
+from pathlib import Path
+from typing import Generator
 
 from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
@@ -28,7 +28,7 @@ from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
 
 
-def filter_for_unignored_files(filenames: list[str]) -> list[str]:
+def filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
     """Returns list of files not in .gitignore.
 
     Keyword arguments:
@@ -38,7 +38,7 @@ def filter_for_unignored_files(filenames: list[str]) -> list[str]:
     # Windows, so os.linesep isn't used here.
     proc = subprocess.run(
         ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
-        input="\n".join(filenames).encode(),
+        input="\n".join(f.as_posix() for f in filenames).encode(),
         stdout=subprocess.PIPE,
     )
     if proc.returncode == 128:
@@ -50,7 +50,7 @@ def filter_for_unignored_files(filenames: list[str]) -> list[str]:
     # wraps names in quotes on Windows, and outputs "\n" line separators on all
     # platforms.
     return [
-        filename[2:].lstrip().strip('"').replace("\\\\", "\\")
+        Path(filename[2:].lstrip().strip('"').replace("\\\\", "\\"))
         for filename in proc.stdout.decode().split("\n")
         if filename[0:2] == "::"
     ]
@@ -75,7 +75,7 @@ def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
     print_lock = mp.Lock()
 
 
-def proc_pipeline(filename: str) -> bool:
+def proc_pipeline(filename: Path) -> bool:
     """Runs the contents of each file through the task pipeline.
 
     If the contents were modified at any point, the result is written back out
@@ -86,9 +86,9 @@ def proc_pipeline(filename: str) -> bool:
     """
     # TODO: Remove handling for deprecated .styleguide file
     try:
-        config_file = Config(os.path.dirname(filename), ".wpiformat")
+        config_file = Config(filename.parent, Path(".wpiformat"))
     except OSError:
-        config_file = Config(os.path.dirname(filename), ".styleguide")
+        config_file = Config(filename.parent, Path(".styleguide"))
 
     if verbose1 or verbose2:
         with print_lock:
@@ -99,15 +99,13 @@ def proc_pipeline(filename: str) -> bool:
                     if subtask.should_process_file(config_file, filename):
                         print("  with " + type(subtask).__name__)
 
-    lines = ""
-    with open(filename, "r", encoding="utf8") as file:
-        try:
-            lines = file.read()
-        except UnicodeDecodeError:
-            print(
-                f"error: {filename} contains characters not in UTF-8. Should this be considered a generated file?"
-            )
-            return False
+    try:
+        lines = filename.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        print(
+            f"error: {filename} contains characters not in UTF-8. Should this be considered a generated file?"
+        )
+        return False
 
     # The success flag is aggregated across multiple file processing results
     all_success = True
@@ -119,13 +117,12 @@ def proc_pipeline(filename: str) -> bool:
             all_success &= success
 
     if lines != output:
-        with open(filename, "wb") as file:
-            file.write(output.encode())
+        filename.write_bytes(output.encode())
 
     return all_success
 
 
-def proc_standalone(filename: str) -> bool:
+def proc_standalone(filename: Path) -> bool:
     """Runs each task on each file.
 
     Keyword arguments:
@@ -133,9 +130,9 @@ def proc_standalone(filename: str) -> bool:
     """
     # TODO: Remove handling for deprecated .styleguide file
     try:
-        config_file = Config(os.path.dirname(filename), ".wpiformat")
+        config_file = Config(filename.parent, Path(".wpiformat"))
     except OSError:
-        config_file = Config(os.path.dirname(filename), ".styleguide")
+        config_file = Config(filename.parent, Path(".styleguide"))
 
     if verbose2:
         with print_lock:
@@ -155,7 +152,7 @@ def proc_standalone(filename: str) -> bool:
     return all_success
 
 
-def chunks(l: list[Any], max_len: int) -> Generator[list[Any], None, None]:
+def chunks(l: list[Path], max_len: int) -> Generator[list[Path], None, None]:
     """Yield successive chunks from l whose content lengths sum to less than
     max_len.
     """
@@ -163,14 +160,14 @@ def chunks(l: list[Any], max_len: int) -> Generator[list[Any], None, None]:
     size = 0
     for i, arg in enumerate(l):
         out.append(arg)
-        size += len(arg) + len(" ")
-        if i == len(l) - 1 or size + len(l[i + 1]) > max_len:
+        size += len(arg.as_posix()) + len(" ")
+        if i == len(l) - 1 or size + len(l[i + 1].as_posix()) > max_len:
             yield out
             out = []
             size = 0
 
 
-def proc_batch(filenames: list[str]) -> bool:
+def proc_batch(filenames: list[Path]) -> bool:
     """Runs each task in the pipeline on batches of files.
 
     These tasks read and write to the files directly. They are given a list of
@@ -184,13 +181,13 @@ def proc_batch(filenames: list[str]) -> bool:
     all_success = True
 
     for subtask in task_pipeline:
-        work: list[str] = []
+        work: list[Path] = []
         for filename in filenames:
             # TODO: Remove handling for deprecated .styleguide file
             try:
-                config_file = Config(os.path.dirname(filename), ".wpiformat")
+                config_file = Config(filename.parent, Path(".wpiformat"))
             except OSError:
-                config_file = Config(os.path.dirname(filename), ".styleguide")
+                config_file = Config(filename.parent, Path(".styleguide"))
 
             if subtask.should_process_file(config_file, filename):
                 work.append(filename)
@@ -212,7 +209,7 @@ def proc_batch(filenames: list[str]) -> bool:
     return all_success
 
 
-def run_pipeline(task_pipeline, args, filenames: list[str]):
+def run_pipeline(task_pipeline, args, filenames: list[Path]):
     """Spawns process pool for proc_pipeline().
 
     Keyword arguments:
@@ -242,7 +239,7 @@ def run_pipeline(task_pipeline, args, filenames: list[str]):
             sys.exit(1)
 
 
-def run_batch(task_pipeline, args, filename_batches: list[list[str]]):
+def run_batch(task_pipeline, args, filename_batches: list[list[Path]]):
     """Spawns process pool for proc_batch().
 
     Keyword arguments:
@@ -272,7 +269,7 @@ def run_batch(task_pipeline, args, filename_batches: list[list[str]]):
             sys.exit(1)
 
 
-def run_standalone(task_pipeline, args, filenames: list[str]):
+def run_standalone(task_pipeline, args, filenames: list[Path]):
     """Spawns process pool for proc_standalone().
 
     Keyword arguments:
@@ -398,10 +395,10 @@ def main():
 
     # tidy requires compile_commands.json
     if args.tidy_all or args.tidy_changed:
-        compile_commands_filename = os.path.join(
-            args.compile_commands, "compile_commands.json"
+        compile_commands_filename = (
+            Path(args.compile_commands) / "compile_commands.json"
         )
-        if not os.path.exists(compile_commands_filename):
+        if not compile_commands_filename.exists():
             print(
                 f"error: clang-tidy: {compile_commands_filename} not found (try -compile-commands)",
                 file=sys.stderr,
@@ -414,37 +411,33 @@ def main():
     # If no files explicitly specified
     if not args.file:
         # Recursively create list of files in given directory
-        filenames: list[str] = [
-            os.path.join(dp, f) for dp, dn, fn in os.walk(repo_root) for f in fn
-        ]
+        filenames: list[Path] = [f for f in repo_root.rglob("*") if f.is_file()]
 
         if not filenames:
             print("error: no files found to format", file=sys.stderr)
             sys.exit(1)
     else:
-        filenames: list[str] = []
+        filenames: list[Path] = []
         for elem in args.file:
             # If a directory was specified, recursively expand it
-            if os.path.isdir(elem):
-                filenames.extend(
-                    [os.path.join(dp, f) for dp, dn, fn in os.walk(elem) for f in fn]
-                )
+            if (path := Path(elem)).is_dir():
+                filenames.extend([f for f in path.rglob("*") if f.is_file()])
             else:
-                filenames.append(elem)
+                filenames.append(path)
 
     # Convert relative filepaths to absolute
-    filenames: list[str] = [os.path.abspath(name) for name in filenames]
+    filenames: list[Path] = [f.resolve() for f in filenames]
 
     # Skip Git metadata
-    filenames: list[str] = [f for f in filenames if os.sep + ".git" + os.sep not in f]
+    filenames: list[Path] = [f for f in filenames if ".git" not in f.parts]
 
     # Skip ignored files
-    filenames: list[str] = filter_for_unignored_files(filenames)
+    filenames: list[Path] = filter_for_unignored_files(filenames)
 
     # Throw an error if any files or directories don't exist
     for f in filenames:
-        if not os.path.exists(f):
-            if not os.path.islink(f):
+        if not f.exists():
+            if not f.is_symlink():
                 print(f"error: {f}: No such file or directory")
                 sys.exit(1)
             else:
@@ -468,21 +461,21 @@ def main():
             sys.exit(1)
 
     # Create list of all changed files
-    changed_file_list: list[str] = [
-        os.path.normpath(repo_root + os.sep + line.rstrip())
+    changed_file_list: list[Path] = [
+        (repo_root / line.rstrip()).resolve()
         for line in subprocess.check_output(
             ["git", "diff", "--name-only", f"{default_branch}..."], encoding="ascii"
         ).split()
     ]
 
     # Skip modifiable or generated files
-    work: list[str] = []
+    work: list[Path] = []
     for filename in filenames:
         # TODO: Remove handling for deprecated .styleguide file
         try:
-            config_file = Config(os.path.dirname(filename), ".wpiformat")
+            config_file = Config(filename.parent, Path(".wpiformat"))
         except OSError:
-            config_file = Config(os.path.dirname(filename), ".styleguide")
+            config_file = Config(filename.parent, Path(".styleguide"))
 
         if config_file.is_modifiable_file(filename):
             continue

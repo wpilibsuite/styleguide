@@ -1,6 +1,7 @@
 """This task warns against "using namespace std;"."""
 
 import re
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -8,11 +9,11 @@ from wpiformat.task import PipelineTask
 
 class UsingNamespaceStd(PipelineTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_cpp_file(filename)
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 

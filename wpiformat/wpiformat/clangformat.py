@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+from pathlib import Path
 
 import clang_format
 
@@ -17,11 +18,11 @@ class ClangFormat(PipelineTask):
         self.exec_name = clang_format.get_executable("clang-format")
 
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_c_file(filename) or config_file.is_cpp_file(filename)
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         try:
             p = subprocess.Popen(

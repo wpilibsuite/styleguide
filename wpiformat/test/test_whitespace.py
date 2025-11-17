@@ -1,9 +1,13 @@
+from pathlib import Path
+
 from wpiformat.whitespace import Whitespace
 
 from .test_tasktest import *
 
 
 def test_whitespace():
+    test_h = Path("./Test.h").resolve()
+
     file_appendix = """#pragma once
 
 #include <iostream>
@@ -14,15 +18,15 @@ int main() {
 """
 
     # Empty file
-    run_and_check_file(Whitespace(), "./Test.h", "", "", True)
+    run_and_check_file(Whitespace(), test_h, "", "", True)
 
     # No trailing whitespace
-    run_and_check_file(Whitespace(), "./Test.h", file_appendix, file_appendix, True)
+    run_and_check_file(Whitespace(), test_h, file_appendix, file_appendix, True)
 
     # Two spaces trailing
     run_and_check_file(
         Whitespace(),
-        "./Test.h",
+        test_h,
         "#pragma once\n"
         + "\n"
         + "#include <iostream>\n"
@@ -37,7 +41,7 @@ int main() {
     # Two tabs trailing
     run_and_check_file(
         Whitespace(),
-        "./Test.h",
+        test_h,
         """#pragma once
 
 #include <iostream>

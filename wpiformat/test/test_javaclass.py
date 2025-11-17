@@ -1,13 +1,17 @@
+from pathlib import Path
+
 from wpiformat.javaclass import JavaClass
 
 from .test_tasktest import *
 
 
 def test_javaclass():
+    test_java = Path("./Test.java").resolve()
+
     # No line separators at beginning of class
     run_and_check_file(
         JavaClass(),
-        "./Test.java",
+        test_java,
         "public class ExampleCommand extends Command {}\n",
         "public class ExampleCommand extends Command {}\n",
         True,
@@ -18,12 +22,12 @@ def test_javaclass():
   public ExampleCommand() {}
 }
 """
-    run_and_check_file(JavaClass(), "./Test.java", contents, contents, True)
+    run_and_check_file(JavaClass(), test_java, contents, contents, True)
 
     # Two line separators at beginning of class
     run_and_check_file(
         JavaClass(),
-        "./Test.java",
+        test_java,
         """public class ExampleCommand extends Command {
 
   public ExampleCommand() {}
@@ -39,7 +43,7 @@ def test_javaclass():
     # Three line separators at beginning of class
     run_and_check_file(
         JavaClass(),
-        "./Test.java",
+        test_java,
         """public class ExampleCommand extends Command {
 
 
@@ -57,7 +61,7 @@ def test_javaclass():
     # continue past end of comment
     run_and_check_file(
         JavaClass(),
-        "./Test.java",
+        test_java,
         """import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 

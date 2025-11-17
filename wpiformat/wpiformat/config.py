@@ -1,14 +1,14 @@
 """This class is for handling wpiformat config files."""
 
-import os
 import re
+from pathlib import Path
 
 
 class Config:
     # Dict from filepath to file contents
-    __config_cache: dict[str, list[str]] = {}
+    __config_cache: dict[Path, list[str]] = {}
 
-    def __init__(self, directory: str, filename: str):
+    def __init__(self, directory: Path, filename: Path):
         """Constructor for Config object.
 
         Keyword arguments:
@@ -23,7 +23,7 @@ class Config:
         self.__modifiable_exclude_regex = self.regex("modifiableFileExclude")
 
     @staticmethod
-    def read_file(directory: str, filename: str) -> tuple[str, list[str]]:
+    def read_file(directory: Path, filename: Path) -> tuple[Path, list[str]]:
         """Find file and return contents.
 
         Checks current directory for file. If one doesn't exist, try all parent
@@ -36,31 +36,32 @@ class Config:
         Returns tuple of filename and list containing file contents or triggers
         program exit.
         """
-        while True:
-            filepath = os.path.join(directory, filename)
+        for parent in (directory / filename).parents:
+            filepath = parent / filename
             try:
                 # If filepath in config cache, return cached version instead
                 if config_file := Config.__config_cache.get(filepath):
                     return filepath, config_file
 
-                with open(filepath, "r") as file_contents:
+                with filepath.open("r") as file_contents:
                     contents = file_contents.read().splitlines()
                     Config.__config_cache[filepath] = contents
 
                     # TODO: Remove deprecation message
-                    if filename.startswith(".styleguide"):
+                    if filename.name.startswith(".styleguide"):
+                        new_name = filename.name.replace("styleguide", "wpiformat")
                         print(
-                            f"warning: rename deprecated {filepath} to {filepath.replace('styleguide', 'wpiformat')}"
+                            f"warning: rename deprecated {filepath} to {filepath.with_name(new_name)}"
                         )
 
                     return filepath, contents
             except OSError as e:
                 # .git files are ignored, which are created within submodules
-                if os.path.isdir(directory + os.sep + ".git"):
+                if (parent / ".git").is_dir():
                     raise OSError(
-                        f"config file '{filename}' not found in '{directory}'"
+                        f"config file '{filename}' not found in '{parent}'"
                     ) from e
-                directory = os.path.dirname(directory)
+        raise OSError(f"config file '{filename}' not found in '{directory}'")
 
     def group(self, group_name: str) -> list[str]:
         """Returns value from config dictionary given key string.
@@ -99,7 +100,7 @@ class Config:
         else:
             return re.compile(r"|".join(group_contents))
 
-    def is_c_file(self, filename: str) -> bool:
+    def is_c_file(self, filename: Path) -> bool:
         """Returns True if file is either C header or C source file.
 
         Keyword arguments:
@@ -107,24 +108,24 @@ class Config:
         """
         return self.is_c_header_file(filename) or self.is_c_src_file(filename)
 
-    def is_c_header_file(self, filename: str) -> bool:
+    def is_c_header_file(self, filename: Path) -> bool:
         """Returns True if file is C header file.
 
         Keyword arguments:
         filename -- filename
         """
-        return self.__c_header_include_regex.search(filename) is not None
+        return self.__c_header_include_regex.search(filename.as_posix()) is not None
 
     @staticmethod
-    def is_c_src_file(filename: str) -> bool:
+    def is_c_src_file(filename: Path) -> bool:
         """Returns True if file is C source file.
 
         Keyword arguments:
         filename -- filename
         """
-        return filename.endswith(".c")
+        return filename.suffix == ".c"
 
-    def is_cpp_file(self, filename: str) -> bool:
+    def is_cpp_file(self, filename: Path) -> bool:
         """Returns True if file is either C++ header or C++ source file.
 
         Keyword arguments:
@@ -132,23 +133,23 @@ class Config:
         """
         return self.is_cpp_header_file(filename) or self.is_cpp_src_file(filename)
 
-    def is_cpp_header_file(self, filename: str) -> bool:
+    def is_cpp_header_file(self, filename: Path) -> bool:
         """Returns True if file is C++ header file.
 
         Keyword arguments:
         filename -- filename
         """
-        return self.__cpp_header_include_regex.search(filename) is not None
+        return self.__cpp_header_include_regex.search(filename.as_posix()) is not None
 
-    def is_cpp_src_file(self, filename: str) -> bool:
+    def is_cpp_src_file(self, filename: Path) -> bool:
         """Returns True if file is C++ source file.
 
         Keyword arguments:
         filename -- filename
         """
-        return self.__cpp_src_include_regex.search(filename) is not None
+        return self.__cpp_src_include_regex.search(filename.as_posix()) is not None
 
-    def is_header_file(self, filename: str) -> bool:
+    def is_header_file(self, filename: Path) -> bool:
         """Returns True if file is either C or C++ header file.
 
         Keyword arguments:
@@ -156,24 +157,24 @@ class Config:
         """
         return self.is_c_header_file(filename) or self.is_cpp_header_file(filename)
 
-    def is_generated_file(self, filename: str) -> bool:
+    def is_generated_file(self, filename: Path) -> bool:
         """Returns True if file is generated (generated files are skipped).
 
         Keyword arguments:
         filename -- filename
         """
-        return self.__generated_exclude_regex.search(filename) is not None
+        return self.__generated_exclude_regex.search(filename.as_posix()) is not None
 
-    def is_modifiable_file(self, filename: str) -> bool:
+    def is_modifiable_file(self, filename: Path) -> bool:
         """Returns True if file is modifiable but should be skipped.
 
         Keyword arguments:
         filename -- filename
         """
-        return self.__modifiable_exclude_regex.search(filename) is not None
+        return self.__modifiable_exclude_regex.search(filename.as_posix()) is not None
 
     def __parse_config_file(
-        self, directory: str, filename: str
+        self, directory: Path, filename: Path
     ) -> dict[str, list[str]]:
         """Parse values from config file.
 
@@ -212,22 +213,5 @@ class Config:
                 config_group[group_name] = group_elements
                 group_elements = []
             elif in_group:
-                value = line.strip()
-
-                # Header includes still use forward slash on Windows
-                unescaped_groups = [
-                    "includeRelated",
-                    "includeCSys",
-                    "includeCppSys",
-                    "includeOtherLibs",
-                    "includeProject",
-                ]
-                if group_name == "includeGuardRoots":
-                    # Include guard roots use native directory separators
-                    value = value.replace("/", os.sep)
-                elif group_name not in unescaped_groups and os.sep == "\\":
-                    # Replace "/" with escaped "\" for regexes on Windows
-                    value = value.replace("/", os.sep + os.sep)
-
-                group_elements.append(value)
+                group_elements.append(line.strip())
         return config_group

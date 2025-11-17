@@ -20,6 +20,7 @@ automatically generated based on the function's return type and arguments.
 """
 
 import re
+from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import PipelineTask
@@ -27,7 +28,7 @@ from wpiformat.task import PipelineTask
 
 class Jni(PipelineTask):
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         return config_file.is_cpp_src_file(filename)
 
     @staticmethod
@@ -62,7 +63,7 @@ class Jni(PipelineTask):
             return ret + "?"
 
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         linesep = super().get_linesep(lines)
 

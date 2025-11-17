@@ -1,8 +1,8 @@
 """Task base classes for wpiformat."""
 
-import os
 import subprocess
 from abc import ABCMeta, abstractmethod
+from pathlib import Path
 
 from wpiformat.config import Config
 
@@ -27,7 +27,7 @@ class Task(metaclass=ABCMeta):
             return "\n"
 
     @staticmethod
-    def get_repo_root() -> str:
+    def get_repo_root() -> Path:
         """Returns the Git repository root as an absolute path.
 
         Raises OSError if no repository root was found.
@@ -35,12 +35,12 @@ class Task(metaclass=ABCMeta):
         if output := subprocess.check_output(
             ["git", "rev-parse", "--show-toplevel"], encoding="ascii"
         ).rstrip():
-            return os.path.normpath(output)
+            return Path(output).resolve()
         else:
             raise OSError("no Git repository root found")
 
     @staticmethod
-    def should_process_file(config_file: Config, filename: str) -> bool:
+    def should_process_file(config_file: Config, filename: Path) -> bool:
         """Returns true if file should be processed by this task.
 
         Keyword arguments:
@@ -55,7 +55,7 @@ class Task(metaclass=ABCMeta):
 class PipelineTask(Task):
     @abstractmethod
     def run_pipeline(
-        self, config_file: Config, filename: str, lines: str
+        self, config_file: Config, filename: Path, lines: str
     ) -> tuple[str, bool]:
         """Performs task on file with given lines.
 
@@ -75,7 +75,7 @@ class PipelineTask(Task):
 class BatchTask(Task):
     @staticmethod
     @abstractmethod
-    def run_batch(config_file: Config, filenames: list[str]) -> bool:
+    def run_batch(config_file: Config, filenames: list[Path]) -> bool:
         """Performs task on list of files.
 
         This function is for processing multiple files in one task to reduce
@@ -92,7 +92,7 @@ class BatchTask(Task):
 
 class StandaloneTask(Task):
     @abstractmethod
-    def run_standalone(self, config_file: Config, filename: str) -> bool:
+    def run_standalone(self, config_file: Config, filename: Path) -> bool:
         """Performs task on a file.
 
         This function is for processing the file on its own.
