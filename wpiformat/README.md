@@ -2,10 +2,6 @@
 
 Provides linters and formatters for ensuring WPILib's C++, Java, and Python code conform to its style guide. WPILib uses a variant of the Google style guides.
 
-## Dependencies
-
-- [Python 3.9](https://www.python.org/downloads/) or newer
-
 ## Installation
 
 On Windows, execute:
