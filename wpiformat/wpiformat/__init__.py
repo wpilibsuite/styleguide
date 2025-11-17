@@ -413,16 +413,6 @@ def main():
 
     # If no files explicitly specified
     if not args.file:
-        # Delete temporary files from previous incomplete run
-        filenames: list[str] = [
-            os.path.join(dp, f)
-            for dp, dn, fn in os.walk(repo_root)
-            for f in fn
-            if f.endswith(".tmp")
-        ]
-        for f in filenames:
-            os.remove(f)
-
         # Recursively create list of files in given directory
         filenames: list[str] = [
             os.path.join(dp, f) for dp, dn, fn in os.walk(repo_root) for f in fn
