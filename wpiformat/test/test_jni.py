@@ -615,3 +615,22 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_cleanFilter
 """,
         True,
     )
+
+    # Test atomic group behavior. On failure, parts of the file before the JNI
+    # doc comment are removed.
+    contents = """/*
+ */
+
+void func(void);
+
+/*
+ * Class:     TestJNI
+ * Method:    testFunc
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_TestJNI_testFunc
+  (JNIEnv* env, jclass)
+{
+"""
+    run_and_check_file(Jni(), test_jni_cpp, contents, contents, True)

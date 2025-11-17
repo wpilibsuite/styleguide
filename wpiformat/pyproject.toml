@@ -4,7 +4,7 @@ description = "Linters and formatters for ensuring WPILib's source code conforms
 dynamic = [ "version" ]
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "autoflake==2.3.1",
   "black==25.9.0",
