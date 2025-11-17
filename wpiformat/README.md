@@ -88,3 +88,5 @@ The license header is always at the beginning of the file and ends after two new
 `{year}` is replaced with a year range from the earliest copyright year in the file to the current year. If the earliest year is the current year, only that year will be written.
 
 `{padding}` is optional and represents an expanding space which pads the line to 80 columns. Multiple instances of `{padding}` on the same line share the padding equally.
+
+`{filename}` is optional and represents the current file's path relative to the Git repository root. Path separators are normalized to forward slashes on all platforms.
