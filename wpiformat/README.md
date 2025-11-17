@@ -2,23 +2,9 @@
 
 Provides linters and formatters for ensuring WPILib's C++, Java, and Python code conform to its style guide. WPILib uses a variant of the Google style guides.
 
-## Installation
-
-On Windows, execute:
-```powershell
-py -m pip install wpiformat
-```
-
-On Linux/OSX, execute:
-```bash
-pip install wpiformat
-```
-
 ## Project Setup
 
 To use these tools with a new project, copy `.wpiformat`, and `.wpiformat-license` from the examples folder into the project and create a new `.clang-format` file based on the desired C/C++ style.
-
-Note: Since wpiformat already handles include ordering, it is recommended to use `SortIncludes: false` in `.clang-format`.
 
 ## .wpiformat
 
