@@ -30,13 +30,14 @@ class Task(metaclass=ABCMeta):
     def get_repo_root() -> str:
         """Returns the Git repository root as an absolute path.
 
-        An empty string is returned if no repository root was found.
+        Raises OSError if no repository root was found.
         """
-        return os.path.normpath(
-            subprocess.check_output(
-                ["git", "rev-parse", "--show-toplevel"], encoding="ascii"
-            ).rstrip()
-        )
+        if output := subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"], encoding="ascii"
+        ).rstrip():
+            return os.path.normpath(output)
+        else:
+            raise OSError("no Git repository root found")
 
     @staticmethod
     def should_process_file(config_file: Config, filename: str) -> bool:
@@ -44,7 +45,7 @@ class Task(metaclass=ABCMeta):
 
         Keyword arguments:
         config_file -- Config object
-        name -- filename
+        filename -- filename
 
         Process any file by default.
         """
@@ -62,7 +63,7 @@ class PipelineTask(Task):
 
         Keyword arguments:
         config_file -- Config object
-        name -- filename
+        filename -- filename
         lines -- file contents
 
         Returns tuple containing processed lines and whether task succeeded in
