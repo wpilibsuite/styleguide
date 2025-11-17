@@ -121,7 +121,7 @@ class LicenseUpdate(PipelineTask):
                 linesep + linesep.join(stripped_lines[license_end:]).lstrip()
             )
 
-            year_regex = re.compile(r"Copyright \(c\).*?\s(20..)")
+            year_regex = re.compile(r"Copyright \(c\)(?>.*?\s(20..))")
             for line in license_part.split(linesep):
                 match = year_regex.search(line)
                 # If license contains copyright pattern, extract the first year

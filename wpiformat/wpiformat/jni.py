@@ -68,7 +68,7 @@ class Jni(PipelineTask):
         linesep = super().get_linesep(lines)
 
         regex_str_sig = (
-            r"(/\*(.|\n)*?\*/\s+)?"
+            r"(/\*(?>(.|\n)*?\*/)\s+)?"
             + r"JNIEXPORT\s+(?P<ret>\w+)\s+JNICALL\s+"
             + r"(?P<func>Java_\w+)\s*\(\s*"
             + r"(?P<env_type>JNIEnv\s*\*\s*)"
