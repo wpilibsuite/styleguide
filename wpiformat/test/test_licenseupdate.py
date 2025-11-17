@@ -243,17 +243,14 @@ blah
         subprocess.run(["git", "init", "-q"])
 
         # Add base files
-        with open(".wpiformat-license", "w") as file:
-            file.write("// Copyright (c) {year}")
-        with open(".wpiformat", "w") as file:
-            file.write("cppSrcFileInclude {\n" + r"\.cpp$")
+        Path(".wpiformat-license").write_text("// Copyright (c) {year}")
+        Path(".wpiformat").write_text("cppSrcFileInclude {\n" + r"\.cpp$")
         subprocess.run(["git", "add", ".wpiformat-license"])
         subprocess.run(["git", "add", ".wpiformat"])
         subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Add file with commit date of last year and range through this year
-        with open("last-year.cpp", "w") as file:
-            file.write(f"// Copyright (c) 2017-{year}")
+        Path("last-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
         subprocess.run(["git", "add", "last-year.cpp"])
         subprocess.run(["git", "commit", "-q", "-m", '"Last year"'])
         last_iso_year = f"{int(year) - 1}-01-01T00:00:00"
@@ -263,14 +260,12 @@ blah
         ).wait()
 
         # Add file with commit date of this year and range through this year
-        with open("this-year.cpp", "w") as file:
-            file.write(f"// Copyright (c) 2017-{year}")
+        Path("this-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
         subprocess.run(["git", "add", "this-year.cpp"])
         subprocess.run(["git", "commit", "-q", "-m", '"This year"'])
 
         # Add file with commit date of next year and range through this year
-        with open("next-year.cpp", "w") as file:
-            file.write(f"// Copyright (c) 2017-{year}")
+        Path("next-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
         subprocess.run(["git", "add", "next-year.cpp"])
         subprocess.run(["git", "commit", "-q", "-m", '"Next year"'])
         next_iso_year = f"{int(year) + 1}-01-01T00:00:00"
@@ -283,8 +278,7 @@ blah
         Path("no-year.cpp").touch()
 
         # Run wpiformat on last-year.cpp
-        with open("last-year.cpp", "r") as input:
-            lines = input.read()
+        lines = Path("last-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(
             config_file, last_year_cpp, lines
         )
@@ -292,8 +286,8 @@ blah
 
         # Run wpiformat on last-year.cpp with uncommitted changes. It should
         # update to next year instead of keeping previous year
-        with open("last-year.cpp", "a") as input:
-            input.write("change\n")
+        with open("last-year.cpp", "a") as f:
+            f.write("change\n")
         output, success = LicenseUpdate().run_pipeline(
             config_file, last_year_cpp, lines + "change\n"
         )
@@ -306,12 +300,10 @@ change
         )
 
         # Erase changes made to last-year.cpp in previous test
-        with open("last-year.cpp", "w") as input:
-            input.write(lines)
+        Path("last-year.cpp").write_text(lines)
 
         # Run wpiformat on this-year.cpp
-        with open("last-year.cpp", "r") as input:
-            lines = input.read()
+        lines = Path("last-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(
             config_file, this_year_cpp, lines
         )
@@ -323,8 +315,7 @@ change
         )
 
         # Run wpiformat on next-year.cpp
-        with open("next-year.cpp", "r") as input:
-            lines = input.read()
+        lines = Path("next-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(
             config_file, next_year_cpp, lines
         )
@@ -337,8 +328,7 @@ change
 
         # Run wpiformat on no-year.cpp
         # Should have current calendar year
-        with open("no-year.cpp", "r") as input:
-            lines = input.read()
+        lines = Path("no-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(config_file, no_year_cpp, lines)
         assert (
             output
