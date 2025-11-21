@@ -1,6 +1,5 @@
 import os
 import subprocess
-import tempfile
 from datetime import date
 from pathlib import Path
 
@@ -10,26 +9,34 @@ from wpiformat.licenseupdate import LicenseUpdate
 from .test_tasktest import *
 
 
-class OpenTemporaryDirectory:
-    def __init__(self):
-        self.prev_dir = os.getcwd()
-
-    def __enter__(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
-        os.chdir(self.temp_dir.name)
-        return self.temp_dir
-
-    def __exit__(self, type, value, traceback):
-        os.chdir(self.prev_dir)
-
-
 def test_licenseupdate():
-    excluded_h = Path("./Excluded.h").resolve()
-    test_h = Path("./Test.h").resolve()
+    with OpenTemporaryDirectory():
+        subprocess.run(["git", "init", "-q"])
+        Path(".wpiformat").write_text(
+            r"""cppHeaderFileInclude {
+  \.h$
+}
 
-    year = str(date.today().year)
+licenseUpdateExclude {
+  Excluded\.h$
+}
+"""
+        )
+        Path(".wpiformat-license").write_text(
+            """/*{padding}Company Name{padding}*/
+/* Copyright (c) {year} Company Name. All Rights Reserved.{padding}*/
+"""
+        )
+        subprocess.run(["git", "add", ".wpiformat"])
+        subprocess.run(["git", "add", ".wpiformat-license"])
+        subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
 
-    file_appendix = """#pragma once
+        excluded_h = Path("./Excluded.h").resolve()
+        test_h = Path("./Test.h").resolve()
+
+        year = str(date.today().year)
+
+        file_appendix = """#pragma once
 
 #include <iostream>
 
@@ -37,123 +44,123 @@ int main() {
   std::cout << "Hello World!";
 }"""
 
-    # pragma once at top of file
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        file_appendix,
-        f"""/*                                Company Name                                */
+        # pragma once at top of file
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # pragma once at top of file preceded by newline
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        "\n" + file_appendix,
-        f"""/*                                Company Name                                */
+        # pragma once at top of file preceded by newline
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            "\n" + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # File containing up-to-date license preceded by newline
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        f"""
+        # File containing up-to-date license preceded by newline
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            f"""
 
 /*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # File containing up-to-date range license
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        f"""/*                                Company Name                                */
+        # File containing up-to-date range license
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            f"""/*                                Company Name                                */
 // Copyright (c) 2011-{year} Company Name. All Rights Reserved.
 
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) 2011-{year} Company Name. All Rights Reserved.                 */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # File containing up-to-date license with one year
-    contents = (
-        f"""/*                                Company Name                                */
+        # File containing up-to-date license with one year
+        contents = (
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix
-    )
-    run_and_check_file(LicenseUpdate(), test_h, contents, contents, True)
+            + file_appendix
+        )
+        run_and_check_file(LicenseUpdate(), test_h, contents, contents, True)
 
-    # File with three newlines between license and include guard
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        f"""/*                                Company Name                                */
+        # File with three newlines between license and include guard
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # File with only one newline between license and include guard
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        f"""/*                                Company Name                                */
+        # File with only one newline between license and include guard
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # File with multiline comment spanning multiple lines of license header
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        """/*
+        # File with multiline comment spanning multiple lines of license header
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            """/*
  * Autogenerated file! Do not manually edit this file. This version is regenerated
  * any time the publish task is run, or when this file is deleted.
  */
 
 const char* WPILibVersion = "";""",
-        f"""/*                                Company Name                                */
+            f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
 /*
@@ -162,33 +169,33 @@ const char* WPILibVersion = "";""",
  */
 
 const char* WPILibVersion = "";""",
-        True,
-    )
+            True,
+        )
 
-    # File containing license year range in different postion than template
-    # (If the year isn't extracted, the range will be replaced with one year and
-    # the test will fail.)
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        f"""/*                                Company Name                                */
+        # File containing license year range in different postion than template
+        # (If the year isn't extracted, the range will be replaced with one year and
+        # the test will fail.)
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            f"""/*                                Company Name                                */
 /* Copyright (c) Company Name 2011-{year}. All Rights Reserved.                 */
 
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) 2011-{year} Company Name. All Rights Reserved.                 */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # Ensure "/*" after "*/" on same line is detected
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        """/*----------------------------------------------------------------------------*/
+        # Ensure "/*" after "*/" on same line is detected
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            """/*----------------------------------------------------------------------------*/
 /* Copyright (c) 2011 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -199,39 +206,39 @@ blah
 
 */
 """,
-        f"""/*                                Company Name                                */
+            f"""/*                                Company Name                                */
 /* Copyright (c) 2011-{year} Company Name. All Rights Reserved.                 */
 
 """,
-        True,
-    )
+            True,
+        )
 
-    # File excluded from license update isn't modified
-    contents = f"""/* Copyright (c) Company Name 2011-{year}. */
-
-"""
-    run_and_check_file(LicenseUpdate(), excluded_h, contents, contents, True)
-
-    # Ensure license regex matches
-    run_and_check_file(
-        LicenseUpdate(),
-        test_h,
-        """/* Company Name */
+        # Ensure license regex matches
+        run_and_check_file(
+            LicenseUpdate(),
+            test_h,
+            """/* Company Name */
 /* Copyright (c) 1992-2015 Company Name. All Rights Reserved. */
 
 """
-        + file_appendix,
-        f"""/*                                Company Name                                */
+            + file_appendix,
+            f"""/*                                Company Name                                */
 /* Copyright (c) 1992-{year} Company Name. All Rights Reserved.                 */
 
 """
-        + file_appendix,
-        True,
-    )
+            + file_appendix,
+            True,
+        )
 
-    # Ensure excluded files won't be processed
-    config_file = Config(Path.cwd(), Path(".wpiformat"))
-    assert not LicenseUpdate().should_process_file(config_file, excluded_h)
+        # File excluded from license update isn't modified
+        contents = f"""/* Copyright (c) Company Name 2011-{year}. */
+
+    """
+        run_and_check_file(LicenseUpdate(), excluded_h, contents, contents, True)
+
+        # Ensure excluded files won't be processed
+        config_file = Config(Path.cwd(), Path(".wpiformat"))
+        assert not LicenseUpdate().should_process_file(config_file, excluded_h)
 
     # Create git repo to test license years for commits
     with OpenTemporaryDirectory():
@@ -243,10 +250,10 @@ blah
         subprocess.run(["git", "init", "-q"])
 
         # Add base files
-        Path(".wpiformat-license").write_text("// Copyright (c) {year}")
         Path(".wpiformat").write_text("cppSrcFileInclude {\n" + r"\.cpp$")
-        subprocess.run(["git", "add", ".wpiformat-license"])
+        Path(".wpiformat-license").write_text("// Copyright (c) {year}")
         subprocess.run(["git", "add", ".wpiformat"])
+        subprocess.run(["git", "add", ".wpiformat-license"])
         subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Add file with commit date of last year and range through this year
@@ -342,14 +349,14 @@ change
         subprocess.run(["git", "init", "-q"])
 
         # Add base files
+        Path(".wpiformat").write_text("cppSrcFileInclude {\n" + r"\.cpp$")
         Path(".wpiformat-license").write_text(
             """// Copyright (c) {year}
 // https://github.com/wpilibsuite/styleguide/blob/main/{filename}
 """
         )
-        Path(".wpiformat").write_text("cppSrcFileInclude {\n" + r"\.cpp$")
-        subprocess.run(["git", "add", ".wpiformat-license"])
         subprocess.run(["git", "add", ".wpiformat"])
+        subprocess.run(["git", "add", ".wpiformat-license"])
         subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Create uncommitted empty file in subdirectory
