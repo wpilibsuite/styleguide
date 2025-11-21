@@ -88,7 +88,9 @@ class IncludeGuard(PipelineTask):
         # Use include root that results in shortest include guard
         guard_root = filename.relative_to(repo_root).as_posix()
         for include_root in sorted(
-            config_file.group("includeGuardRoots"), key=len, reverse=True
+            config_file.group("includeGuardRoots") + [""],
+            key=len,
+            reverse=True,
         ):
             if guard_root.startswith(include_root):
                 guard_path += guard_root[len(include_root) :]
