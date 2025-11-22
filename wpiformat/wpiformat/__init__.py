@@ -422,14 +422,15 @@ def main():
             else:
                 filenames.append(path)
 
-    # Convert relative filepaths to absolute
+    # Skip ignored files before resolving symlinks in case resolved filepath is
+    # outside Git repo
+    filenames: list[Path] = filter_for_unignored_files(filenames)
+
+    # Convert relative filepaths to absolute and resolve symlinks
     filenames: list[Path] = [f.resolve() for f in filenames]
 
     # Skip Git metadata
     filenames: list[Path] = [f for f in filenames if ".git" not in f.parts]
-
-    # Skip ignored files
-    filenames: list[Path] = filter_for_unignored_files(filenames)
 
     # Throw an error if any files or directories don't exist
     for f in filenames:
