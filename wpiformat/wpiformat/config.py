@@ -33,8 +33,8 @@ class Config:
         directory -- current directory from which to start search
         filename -- filename
 
-        Returns tuple of filename and list containing file contents or triggers
-        program exit.
+        Returns tuple of filename and list containing file contents or raises
+        OSError if no file was found.
         """
         for parent in (directory / filename).parents:
             filepath = parent / filename
@@ -57,10 +57,8 @@ class Config:
             except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if (parent / ".git").is_dir():
-                    raise OSError(
-                        f"config file '{filename}' not found in '{parent}'"
-                    ) from e
-        raise OSError(f"config file '{filename}' not found in '{directory}'")
+                    raise e
+        raise OSError
 
     def group(self, group_name: str) -> list[str]:
         """Returns value from config dictionary given key string.
@@ -138,7 +136,10 @@ class Config:
         Keyword arguments:
         filename -- filename
         """
-        return self.__cpp_header_include_regex.search(filename.as_posix()) is not None
+        return (
+            filename.suffix == ".hpp"
+            or self.__cpp_header_include_regex.search(filename.as_posix()) is not None
+        )
 
     def is_cpp_src_file(self, filename: Path) -> bool:
         """Returns True if file is C++ source file.
@@ -146,7 +147,10 @@ class Config:
         Keyword arguments:
         filename -- filename
         """
-        return self.__cpp_src_include_regex.search(filename.as_posix()) is not None
+        return (
+            filename.suffix == ".cpp"
+            or self.__cpp_src_include_regex.search(filename.as_posix()) is not None
+        )
 
     def is_header_file(self, filename: Path) -> bool:
         """Returns True if file is either C or C++ header file.
@@ -191,7 +195,11 @@ class Config:
         group_name = ""
         group_elements = []
 
-        self.filename, lines = self.read_file(directory, filename)
+        try:
+            self.filename, lines = self.read_file(directory, filename)
+        except OSError:
+            self.filename = "<none found>"
+            return {}
         if not lines:
             return {}
 

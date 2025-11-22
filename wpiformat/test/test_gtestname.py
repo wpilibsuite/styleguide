@@ -9,12 +9,6 @@ from .test_tasktest import *
 def test_gtestname():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""cppSrcFileInclude {
-  \.cpp$
-}
-"""
-        )
 
         test_cpp = Path("./Test.cpp").resolve()
 

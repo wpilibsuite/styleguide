@@ -85,9 +85,8 @@ def proc_pipeline(filename: Path) -> bool:
     filename -- filename
     """
     # TODO: Remove handling for deprecated .styleguide file
-    try:
-        config_file = Config(filename.parent, Path(".wpiformat"))
-    except OSError:
+    config_file = Config(filename.parent, Path(".wpiformat"))
+    if config_file.filename == "<none found>":
         config_file = Config(filename.parent, Path(".styleguide"))
 
     if verbose1 or verbose2:
@@ -129,9 +128,8 @@ def proc_standalone(filename: Path) -> bool:
     filename -- filename
     """
     # TODO: Remove handling for deprecated .styleguide file
-    try:
-        config_file = Config(filename.parent, Path(".wpiformat"))
-    except OSError:
+    config_file = Config(filename.parent, Path(".wpiformat"))
+    if config_file.filename == "<none found>":
         config_file = Config(filename.parent, Path(".styleguide"))
 
     if verbose2:
@@ -184,9 +182,8 @@ def proc_batch(filenames: list[Path]) -> bool:
         work: list[Path] = []
         for filename in filenames:
             # TODO: Remove handling for deprecated .styleguide file
-            try:
-                config_file = Config(filename.parent, Path(".wpiformat"))
-            except OSError:
+            config_file = Config(filename.parent, Path(".wpiformat"))
+            if config_file.filename == "<none found>":
                 config_file = Config(filename.parent, Path(".styleguide"))
 
             if subtask.should_process_file(config_file, filename):
@@ -472,9 +469,8 @@ def main():
     work: list[Path] = []
     for filename in filenames:
         # TODO: Remove handling for deprecated .styleguide file
-        try:
-            config_file = Config(filename.parent, Path(".wpiformat"))
-        except OSError:
+        config_file = Config(filename.parent, Path(".wpiformat"))
+        if config_file.filename == "<none found>":
             config_file = Config(filename.parent, Path(".styleguide"))
 
         if config_file.is_modifiable_file(filename):

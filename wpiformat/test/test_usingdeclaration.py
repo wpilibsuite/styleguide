@@ -9,31 +9,25 @@ from .test_tasktest import *
 def test_usingdeclaration():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""cppHeaderFileInclude {
-  \.h$
-}
-"""
-        )
 
-        test_h = Path("./Test.h").resolve()
+        test_hpp = Path("./Test.hpp").resolve()
 
         # Before class block
         run_and_check_stdout(
             UsingDeclaration(),
-            test_h,
+            test_hpp,
             """using std::chrono;
 class Test {
 }
 """,
-            f"warning: {test_h}: 1: 'using std::chrono;' in global namespace\n",
+            f"warning: {test_hpp}: 1: 'using std::chrono;' in global namespace\n",
             False,
         )
 
         # Inside enum block
         run_and_check_stdout(
             UsingDeclaration(),
-            test_h,
+            test_hpp,
             """enum Test {
   using std::chrono;
 }
@@ -45,19 +39,19 @@ class Test {
         # After { block
         run_and_check_stdout(
             UsingDeclaration(),
-            test_h,
+            test_hpp,
             """{
 }
 using std::chrono;
 """,
-            f"warning: {test_h}: 3: 'using std::chrono;' in global namespace\n",
+            f"warning: {test_hpp}: 3: 'using std::chrono;' in global namespace\n",
             False,
         )
 
         # Before class block with NOLINT
         run_and_check_stdout(
             UsingDeclaration(),
-            test_h,
+            test_hpp,
             """using std::chrono;  // NOLINT
 class Test {
 }
@@ -69,7 +63,7 @@ class Test {
         # "using" in comment without trailing semicolon
         run_and_check_stdout(
             UsingDeclaration(),
-            test_h,
+            test_hpp,
             """// using
 void func() {
   using A = int;
