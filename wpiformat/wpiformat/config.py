@@ -43,18 +43,17 @@ class Config:
                 if config_file := Config.__config_cache.get(filepath):
                     return filepath, config_file
 
-                with filepath.open("r") as file_contents:
-                    contents = file_contents.read().splitlines()
-                    Config.__config_cache[filepath] = contents
+                contents = filepath.read_text().splitlines()
+                Config.__config_cache[filepath] = contents
 
-                    # TODO: Remove deprecation message
-                    if filename.name.startswith(".styleguide"):
-                        new_name = filename.name.replace("styleguide", "wpiformat")
-                        print(
-                            f"warning: rename deprecated {filepath} to {filepath.with_name(new_name)}"
-                        )
+                # TODO: Remove deprecation message
+                if filename.name.startswith(".styleguide"):
+                    new_name = filename.name.replace("styleguide", "wpiformat")
+                    print(
+                        f"warning: rename deprecated {filepath} to {filepath.with_name(new_name)}"
+                    )
 
-                    return filepath, contents
+                return filepath, contents
             except OSError as e:
                 # .git files are ignored, which are created within submodules
                 if (parent / ".git").is_dir():
