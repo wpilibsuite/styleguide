@@ -50,7 +50,7 @@ class Lint(BatchTask):
         ]
 
         # Prepare header file extensions
-        header_exts = []
+        header_exts = ["hpp"]
         for pattern in config_file.group("cHeaderFileInclude") + config_file.group(
             "cppHeaderFileInclude"
         ):
@@ -58,8 +58,7 @@ class Lint(BatchTask):
             header_exts.append(basename[basename.rfind(".") + 1 :].rstrip("$"))
 
         args = ["cpplint.py", "--filter=-" + ",-".join(exclusion_filters)]
-        if header_exts:
-            args.append("--headers=" + ",".join(header_exts))
+        args.append("--headers=" + ",".join(header_exts))
         args.append("--quiet")
         sys.argv = args + [f.as_posix() for f in filenames]
 
