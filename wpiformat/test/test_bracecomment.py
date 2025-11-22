@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 
 from wpiformat.bracecomment import BraceComment
@@ -6,77 +7,90 @@ from .test_tasktest import *
 
 
 def test_bracecomment():
-    test_h = Path("./Test.h").resolve()
-    test_cpp = Path("./Test.cpp").resolve()
-    path_h = Path("./Path.h").resolve()
+    with OpenTemporaryDirectory():
+        subprocess.run(["git", "init", "-q"])
+        Path(".wpiformat").write_text(
+            r"""cppHeaderFileInclude {
+  \.h$
+}
 
-    # Empty anonymous namespace
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """namespace {
+cppSrcFileInclude {
+  \.cpp$
+}
+"""
+        )
+
+        test_h = Path("./Test.h").resolve()
+        test_cpp = Path("./Test.cpp").resolve()
+        path_h = Path("./Path.h").resolve()
+
+        # Empty anonymous namespace
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """namespace {
 }// comment
 """,
-        """namespace {
+            """namespace {
 }  // namespace
 """,
-        True,
-    )
+            True,
+        )
 
-    # Anonymous namespace containing comment
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """namespace {
+        # Anonymous namespace containing comment
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """namespace {
   // comment
 }// comment
 """,
-        """namespace {
+            """namespace {
   // comment
 }  // namespace
 """,
-        True,
-    )
+            True,
+        )
 
-    # namespace
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """namespace hal {
+        # namespace
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """namespace hal {
   // comment
 }// comment
 """,
-        """namespace hal {
+            """namespace hal {
   // comment
 }  // namespace hal
 """,
-        True,
-    )
+            True,
+        )
 
-    # namespace with leftover input
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """// comment before namespace
+        # namespace with leftover input
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """// comment before namespace
 namespace hal {
   // comment
 }// comment
 // comment after namespace
 """,
-        """// comment before namespace
+            """// comment before namespace
 namespace hal {
   // comment
 }  // namespace hal
 // comment after namespace
 """,
-        True,
-    )
+            True,
+        )
 
-    # Braces within namespace
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """namespace {
+        # Braces within namespace
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """namespace {
 
 struct AnalogGyro {
   HAL_AnalogInputHandle handle;
@@ -87,7 +101,7 @@ struct AnalogGyro {
 
 }
 """,
-        """namespace {
+            """namespace {
 
 struct AnalogGyro {
   HAL_AnalogInputHandle handle;
@@ -98,26 +112,26 @@ struct AnalogGyro {
 
 }  // namespace
 """,
-        True,
-    )
+            True,
+        )
 
-    # extern "C"
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """extern "C" {
+        # extern "C"
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """extern "C" {
     // nothing
 }// comment
 """,
-        """extern "C" {
+            """extern "C" {
     // nothing
 }  // extern "C"
 """,
-        True,
-    )
+            True,
+        )
 
-    # Nested brackets should be handled properly
-    contents = """extern "C" {
+        # Nested brackets should be handled properly
+        contents = """extern "C" {
 void func() {
   if (1) {
   } else if (1) {
@@ -126,65 +140,65 @@ void func() {
 }
 }  // extern "C"
 """
-    run_and_check_file(BraceComment(), test_cpp, contents, contents, True)
+        run_and_check_file(BraceComment(), test_cpp, contents, contents, True)
 
-    # Nested brackets on same line
-    run_and_check_file(
-        BraceComment(),
-        test_cpp,
-        """namespace wpi {
+        # Nested brackets on same line
+        run_and_check_file(
+            BraceComment(),
+            test_cpp,
+            """namespace wpi {
 {{}}
 }  // namespace java
 """,
-        """namespace wpi {
+            """namespace wpi {
 {{}}
 }  // namespace wpi
 """,
-        True,
-    )
+            True,
+        )
 
-    # Handle single-line statements correctly
-    run_and_check_file(
-        BraceComment(),
-        test_cpp,
-        "namespace hal { Type typeName; }\n",
-        "namespace hal { Type typeName; }  // namespace hal\n",
-        True,
-    )
+        # Handle single-line statements correctly
+        run_and_check_file(
+            BraceComment(),
+            test_cpp,
+            "namespace hal { Type typeName; }\n",
+            "namespace hal { Type typeName; }  // namespace hal\n",
+            True,
+        )
 
-    # Two incorrect comments
-    run_and_check_file(
-        BraceComment(),
-        test_h,
-        """namespace {
+        # Two incorrect comments
+        run_and_check_file(
+            BraceComment(),
+            test_h,
+            """namespace {
     // nothing
 }// comment
 namespace Name {
     // nothing
 }
 """,
-        """namespace {
+            """namespace {
     // nothing
 }  // namespace
 namespace Name {
     // nothing
 }  // namespace Name
 """,
-        True,
-    )
+            True,
+        )
 
-    # Don't touch correct comment
-    contents = """namespace {
+        # Don't touch correct comment
+        contents = """namespace {
     // nothing
 }  // namespace
 """
-    run_and_check_file(BraceComment(), test_h, contents, contents, True)
+        run_and_check_file(BraceComment(), test_h, contents, contents, True)
 
-    # Handle braces in comments properly
-    run_and_check_file(
-        BraceComment(),
-        path_h,
-        """#ifndef ALLWPILIB_WPI_PATH_H_
+        # Handle braces in comments properly
+        run_and_check_file(
+            BraceComment(),
+            path_h,
+            """#ifndef ALLWPILIB_WPI_PATH_H_
 #define ALLWPILIB_WPI_PATH_H_
 
 namespace wpi {
@@ -199,7 +213,7 @@ namespace path {
 
 #endif  // ALLWPILIB_WPI_PATH_H_
 """,
-        """#ifndef ALLWPILIB_WPI_PATH_H_
+            """#ifndef ALLWPILIB_WPI_PATH_H_
 #define ALLWPILIB_WPI_PATH_H_
 
 namespace wpi {
@@ -214,41 +228,41 @@ namespace path {
 
 #endif  // ALLWPILIB_WPI_PATH_H_
 """,
-        True,
-    )
+            True,
+        )
 
-    # Comment in macro
-    run_and_check_file(
-        BraceComment(),
-        test_cpp,
-        """#define TEST(namespaceName, name, ...) \\
+        # Comment in macro
+        run_and_check_file(
+            BraceComment(),
+            test_cpp,
+            """#define TEST(namespaceName, name, ...) \\
   namespace namespaceName { \\
   using name = __VA_ARGS__; \\
   } \\
   using name = namespaceName::name;
 """,
-        """#define TEST(namespaceName, name, ...) \\
+            """#define TEST(namespaceName, name, ...) \\
   namespace namespaceName { \\
   using name = __VA_ARGS__; \\
   }  /* namespace namespaceName */ \\
   using name = namespaceName::name;
 """,
-        True,
-    )
-    run_and_check_file(
-        BraceComment(),
-        test_cpp,
-        """#define TEST(namespaceName, name, ...) \\
+            True,
+        )
+        run_and_check_file(
+            BraceComment(),
+            test_cpp,
+            """#define TEST(namespaceName, name, ...) \\
   namespace namespaceName { \\
   using name = __VA_ARGS__; \\
   } /* namespaceName */\\
   using name = namespaceName::name;
 """,
-        """#define TEST(namespaceName, name, ...) \\
+            """#define TEST(namespaceName, name, ...) \\
   namespace namespaceName { \\
   using name = __VA_ARGS__; \\
   }  /* namespace namespaceName */ \\
   using name = namespaceName::name;
 """,
-        True,
-    )
+            True,
+        )

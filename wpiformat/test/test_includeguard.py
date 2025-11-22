@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 
 from wpiformat.includeguard import IncludeGuard
@@ -7,34 +8,47 @@ from .test_tasktest import *
 
 
 def test_includeguard():
-    test_h = Path("./Test.h").resolve()
-    test_test_h = Path("./test/Test.h").resolve()
+    with OpenTemporaryDirectory():
+        subprocess.run(["git", "init", "-q"])
+        Path(".wpiformat").write_text(
+            r"""cppHeaderFileInclude {
+  \.h$
+}
 
-    repo_root = Task.get_repo_root().name.upper()
+includeGuardRoots {
+  test/
+}
+"""
+        )
 
-    # Fix incorrect include guard
-    run_and_check_file(
-        IncludeGuard(),
-        test_h,
-        """#ifndef WRONG_H
+        test_h = Path("./Test.h").resolve()
+        test_test_h = Path("./test/Test.h").resolve()
+
+        repo_root = Task.get_repo_root().name.upper()
+
+        # Fix incorrect include guard
+        run_and_check_file(
+            IncludeGuard(),
+            test_h,
+            """#ifndef WRONG_H
 #define WRONG_C
 
 #endif
 """,
-        f"""#ifndef {repo_root}_TEST_H_
+            f"""#ifndef {repo_root}_TEST_H_
 #define {repo_root}_TEST_H_
 
 #endif  // {repo_root}_TEST_H_
 """,
-        True,
-    )
+            True,
+        )
 
-    # Ensure nested preprocessor statements are handled properly for incorrect
-    # include guard
-    run_and_check_file(
-        IncludeGuard(),
-        test_h,
-        """#ifndef WRONG_H
+        # Ensure nested preprocessor statements are handled properly for incorrect
+        # include guard
+        run_and_check_file(
+            IncludeGuard(),
+            test_h,
+            """#ifndef WRONG_H
 #define WRONG_C
 
 #if SOMETHING
@@ -42,7 +56,7 @@ def test_includeguard():
 #endif
 #endif
 """,
-        f"""#ifndef {repo_root}_TEST_H_
+            f"""#ifndef {repo_root}_TEST_H_
 #define {repo_root}_TEST_H_
 
 #if SOMETHING
@@ -50,56 +64,58 @@ def test_includeguard():
 #endif
 #endif  // {repo_root}_TEST_H_
 """,
-        True,
-    )
+            True,
+        )
 
-    # Don't touch correct include guard
-    contents = f"""#ifndef {repo_root}_TEST_H_
+        # Don't touch correct include guard
+        contents = f"""#ifndef {repo_root}_TEST_H_
 #define {repo_root}_TEST_H_
 
 #endif  // {repo_root}_TEST_H_
 """
-    run_and_check_file(IncludeGuard(), test_h, contents, contents, True)
+        run_and_check_file(IncludeGuard(), test_h, contents, contents, True)
 
-    # Fail on missing include guard
-    run_and_check_file(
-        IncludeGuard(), test_h, "// Empty file\n", "// Empty file\n", False
-    )
+        # Fail on missing include guard
+        run_and_check_file(
+            IncludeGuard(), test_h, "// Empty file\n", "// Empty file\n", False
+        )
 
-    # Verify pragma once counts as include guard
-    run_and_check_file(IncludeGuard(), test_h, "#pragma once\n", "#pragma once\n", True)
+        # Verify pragma once counts as include guard
+        run_and_check_file(
+            IncludeGuard(), test_h, "#pragma once\n", "#pragma once\n", True
+        )
 
-    # Ensure include guard roots are processed correctly
-    run_and_check_file(
-        IncludeGuard(),
-        test_h,
-        f"""#ifndef {repo_root}_WPIFORMAT_TEST_H_
+        # Ensure include guard roots are processed correctly
+        run_and_check_file(
+            IncludeGuard(),
+            test_h,
+            f"""#ifndef {repo_root}_WPIFORMAT_TEST_H_
 #define {repo_root}_WPIFORMAT_TEST_H_
 
 #endif  // {repo_root}_WPIFORMAT_TEST_H_
 """,
-        f"""#ifndef {repo_root}_TEST_H_
+            f"""#ifndef {repo_root}_TEST_H_
 #define {repo_root}_TEST_H_
 
 #endif  // {repo_root}_TEST_H_
 """,
-        True,
-    )
+            True,
+        )
 
-    # Ensure leading underscores are removed (this occurs if the user doesn't
-    # include a trailing "/" in the include guard root)
-    run_and_check_file(
-        IncludeGuard(),
-        test_test_h,
-        f"""#ifndef {repo_root}_WPIFORMAT_TEST_TEST_H_
+        # Ensure leading underscores are removed (this occurs if the user doesn't
+        # include a trailing "/" in the include guard root)
+        run_and_check_file(
+            IncludeGuard(),
+            test_test_h,
+            f"""#ifndef {repo_root}_WPIFORMAT_TEST_TEST_H_
 #define {repo_root}_WPIFORMAT_TEST_TEST_H_
 
 #endif  // {repo_root}_WPIFORMAT_TEST_TEST_H_
 """,
-        f"""#ifndef {repo_root}_TEST_H_
+            f"""#ifndef {repo_root}_TEST_H_
 #define {repo_root}_TEST_H_
 
 #endif  // {repo_root}_TEST_H_
 """,
-        True,
-    )
+            True,
+        )

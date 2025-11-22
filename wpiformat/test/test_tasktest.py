@@ -2,11 +2,25 @@
 
 import io
 import os
+import tempfile
 from contextlib import redirect_stdout
 from pathlib import Path
 
 from wpiformat.config import Config
 from wpiformat.task import Task
+
+
+class OpenTemporaryDirectory:
+    def __init__(self):
+        self.prev_dir = os.getcwd()
+
+    def __enter__(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        os.chdir(self.temp_dir.name)
+        return self.temp_dir
+
+    def __exit__(self, type, value, traceback):
+        os.chdir(self.prev_dir)
 
 
 def run_and_check_file(
