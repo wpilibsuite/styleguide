@@ -9,12 +9,6 @@ from .test_tasktest import *
 def test_jni():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""cppSrcFileInclude {
-  \.cpp$
-}
-"""
-        )
 
         digital_glitch_filter_jni_cpp = Path("./DigitalGlitchFilterJNI.cpp").resolve()
         networktables_jni_cpp = Path("./NetworkTablesJNI.cpp").resolve()

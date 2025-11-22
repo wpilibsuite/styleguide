@@ -9,25 +9,15 @@ from .test_tasktest import *
 def test_bracecomment():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""cppHeaderFileInclude {
-  \.h$
-}
 
-cppSrcFileInclude {
-  \.cpp$
-}
-"""
-        )
-
-        test_h = Path("./Test.h").resolve()
+        test_hpp = Path("./Test.hpp").resolve()
         test_cpp = Path("./Test.cpp").resolve()
-        path_h = Path("./Path.h").resolve()
+        path_hpp = Path("./Path.hpp").resolve()
 
         # Empty anonymous namespace
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """namespace {
 }// comment
 """,
@@ -40,7 +30,7 @@ cppSrcFileInclude {
         # Anonymous namespace containing comment
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """namespace {
   // comment
 }// comment
@@ -55,7 +45,7 @@ cppSrcFileInclude {
         # namespace
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """namespace hal {
   // comment
 }// comment
@@ -70,7 +60,7 @@ cppSrcFileInclude {
         # namespace with leftover input
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """// comment before namespace
 namespace hal {
   // comment
@@ -89,7 +79,7 @@ namespace hal {
         # Braces within namespace
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """namespace {
 
 struct AnalogGyro {
@@ -118,7 +108,7 @@ struct AnalogGyro {
         # extern "C"
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """extern "C" {
     // nothing
 }// comment
@@ -169,7 +159,7 @@ void func() {
         # Two incorrect comments
         run_and_check_file(
             BraceComment(),
-            test_h,
+            test_hpp,
             """namespace {
     // nothing
 }// comment
@@ -192,14 +182,14 @@ namespace Name {
     // nothing
 }  // namespace
 """
-        run_and_check_file(BraceComment(), test_h, contents, contents, True)
+        run_and_check_file(BraceComment(), test_hpp, contents, contents, True)
 
         # Handle braces in comments properly
         run_and_check_file(
             BraceComment(),
-            path_h,
-            """#ifndef ALLWPILIB_WPI_PATH_H_
-#define ALLWPILIB_WPI_PATH_H_
+            path_hpp,
+            """#ifndef ALLWPILIB_WPI_PATH_HPP_
+#define ALLWPILIB_WPI_PATH_HPP_
 
 namespace wpi {
 namespace sys {
@@ -211,10 +201,10 @@ namespace path {
 }  // namespace sys
 }  // namespace wpi
 
-#endif  // ALLWPILIB_WPI_PATH_H_
+#endif  // ALLWPILIB_WPI_PATH_HPP_
 """,
-            """#ifndef ALLWPILIB_WPI_PATH_H_
-#define ALLWPILIB_WPI_PATH_H_
+            """#ifndef ALLWPILIB_WPI_PATH_HPP_
+#define ALLWPILIB_WPI_PATH_HPP_
 
 namespace wpi {
 namespace sys {
@@ -226,7 +216,7 @@ namespace path {
 }  // namespace sys
 }  // namespace wpi
 
-#endif  // ALLWPILIB_WPI_PATH_H_
+#endif  // ALLWPILIB_WPI_PATH_HPP_
 """,
             True,
         )

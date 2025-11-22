@@ -9,17 +9,6 @@ from .test_tasktest import *
 def test_cidentlist():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""cppHeaderFileInclude {
-  \.h$
-  \.hpp$
-}
-
-cppSrcFileInclude {
-  \.cpp$
-}
-"""
-        )
 
         main_c = Path("./Main.c").resolve()
         main_cpp = Path("./Main.cpp").resolve()

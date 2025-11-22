@@ -9,7 +9,6 @@ from .test_tasktest import *
 def test_javaclass():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text("")
 
         test_java = Path("./Test.java").resolve()
 

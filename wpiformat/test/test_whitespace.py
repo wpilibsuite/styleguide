@@ -9,9 +9,8 @@ from .test_tasktest import *
 def test_whitespace():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text("")
 
-        test_h = Path("./Test.h").resolve()
+        test_hpp = Path("./Test.hpp").resolve()
 
         file_appendix = """#pragma once
 
@@ -23,15 +22,15 @@ int main() {
 """
 
         # Empty file
-        run_and_check_file(Whitespace(), test_h, "", "", True)
+        run_and_check_file(Whitespace(), test_hpp, "", "", True)
 
         # No trailing whitespace
-        run_and_check_file(Whitespace(), test_h, file_appendix, file_appendix, True)
+        run_and_check_file(Whitespace(), test_hpp, file_appendix, file_appendix, True)
 
         # Two spaces trailing
         run_and_check_file(
             Whitespace(),
-            test_h,
+            test_hpp,
             "#pragma once\n"
             + "\n"
             + "#include <iostream>\n"
@@ -46,7 +45,7 @@ int main() {
         # Two tabs trailing
         run_and_check_file(
             Whitespace(),
-            test_h,
+            test_hpp,
             """#pragma once
 
 #include <iostream>
