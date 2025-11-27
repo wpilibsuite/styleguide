@@ -474,6 +474,10 @@ def main():
         if config_file.filename == "<none found>":
             config_file = Config(filename.parent, Path(".styleguide"))
 
+        # Skip .patch files since they have significant trailing whitespace
+        if filename.suffix == ".patch":
+            continue
+
         if config_file.is_modifiable_file(filename):
             continue
         if config_file.is_generated_file(filename):
