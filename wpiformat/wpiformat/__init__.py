@@ -478,6 +478,33 @@ def main():
         if filename.suffix == ".patch":
             continue
 
+        # Skip binary files
+        if filename.suffix in [
+            ".dll",
+            ".flac",
+            ".gif",
+            ".icns",
+            ".ico",
+            ".jar",
+            ".jinja",
+            ".jpeg",
+            ".jpg",
+            ".m4a",
+            ".mp3",
+            ".mp4",
+            ".pdf",
+            ".png",
+            ".rknn",
+            ".so",
+            ".svg",
+            ".tflite",
+            ".ttf",
+            ".wav",
+            ".webp",
+            ".woff2",
+        ]:
+            continue
+
         if config_file.is_modifiable_file(filename):
             continue
         if config_file.is_generated_file(filename):
