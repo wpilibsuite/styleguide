@@ -388,7 +388,19 @@ def main():
         action="store_true",
         help="disable formatting steps, only run linting",
     )
+    parser.add_argument(
+        "--version",
+        dest="version",
+        action="store_true",
+        help="print the version and exit",
+    )
     args = parser.parse_args()
+
+    if args.version:
+        from importlib.metadata import version
+
+        print(version("wpiformat"))
+        sys.exit(0)
 
     # tidy requires compile_commands.json
     if args.tidy_all or args.tidy_changed:

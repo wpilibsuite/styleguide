@@ -56,6 +56,8 @@ jobs:
         pip install dist/*.whl
       shell: bash
 
+    - run: wpiformat --version
+
     - run: pip install pytest
 
     - name: Run unit tests
