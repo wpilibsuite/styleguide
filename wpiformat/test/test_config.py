@@ -9,16 +9,14 @@ from .test_tasktest import OpenTemporaryDirectory
 def test_config():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""generatedFileExclude {
+        Path(".wpiformat").write_text(r"""generatedFileExclude {
   /cpplint\.py$
 }
 
 modifiableFileExclude {
   \.png$
 }
-"""
-        )
+""")
 
         config_file = Config(Path.cwd(), Path(".wpiformat"))
         assert config_file.is_modifiable_file(

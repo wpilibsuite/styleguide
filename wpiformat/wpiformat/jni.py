@@ -114,15 +114,11 @@ class Jni(PipelineTask):
             comment += f"""/*
  * Class:     {match.group("class")}
  * Method:    {match.group("method")}
- * Signature: (""".replace(
-                "\n", linesep
-            )
+ * Signature: (""".replace("\n", linesep)
 
             signature += f"""JNIEXPORT {match_sig.group("ret")} JNICALL
 {match_sig.group("func")}
-{jni_args}""".replace(
-                "\n", linesep
-            )
+{jni_args}""".replace("\n", linesep)
 
             # Add other args
             line_length = len(jni_args)
@@ -144,9 +140,7 @@ class Jni(PipelineTask):
                 comment += self.map_jni_type(match_arg.group("arg_type"))
             comment += f"""){self.map_jni_type(match_sig.group("ret"))}
  */
-""".replace(
-                "\n", linesep
-            )
+""".replace("\n", linesep)
 
             # Output correct trailing character for declaration vs definition
             if match_arg.group("trailing") == "{":
