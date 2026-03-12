@@ -10,12 +10,10 @@ from .test_tasktest import *
 def test_includeguard():
     with OpenTemporaryDirectory():
         subprocess.run(["git", "init", "-q"])
-        Path(".wpiformat").write_text(
-            r"""includeGuardRoots {
+        Path(".wpiformat").write_text(r"""includeGuardRoots {
   test/
 }
-"""
-        )
+""")
 
         test_hpp = Path("./Test.hpp").resolve()
         test_test_hpp = Path("./test/Test.hpp").resolve()

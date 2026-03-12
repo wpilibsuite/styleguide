@@ -6,13 +6,13 @@ readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.11"
 dependencies = [
-  "autoflake==2.3.1",
-  "black==25.9.0",
-  "clang-format==21.1.2",
-  "clang-tidy==21.1.1",
+  "autoflake==2.3.3",
+  "black==26.3.1",
+  "clang-format==22.1.1",
+  "clang-tidy==22.1.0",
   "cpplint==2.0.2",
-  "gersemi==0.22.3",
-  "isort==7.0.0"
+  "gersemi==0.26.0",
+  "isort==8.0.1"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
