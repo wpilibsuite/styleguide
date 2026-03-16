@@ -60,6 +60,9 @@ class ClangTidy(StandaloneTask):
         # Filter out "Error while processing" lines
         lines = [l for l in lines if "Error while processing" not in l]
 
+        # Filter out "Processing file" lines
+        lines = [l for l in lines if "Processing file" not in l]
+
         # Ignore include file not found errors
         filtered_lines = []
         iterlines = iter(lines)
