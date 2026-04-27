@@ -9,9 +9,16 @@ from wpiformat.licenseupdate import LicenseUpdate
 from .test_tasktest import *
 
 
+def init_repo():
+    subprocess.run(["git", "init", "-q"])
+    subprocess.run(["git", "config", "user.email", "you@example.com"])
+    subprocess.run(["git", "config", "user.name", "Your Name"])
+
+
 def test_licenseupdate():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        init_repo()
+
         Path(".wpiformat").write_text(r"""licenseUpdateExclude {
   Excluded\.hpp$
 }
@@ -232,12 +239,12 @@ blah
 
     # Create git repo to test license years for commits
     with OpenTemporaryDirectory():
+        init_repo()
+
         last_year_cpp = Path("last-year.cpp").resolve()
         next_year_cpp = Path("next-year.cpp").resolve()
         no_year_cpp = Path("no-year.cpp").resolve()
         this_year_cpp = Path("this-year.cpp").resolve()
-
-        subprocess.run(["git", "init", "-q"])
 
         # Add base files
         Path(".wpiformat-license").write_text("// Copyright (c) {year}")
@@ -323,7 +330,7 @@ change
 
     # Create git repo to test filename expansion
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        init_repo()
 
         # Add base files
         Path(".wpiformat-license").write_text("""// Copyright (c) {year}

@@ -62,8 +62,6 @@ jobs:
 
     - name: Run unit tests
       run: |
-        git config --global user.email "you@example.com"
-        git config --global user.name "Your Name"
         cd wpiformat
         pytest
 
@@ -105,6 +103,8 @@ jobs:
         rm -rf branch-test
         git config --global init.defaultBranch develop
         mkdir branch-test && cd branch-test && git init
+        git config user.email "you@example.com"
+        git config user.name "Your Name"
         touch .wpiformat && git add .wpiformat && git commit -q -m "Initial commit"
         if wpiformat; then
           exit 1
@@ -117,6 +117,8 @@ jobs:
         rm -rf branch-test
         git config --global init.defaultBranch develop
         mkdir branch-test && cd branch-test && git init
+        git config user.email "you@example.com"
+        git config user.name "Your Name"
         touch .wpiformat && git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat -default-branch develop
 
@@ -127,6 +129,8 @@ jobs:
         rm -rf branch-test
         git config --global init.defaultBranch main
         mkdir branch-test && cd branch-test && git init
+        git config user.email "you@example.com"
+        git config user.name "Your Name"
         touch .wpiformat && git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat
 
@@ -137,6 +141,8 @@ jobs:
         rm -rf branch-test
         git config --global init.defaultBranch master
         mkdir branch-test && cd branch-test && git init
+        git config user.email "you@example.com"
+        git config user.name "Your Name"
         touch .wpiformat && git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat
 
