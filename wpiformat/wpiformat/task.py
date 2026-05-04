@@ -33,7 +33,7 @@ class Task(metaclass=ABCMeta):
         Raises OSError if no repository root was found.
         """
         if output := subprocess.check_output(
-            ["git", "rev-parse", "--show-toplevel"], encoding="ascii"
+            ["git", "rev-parse", "--show-toplevel"], encoding="utf-8"
         ).rstrip():
             return Path(output).resolve()
         else:

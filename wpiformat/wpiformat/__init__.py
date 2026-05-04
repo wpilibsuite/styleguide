@@ -474,7 +474,7 @@ def main():
     changed_file_list: list[Path] = [
         (repo_root / line.rstrip()).resolve()
         for line in subprocess.check_output(
-            ["git", "diff", "--name-only", f"{default_branch}..."], encoding="ascii"
+            ["git", "diff", "--name-only", f"{default_branch}..."], encoding="utf-8"
         ).split()
     ]
 
