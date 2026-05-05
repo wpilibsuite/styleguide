@@ -37,7 +37,7 @@ def filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
     # "git check-ignore" misbehaves when the names are separated by "\r\n" on
     # Windows, so os.linesep isn't used here.
     proc = subprocess.run(
-        ["git", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
+        ["git", "-c", "core.quotepath=off", "check-ignore", "--no-index", "-n", "-v", "--stdin"],
         input="\n".join(f.as_posix() for f in filenames).encode(),
         stdout=subprocess.PIPE,
     )
