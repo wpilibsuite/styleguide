@@ -150,12 +150,12 @@ jobs:
     - name: Git repo with non-ascii path
       shell: bash
       run: |
-        rm -rf branch-test
         mkdir bränch-tést && cd bränch-tést && git init
         git config user.email "you@example.com"
         git config user.name "Your Name"
         touch .wpiformat && git add .wpiformat && git commit -q -m "Initial commit"
         wpiformat
+        rm -rf bränch-tést
 
     - name: Delete branch-test folder
       shell: bash
