@@ -1,4 +1,8 @@
-"""This task replaces empty C identifier lists "()" with "(void)"."""
+"""
+This task replaces empty identifier lists `()` with `(void)`.
+
+Runs on: C
+"""
 
 import re
 from pathlib import Path

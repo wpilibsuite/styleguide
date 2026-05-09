@@ -1,4 +1,8 @@
-"""This task runs gersemi on CMake files."""
+"""
+This task runs gersemi.
+
+Runs on: CMake
+"""
 
 import subprocess
 import sys

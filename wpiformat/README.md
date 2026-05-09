@@ -4,25 +4,58 @@ Provides linters and formatters for ensuring WPILib's C++, Java, and Python code
 
 ## Project Setup
 
-To use these tools with a new project, copy `.wpiformat`, and `.wpiformat-license` from the examples folder into the project and create a new `.clang-format` file based on the desired C/C++ style.
+To use wpiformat with a new project, copy `.wpiformat-license` from the examples folder into the project. If you're using C or C++, also create a new `.clang-format` file based on the desired C/C++ style.
+
+## Supported tasks
+
+|Name|File types|Description|
+|----|----------|-----------|
+|BraceComment|C, C++|Ensures the trailing comment on the closing brace of extern and namespace declarations matches the declaration name.|
+|CIdentList|C|Replaces empty identifier lists `()` with `(void)`.|
+|ClangFormat|C, C++|Runs clang-format.|
+|ClangTidy|C, C++|Runs clang-tidy.|
+|CMakeFormat|CMake|Runs gersemi.|
+|EofNewline|all|Ensures that the file has zero EOF newlines if it's empty or one EOF newline.|
+|GTestName|C, C++|Ensures Google Test test names follow the format `TEST(ThingTest, Thing)`.|
+|IncludeGuard|C header, C++ header|Makes include guards follow the Google style guide.|
+|JavaClass|Java|Removes extra newlines after the line containing `class`.|
+|Jni|C++ source|Formats JNI signatures according to javah's output.|
+|LicenseUpdate|C, C++, Java|Updates the license header at the top of the file.|
+|Lint|C++|Runs cpplint.py.|
+|PyFormat|Python|Runs black.|
+|UsingDeclaration|C++ header|Disallows `using` declarations in header global namespaces.|
+|UsingNamespaceStd|C++|Warns against `using namespace std;`.|
+|Whitespace|all|Removes trailing whitespace.|
 
 ## .wpiformat
 
-wpiformat checks the current directory for the `.wpiformat` file. If one doesn't exist, all parent directories are tried as well. This file contains groups of filename regular expressions.
+This file contains groups of filename regular expressions.
 ```
 groupName {
   regex_here
 }
 ```
-The regexes are matched using [re.search()](https://docs.python.org/3/library/re.html#re.search), so they don't have to match the whole filename.
 
-Empty config groups can be omitted. Directory separators must be "/", not "\\". During processing, they will be replaced internally with an os.sep that is automatically escaped for regexes.
+The regexes are matched using [re.search()](https://docs.python.org/3/library/re.html#re.search), so they don't have to match a file's whole path.
 
-See the `.wpiformat` file in the docs/examples directory for all possible groups.
+Empty config groups can be omitted. Directory separators must be `/`, not `\`. During processing, they will be replaced internally with an `os.sep` that is automatically escaped for regexes.
 
-### Specifying C/C++ files to format
+wpiformat checks the currently processed file's directory for a `.wpiformat` file first and traverses up the directory tree if one isn't found. This allows configs which are closer to the processed file to override a project's main config.
 
-The `cHeaderFileInclude` group specifies C headers to format, the `cppHeaderFileInclude` group specifies C++ headers to format, and the `cppSrcFileInclude` group specifies C++ source files to format. It's common to match just the file extension like so: `\.hpp$`.
+### Specifying files to format
+
+wpiformat has the following file extension associations: `.h` for C header files, `.c` for C source files, `.hpp` for C++ header files, `.cpp` for C++ source files, `.py` for Python files, and `.java` for Java files. Additional C and C++ files can be associated with the following groups:
+
+- `cHeaderFileInclude`
+- `cppHeaderFileInclude`
+- `cppSrcFileInclude`
+
+It's common to match just the file extension like so:
+```
+cppHeaderFileInclude {
+  \.inc$
+}
+```
 
 ### Ignoring files
 
@@ -31,9 +64,38 @@ There are two groups of regexes which prevent tasks (i.e., formatters and linter
 - `generatedFileExclude` (generated files)
 - `modifiableFileExclude` (modifiable files)
 
-Generated files should not be modified by the user; if they are, wpiformat will emit warnings. No warnings are emitted for modifications to modifiable files.
+Generated files should not be modified by the user; if they are, wpiformat will emit warnings. No warnings are emitted for modifications to modifiable files. Exclusion groups take precedence over inclusion groups.
 
-All files ignored by patterns in a repository's `.gitignore` file are considered modifiable files. Exclusion groups take precedence over inclusion groups.
+Files excluded from version control via [.gitignore](https://git-scm.com/docs/gitignore) are skipped as modifiable.
+
+The following file types are skipped as modifiable due to significant trailing whitespace:
+
+- .jinja
+- .patch
+
+The following binary file types are skipped as modifiable:
+
+- .dll
+- .flac
+- .gif
+- .icns
+- .ico
+- .jar
+- .jpeg
+- .jpg
+- .m4a
+- .mp3
+- .mp4
+- .pdf
+- .png
+- .rknn
+- .so
+- .svg
+- .tflite
+- .ttf
+- .wav
+- .webp
+- .woff2
 
 ### License update exclusion
 
@@ -57,9 +119,9 @@ The `repoRootNameOverride` group allows one to override the repository name used
 
 ## .wpiformat-license
 
-This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. See the `.wpiformat-license` file in the docs/examples directory.
+This file contains the license header template. It should contain `Copyright (c)` followed by the company name and the string `{year}`. See the `.wpiformat-license` file in the examples directory.
 
-wpiformat checks the currently processed file's directory for a `.wpiformat` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
+wpiformat checks the currently processed file's directory for a `.wpiformat-license` file first and traverses up the directory tree if one isn't found. This allows templates which are closer to the processed file to override a project's main template.
 
 ### License header semantics
 
@@ -68,7 +130,13 @@ The license header is always at the beginning of the file and ends after two new
 ### `.wpiformat-license` special variables
 
 `{year}` is replaced with a year range from the earliest copyright year in the file to the current year. If the earliest year is the current year, only that year will be written.
+```
+// Copyright (c) {year} Company Name. All Rights Reserved.
+```
 
 `{padding}` is optional and represents an expanding space which pads the line to 80 columns. Multiple instances of `{padding}` on the same line share the padding equally.
+```
+/*{padding}Company Name{padding}*/
+```
 
 `{filename}` is optional and represents the current file's path relative to the Git repository root. Path separators are normalized to forward slashes on all platforms.

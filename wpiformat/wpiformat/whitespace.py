@@ -1,4 +1,8 @@
-"""This task removes trailing whitespace from the file."""
+"""
+This task removes trailing whitespace.
+
+Runs on: all
+"""
 
 from pathlib import Path
 

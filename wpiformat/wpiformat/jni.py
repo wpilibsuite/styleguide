@@ -1,4 +1,5 @@
-"""This task formats JNI signatures according to javah's output.
+"""
+This task formats JNI signatures according to javah's output.
 
 The format is of the form:
 
@@ -17,6 +18,8 @@ If string of arguments exceeds 80 characters in length, it wraps as follows:
 
 The preceding comment containing the Class, Method, and Signature is also
 automatically generated based on the function's return type and arguments.
+
+Runs on: C++ source
 """
 
 import re

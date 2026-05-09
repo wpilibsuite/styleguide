@@ -1,5 +1,8 @@
-"""This task ensures GoogleTest test names follow the format
-"TEST(ThingTest, Thing)".
+"""
+This task ensures Google Test test names follow the format
+`TEST(ThingTest, Thing)`.
+
+Runs on: C, C++
 """
 
 import re

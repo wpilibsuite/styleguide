@@ -1,4 +1,8 @@
-"""This task warns against "using namespace std;"."""
+"""
+This task warns against `using namespace std;`.
+
+Runs on: C++
+"""
 
 import re
 from pathlib import Path

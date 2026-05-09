@@ -495,8 +495,11 @@ def main():
         if config_file.filename == "<none found>":
             config_file = Config(filename.parent, Path(".styleguide"))
 
-        # Skip .patch files since they have significant trailing whitespace
-        if filename.suffix == ".patch":
+        # Skip files with significant trailing whitespace
+        if filename.suffix in [
+            ".jinja",
+            ".patch",
+        ]:
             continue
 
         # Skip binary files
@@ -507,7 +510,6 @@ def main():
             ".icns",
             ".ico",
             ".jar",
-            ".jinja",
             ".jpeg",
             ".jpg",
             ".m4a",

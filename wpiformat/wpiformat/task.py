@@ -1,4 +1,4 @@
-"""Task base classes for wpiformat."""
+"""Task base classes."""
 
 import subprocess
 from abc import ABCMeta, abstractmethod

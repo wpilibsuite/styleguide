@@ -1,5 +1,8 @@
-"""This task ensures the trailing comment on the closing brace of extern and
-namespace declarations matches that of the declaration name.
+"""
+This task ensures the trailing comment on the closing brace of extern and
+namespace declarations matches the declaration name.
+
+Runs on: C, C++
 """
 
 import re

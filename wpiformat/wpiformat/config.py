@@ -1,4 +1,4 @@
-"""This class is for handling wpiformat config files."""
+"""Handles wpiformat config files."""
 
 import re
 from pathlib import Path

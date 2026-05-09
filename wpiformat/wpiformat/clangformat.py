@@ -1,4 +1,8 @@
-"""This task runs clang-format on the file."""
+"""
+This task runs clang-format.
+
+Runs on: C, C++
+"""
 
 import subprocess
 import sys

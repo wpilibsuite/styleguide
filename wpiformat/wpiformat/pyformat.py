@@ -1,4 +1,8 @@
-"""This task runs black on files with Python extension."""
+"""
+This task runs black.
+
+Runs on: Python
+"""
 
 import subprocess
 import sys

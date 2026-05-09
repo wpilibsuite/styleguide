@@ -1,4 +1,8 @@
-"""This task removes extra newlines after the line containing "class"."""
+"""
+This task removes extra newlines after the line containing `class`.
+
+Runs on: Java
+"""
 
 import re
 from pathlib import Path

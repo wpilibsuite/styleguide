@@ -1,4 +1,8 @@
-"""This task updates the license header at the top of the file."""
+"""
+This task updates the license header at the top of the file.
+
+Runs on: C, C++, Java
+"""
 
 import re
 import subprocess

@@ -1,16 +1,3 @@
-cHeaderFileInclude {
-  \.h$
-}
-
-cppHeaderFileInclude {
-  \.hpp$
-  \.inc$
-}
-
-cppSrcFileInclude {
-  \.cc$
-}
-
 generatedFileExclude {
   folder1/
   folder2/subdir1/subdir2/
@@ -19,14 +6,5 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  __pycache__/
   folder/subdir/
-  \.jar$
-  \.patch$
-}
-
-licenseUpdateExclude {
-}
-
-includeGuardRoots {
 }

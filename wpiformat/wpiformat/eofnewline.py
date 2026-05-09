@@ -1,4 +1,9 @@
-"""This task ensures that the file has zero EOF newlines if it's empty or one EOF newline."""
+"""
+This task ensures that the file has zero EOF newlines if it's empty or one EOF
+newline.
+
+Runs on: all
+"""
 
 from pathlib import Path
 

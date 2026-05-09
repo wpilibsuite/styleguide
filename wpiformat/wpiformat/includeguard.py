@@ -1,5 +1,7 @@
-"""This task makes include guards follow the style stipulated by the Google
-style guide.
+"""
+This task makes include guards follow the Google style guide.
+
+Runs on: C header, C++ header
 """
 
 import re

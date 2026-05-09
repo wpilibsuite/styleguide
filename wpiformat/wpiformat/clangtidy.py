@@ -1,4 +1,8 @@
-"""This task runs clang-tidy on the file."""
+"""
+This task runs clang-tidy.
+
+Runs on: C, C++
+"""
 
 import subprocess
 import sys

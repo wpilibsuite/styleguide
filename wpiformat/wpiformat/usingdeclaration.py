@@ -1,4 +1,8 @@
-"""This task disallows "using" declarations in global namespaces in headers."""
+"""
+This task disallows `using` declarations in header global namespaces.
+
+Runs on: C++ header
+"""
 
 import re
 from pathlib import Path

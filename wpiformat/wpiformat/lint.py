@@ -1,4 +1,8 @@
-"""This task runs cpplint.py on a C++ source file."""
+"""
+This task runs cpplint.py.
+
+Runs on: C++
+"""
 
 import os
 import sys
