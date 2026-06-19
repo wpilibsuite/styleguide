@@ -75,5 +75,5 @@ class Lint(BatchTask):
             sys.argv = saved_argv
 
             # Report success if error code is 0 (False)
-            return e.code == False
+            return not e.code
         return False

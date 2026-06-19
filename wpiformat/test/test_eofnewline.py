@@ -4,7 +4,7 @@ from pathlib import Path
 
 from wpiformat.eofnewline import EofNewline
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 
 def test_eofnewline():

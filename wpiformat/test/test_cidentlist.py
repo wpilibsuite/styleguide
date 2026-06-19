@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wpiformat.cidentlist import CIdentList
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 
 def test_cidentlist():

@@ -56,31 +56,31 @@ class ClangTidy(StandaloneTask):
             )
             return False
 
-        lines = [l for l in stdout.rstrip().split("\n") if l]
+        lines = [line for line in stdout.rstrip().split("\n") if line]
 
         # Filter out "X error(s) and Y warning(s) generated." lines
-        lines = [l for l in lines if " generated." not in l]
+        lines = [line for line in lines if " generated." not in line]
 
         # Filter out "Error while processing" lines
-        lines = [l for l in lines if "Error while processing" not in l]
+        lines = [line for line in lines if "Error while processing" not in line]
 
         # Filter out "Processing file" lines
-        lines = [l for l in lines if "Processing file" not in l]
+        lines = [line for line in lines if "Processing file" not in line]
 
         # Ignore include file not found errors
         filtered_lines = []
         iterlines = iter(lines)
-        for l in iterlines:
-            if "file not found [clang-diagnostic-error]" in l:
+        for line in iterlines:
+            if "file not found [clang-diagnostic-error]" in line:
                 # Skip #include line and caret indicator line
                 next(iterlines)
                 next(iterlines)
             else:
-                filtered_lines.append(l)
+                filtered_lines.append(line)
         lines = filtered_lines
 
         # If any lines are non-empty, print them and report an error
-        if any(len(l.rstrip()) > 0 for l in lines):
+        if any(len(line.rstrip()) > 0 for line in lines):
             print(f"== clang-tidy {filename} ==\n" + "\n".join(lines))
             return False
 

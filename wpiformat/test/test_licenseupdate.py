@@ -6,7 +6,7 @@ from pathlib import Path
 from wpiformat.config import Config
 from wpiformat.licenseupdate import LicenseUpdate
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 
 def init_repo():
@@ -78,7 +78,8 @@ int main() {
 /*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
-""" + file_appendix,
+"""
+            + file_appendix,
             f"""/*                                Company Name                                */
 /* Copyright (c) {year} Company Name. All Rights Reserved.                      */
 
@@ -218,7 +219,8 @@ blah
             """/* Company Name */
 /* Copyright (c) 1992-2015 Company Name. All Rights Reserved. */
 
-""" + file_appendix,
+"""
+            + file_appendix,
             f"""/*                                Company Name                                */
 /* Copyright (c) 1992-{year} Company Name. All Rights Reserved.                 */
 
@@ -294,10 +296,13 @@ blah
         output, success = LicenseUpdate().run_pipeline(
             config_file, last_year_cpp, lines + "change\n"
         )
-        assert output == f"""// Copyright (c) 2017-{year}
+        assert (
+            output
+            == f"""// Copyright (c) 2017-{year}
 
 change
 """
+        )
 
         # Erase changes made to last-year.cpp in previous test
         Path("last-year.cpp").write_text(lines)
@@ -307,26 +312,35 @@ change
         output, success = LicenseUpdate().run_pipeline(
             config_file, this_year_cpp, lines
         )
-        assert output == f"""// Copyright (c) 2017-{year}
+        assert (
+            output
+            == f"""// Copyright (c) 2017-{year}
 
 """
+        )
 
         # Run wpiformat on next-year.cpp
         lines = Path("next-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(
             config_file, next_year_cpp, lines
         )
-        assert output == f"""// Copyright (c) 2017-{int(year) + 1}
+        assert (
+            output
+            == f"""// Copyright (c) 2017-{int(year) + 1}
 
 """
+        )
 
         # Run wpiformat on no-year.cpp
         # Should have current calendar year
         lines = Path("no-year.cpp").read_text()
         output, success = LicenseUpdate().run_pipeline(config_file, no_year_cpp, lines)
-        assert output == f"""// Copyright (c) {year}
+        assert (
+            output
+            == f"""// Copyright (c) {year}
 
 """
+        )
 
     # Create git repo to test filename expansion
     with OpenTemporaryDirectory():
@@ -347,7 +361,10 @@ change
 
         # Empty file
         output, success = LicenseUpdate().run_pipeline(config_file, file, "")
-        assert output == f"""// Copyright (c) {year}
+        assert (
+            output
+            == f"""// Copyright (c) {year}
 // https://github.com/wpilibsuite/styleguide/blob/main/dir/empty.cpp
 
 """
+        )

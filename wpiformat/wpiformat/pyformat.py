@@ -23,32 +23,27 @@ class PyFormat(BatchTask):
             args = [
                 sys.executable,
                 "-m",
-                "autoflake",
-                "--remove-all-unused-imports",
-                "--remove-unused-variables",
-                "--ignore-init-module-imports",
-                "--quiet",
-                "-i",
+                "ruff",
+                "check",
+                "--fix",
+                "-q",
             ]
             subprocess.run(args + filenames)
         except FileNotFoundError:
-            print(
-                "error: autoflake not found in PATH. Is it installed?", file=sys.stderr
-            )
+            print("error: ruff not found in PATH. Is it installed?", file=sys.stderr)
             return False
 
         try:
-            args = [sys.executable, "-m", "black", "-q"]
+            args = [
+                sys.executable,
+                "-m",
+                "ruff",
+                "format",
+                "-q",
+            ]
             subprocess.run(args + filenames)
         except FileNotFoundError:
-            print("error: black not found in PATH. Is it installed?", file=sys.stderr)
-            return False
-
-        try:
-            args = [sys.executable, "-m", "isort", "--profile", "black", "-q"]
-            subprocess.run(args + filenames)
-        except FileNotFoundError:
-            print("error: isort not found in PATH. Is it installed?", file=sys.stderr)
+            print("error: ruff not found in PATH. Is it installed?", file=sys.stderr)
             return False
 
         return True

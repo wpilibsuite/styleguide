@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wpiformat.usingdeclaration import UsingDeclaration
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_stdout
 
 
 def test_usingdeclaration():

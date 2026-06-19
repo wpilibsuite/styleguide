@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wpiformat.usingnamespacestd import UsingNamespaceStd
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_stdout
 
 
 def test_usingnamespacestd():

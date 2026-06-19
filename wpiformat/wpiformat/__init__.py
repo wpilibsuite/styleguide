@@ -159,16 +159,17 @@ def proc_standalone(filename: Path) -> bool:
     return all_success
 
 
-def chunks(l: list[Path], max_len: int) -> Generator[list[Path], None, None]:
-    """Yield successive chunks from l whose content lengths sum to less than
+def chunks(iterable: list[Path], max_len: int) -> Generator[list[Path], None, None]:
+    """
+    Yield successive chunks from iterable whose content lengths sum to less than
     max_len.
     """
     out = []
     size = 0
-    for i, arg in enumerate(l):
+    for i, arg in enumerate(iterable):
         out.append(arg)
         size += len(arg.as_posix()) + len(" ")
-        if i == len(l) - 1 or size + len(l[i + 1].as_posix()) > max_len:
+        if i == len(iterable) - 1 or size + len(iterable[i + 1].as_posix()) > max_len:
             yield out
             out = []
             size = 0

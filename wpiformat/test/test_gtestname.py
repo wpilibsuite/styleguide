@@ -3,7 +3,7 @@ from pathlib import Path
 
 from wpiformat.gtestname import GTestName
 
-from .test_tasktest import *
+from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 
 def test_gtestname():
