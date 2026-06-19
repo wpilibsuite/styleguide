@@ -6,10 +6,10 @@ readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.11"
 dependencies = [
-  "clang-format==22.1.1",
-  "clang-tidy==22.1.0",
+  "clang-format==22.1.5",
+  "clang-tidy==22.1.7",
   "cpplint==2.0.2",
-  "gersemi==0.26.0",
+  "gersemi==0.27.7",
   "ruff==0.15.18"
 ]
 classifiers = [
