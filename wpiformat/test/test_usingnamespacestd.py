@@ -71,6 +71,15 @@ int main() {
             True,
         )
 
+        # Ignore std::string_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std::string_literals;\n",
+            "",
+            True,
+        )
+
         # Ignore std::string_view_literals
         run_and_check_stdout(
             UsingNamespaceStd(),

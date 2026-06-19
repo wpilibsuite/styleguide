@@ -22,9 +22,9 @@ class UsingNamespaceStd(PipelineTask):
         linesep = super().get_linesep(lines)
 
         # Find instances of "using namespace std;" or subnamespaces of "std",
-        # but not std::literals or std::chrono_literals.
+        # but not namespaces for literals or placeholders.
         using_regex = re.compile(
-            r"using\s+namespace\s+std(;|::(?!(chrono_|string_view_)?literals|placeholders))"
+            r"using\s+namespace\s+std(;|::(?!(chrono_|string_|string_view_)?literals|placeholders))"
         )
 
         for match in using_regex.finditer(lines):
