@@ -1,5 +1,5 @@
 """
-This task runs black.
+This task runs ruff.
 
 Runs on: Python
 """

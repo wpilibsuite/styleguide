@@ -22,7 +22,7 @@ To use wpiformat with a new project, copy `.wpiformat-license` from the examples
 |Jni|C++ source|Formats JNI signatures according to javah's output.|
 |LicenseUpdate|C, C++, Java|Updates the license header at the top of the file.|
 |Lint|C++|Runs cpplint.py.|
-|PyFormat|Python|Runs black.|
+|PyFormat|Python|Runs ruff.|
 |UsingDeclaration|C++ header|Disallows `using` declarations in header global namespaces.|
 |UsingNamespaceStd|C++|Warns against `using namespace std;`.|
 |Whitespace|all|Removes trailing whitespace.|
