@@ -8,7 +8,7 @@ from .test_tasktest import OpenTemporaryDirectory, run_and_check_stdout
 
 def test_usingdeclaration():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        subprocess.check_call(["git", "init", "-q"])
 
         test_hpp = Path("./Test.hpp").resolve()
 

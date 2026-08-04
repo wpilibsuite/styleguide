@@ -10,7 +10,7 @@ dependencies = [
   "clang-tidy==22.1.7",
   "cpplint==2.0.2",
   "gersemi==0.27.7",
-  "ruff==0.15.18"
+  "ruff==0.16.1"
 ]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -48,3 +48,6 @@ version_callback = "wpiformat.version:get_version"
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = [ "test" ]
+
+[tool.ruff.lint]
+ignore = ["DTZ011"]

@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-
 import argparse
 import math
 import multiprocessing as mp
 import subprocess
 import sys
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 from wpiformat.bracecomment import BraceComment
 from wpiformat.cidentlist import CIdentList
@@ -48,6 +46,7 @@ def filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
             "--stdin",
         ],
         input="\n".join(f.as_posix() for f in filenames).encode(),
+        check=False,
         stdout=subprocess.PIPE,
     )
     if proc.returncode == 128:
@@ -469,6 +468,7 @@ def main():
         for branch in branch_options:
             proc = subprocess.run(
                 ["git", "rev-parse", "-q", "--verify", branch],
+                check=False,
                 stdout=subprocess.DEVNULL,
             )
             if proc.returncode == 0:

@@ -8,7 +8,7 @@ from .test_tasktest import OpenTemporaryDirectory
 
 def test_config():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        subprocess.check_call(["git", "init", "-q"])
         Path(".wpiformat").write_text(r"""generatedFileExclude {
   /cpplint\.py$
 }

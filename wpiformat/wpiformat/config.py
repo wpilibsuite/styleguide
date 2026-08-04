@@ -2,11 +2,12 @@
 
 import re
 from pathlib import Path
+from typing import ClassVar
 
 
 class Config:
     # Dict from filepath to file contents
-    __config_cache: dict[Path, list[str]] = {}
+    __config_cache: ClassVar[dict[Path, list[str]]] = {}
 
     def __init__(self, directory: Path, filename: Path):
         """Constructor for Config object.
@@ -54,10 +55,10 @@ class Config:
                     )
 
                 return filepath, contents
-            except OSError as e:
+            except OSError:
                 # .git files are ignored, which are created within submodules
                 if (parent / ".git").is_dir():
-                    raise e
+                    raise
         raise OSError
 
     def group(self, group_name: str) -> list[str]:

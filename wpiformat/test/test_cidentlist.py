@@ -8,7 +8,7 @@ from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 def test_cidentlist():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        subprocess.check_call(["git", "init", "-q"])
 
         main_c = Path("./Main.c").resolve()
         main_cpp = Path("./Main.cpp").resolve()

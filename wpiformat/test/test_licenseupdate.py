@@ -10,9 +10,9 @@ from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 
 def init_repo():
-    subprocess.run(["git", "init", "-q"])
-    subprocess.run(["git", "config", "user.email", "you@example.com"])
-    subprocess.run(["git", "config", "user.name", "Your Name"])
+    subprocess.check_call(["git", "init", "-q"])
+    subprocess.check_call(["git", "config", "user.email", "you@example.com"])
+    subprocess.check_call(["git", "config", "user.name", "Your Name"])
 
 
 def test_licenseupdate():
@@ -26,9 +26,9 @@ def test_licenseupdate():
         Path(".wpiformat-license").write_text("""/*{padding}Company Name{padding}*/
 /* Copyright (c) {year} Company Name. All Rights Reserved.{padding}*/
 """)
-        subprocess.run(["git", "add", ".wpiformat"])
-        subprocess.run(["git", "add", ".wpiformat-license"])
-        subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
+        subprocess.check_call(["git", "add", ".wpiformat"])
+        subprocess.check_call(["git", "add", ".wpiformat-license"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         excluded_hpp = Path("./Excluded.hpp").resolve()
         test_hpp = Path("./Test.hpp").resolve()
@@ -250,14 +250,13 @@ blah
 
         # Add base files
         Path(".wpiformat-license").write_text("// Copyright (c) {year}")
-        subprocess.run(["git", "add", ".wpiformat"])
-        subprocess.run(["git", "add", ".wpiformat-license"])
-        subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
+        subprocess.check_call(["git", "add", ".wpiformat-license"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Add file with commit date of last year and range through this year
         Path("last-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
-        subprocess.run(["git", "add", "last-year.cpp"])
-        subprocess.run(["git", "commit", "-q", "-m", '"Last year"'])
+        subprocess.check_call(["git", "add", "last-year.cpp"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"Last year"'])
         last_iso_year = f"{int(year) - 1}-01-01T00:00:00"
         subprocess.Popen(
             ["git", "commit", "-q", "--amend", "--no-edit", f"--date={last_iso_year}"],
@@ -266,13 +265,13 @@ blah
 
         # Add file with commit date of this year and range through this year
         Path("this-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
-        subprocess.run(["git", "add", "this-year.cpp"])
-        subprocess.run(["git", "commit", "-q", "-m", '"This year"'])
+        subprocess.check_call(["git", "add", "this-year.cpp"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"This year"'])
 
         # Add file with commit date of next year and range through this year
         Path("next-year.cpp").write_text(f"// Copyright (c) 2017-{year}")
-        subprocess.run(["git", "add", "next-year.cpp"])
-        subprocess.run(["git", "commit", "-q", "-m", '"Next year"'])
+        subprocess.check_call(["git", "add", "next-year.cpp"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"Next year"'])
         next_iso_year = f"{int(year) + 1}-01-01T00:00:00"
         subprocess.Popen(
             ["git", "commit", "-q", "--amend", "--no-edit", f"--date={next_iso_year}"],
@@ -284,7 +283,7 @@ blah
 
         # Run wpiformat on last-year.cpp
         lines = Path("last-year.cpp").read_text()
-        output, success = LicenseUpdate().run_pipeline(
+        output, _success = LicenseUpdate().run_pipeline(
             config_file, last_year_cpp, lines
         )
         assert output == f"// Copyright (c) 2017-{int(year) - 1}\n\n"
@@ -293,7 +292,7 @@ blah
         # update to next year instead of keeping previous year
         with open("last-year.cpp", "a") as f:
             f.write("change\n")
-        output, success = LicenseUpdate().run_pipeline(
+        output, _success = LicenseUpdate().run_pipeline(
             config_file, last_year_cpp, lines + "change\n"
         )
         assert (
@@ -309,7 +308,7 @@ change
 
         # Run wpiformat on this-year.cpp
         lines = Path("last-year.cpp").read_text()
-        output, success = LicenseUpdate().run_pipeline(
+        output, _success = LicenseUpdate().run_pipeline(
             config_file, this_year_cpp, lines
         )
         assert (
@@ -321,7 +320,7 @@ change
 
         # Run wpiformat on next-year.cpp
         lines = Path("next-year.cpp").read_text()
-        output, success = LicenseUpdate().run_pipeline(
+        output, _success = LicenseUpdate().run_pipeline(
             config_file, next_year_cpp, lines
         )
         assert (
@@ -334,7 +333,7 @@ change
         # Run wpiformat on no-year.cpp
         # Should have current calendar year
         lines = Path("no-year.cpp").read_text()
-        output, success = LicenseUpdate().run_pipeline(config_file, no_year_cpp, lines)
+        output, _success = LicenseUpdate().run_pipeline(config_file, no_year_cpp, lines)
         assert (
             output
             == f"""// Copyright (c) {year}
@@ -350,9 +349,8 @@ change
         Path(".wpiformat-license").write_text("""// Copyright (c) {year}
 // https://github.com/wpilibsuite/styleguide/blob/main/{filename}
 """)
-        subprocess.run(["git", "add", ".wpiformat"])
-        subprocess.run(["git", "add", ".wpiformat-license"])
-        subprocess.run(["git", "commit", "-q", "-m", '"Initial commit"'])
+        subprocess.check_call(["git", "add", ".wpiformat-license"])
+        subprocess.check_call(["git", "commit", "-q", "-m", '"Initial commit"'])
 
         # Create uncommitted empty file in subdirectory
         file = (Path("dir") / "empty.cpp").resolve()
@@ -360,7 +358,7 @@ change
         file.touch()
 
         # Empty file
-        output, success = LicenseUpdate().run_pipeline(config_file, file, "")
+        output, _success = LicenseUpdate().run_pipeline(config_file, file, "")
         assert (
             output
             == f"""// Copyright (c) {year}

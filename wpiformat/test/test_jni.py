@@ -8,7 +8,7 @@ from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 def test_jni():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        subprocess.check_call(["git", "init", "-q"])
 
         digital_glitch_filter_jni_cpp = Path("./DigitalGlitchFilterJNI.cpp").resolve()
         networktables_jni_cpp = Path("./NetworkTablesJNI.cpp").resolve()
