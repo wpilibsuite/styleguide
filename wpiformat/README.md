@@ -16,7 +16,6 @@ To use wpiformat with a new project, copy `.wpiformat-license` from the examples
 |ClangTidy|C, C++|Runs clang-tidy.|
 |CMakeFormat|CMake|Runs gersemi.|
 |EofNewline|all|Ensures that the file has zero EOF newlines if it's empty or one EOF newline.|
-|GTestName|C, C++|Ensures Google Test test names follow the format `TEST(ThingTest, Thing)`.|
 |IncludeGuard|C header, C++ header|Makes include guards follow the Google style guide.|
 |JavaClass|Java|Removes extra newlines after the line containing `class`.|
 |Jni|C++ source|Formats JNI signatures according to javah's output.|
