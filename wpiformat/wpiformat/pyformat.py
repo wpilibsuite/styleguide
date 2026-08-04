@@ -28,9 +28,11 @@ class PyFormat(BatchTask):
                 "--fix",
                 "-q",
             ]
-            subprocess.run(args + filenames)
+            subprocess.check_call(args + filenames)
         except FileNotFoundError:
             print("error: ruff not found in PATH. Is it installed?", file=sys.stderr)
+            return False
+        except subprocess.CalledProcessError:
             return False
 
         try:
@@ -41,9 +43,11 @@ class PyFormat(BatchTask):
                 "format",
                 "-q",
             ]
-            subprocess.run(args + filenames)
+            subprocess.check_call(args + filenames)
         except FileNotFoundError:
             print("error: ruff not found in PATH. Is it installed?", file=sys.stderr)
+            return False
+        except subprocess.CalledProcessError:
             return False
 
         return True
