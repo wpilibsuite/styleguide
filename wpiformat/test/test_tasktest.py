@@ -78,7 +78,7 @@ def run_and_check_stdout(
 
     if task.should_process_file(config_file, filename):
         with redirect_stdout(io.StringIO()) as f:
-            _, success = task.run_pipeline(config_file, filename, input_contents)
+            _output, success = task.run_pipeline(config_file, filename, input_contents)
         output = f.getvalue()
     else:
         output = input_contents

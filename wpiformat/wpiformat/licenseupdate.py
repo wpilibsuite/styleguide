@@ -51,7 +51,7 @@ class LicenseUpdate(PipelineTask):
             .replace("{padding}", "[ ]*")
             .replace("{filename}", "")
         )
-        license_rgx = re.compile(license_rgxstr, re.M)
+        license_rgx = re.compile(license_rgxstr, re.MULTILINE)
 
         first_year = last_year
 
@@ -164,7 +164,7 @@ class LicenseUpdate(PipelineTask):
 
         # Check if file has uncomitted changes in the working directory
         has_uncommitted_changes = subprocess.run(
-            ["git", "diff-index", "--quiet", "HEAD", "--", filename]
+            ["git", "diff-index", "--quiet", "HEAD", "--", filename], check=False
         ).returncode
 
         # If file hasn't been committed yet or has changes in the working

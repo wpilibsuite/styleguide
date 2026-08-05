@@ -56,10 +56,8 @@ class GTestName(PipelineTask):
                 )
                 success = False
             else:
-                if test_case.endswith("Test"):
-                    test_case = test_case[:-4]
-                if test_case.endswith("Tests"):
-                    test_case = test_case[:-5]
+                test_case = test_case.removesuffix("Test")
+                test_case = test_case.removesuffix("Tests")
 
             # Write test case name
             output += ", " + test_case + ")"

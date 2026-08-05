@@ -72,19 +72,18 @@ class UsingDeclaration(PipelineTask):
                 brace_count += 1
             elif token == "}":
                 brace_count -= 1
-            elif token.startswith("using"):
-                if brace_count == 0:
-                    linenum = lines.count(linesep, 0, match.start()) + 1
-                    if "NOLINT" not in lines.splitlines()[linenum - 1]:
-                        format_succeeded = False
+            elif token.startswith("using") and brace_count == 0:
+                linenum = lines.count(linesep, 0, match.start()) + 1
+                if "NOLINT" not in lines.splitlines()[linenum - 1]:
+                    format_succeeded = False
 
-                        # Extract using declaration
-                        using_decl = lines[
-                            match.start() : lines.find(";", match.start()) + 1
-                        ]
+                    # Extract using declaration
+                    using_decl = lines[
+                        match.start() : lines.find(";", match.start()) + 1
+                    ]
 
-                        print(
-                            f"warning: {filename}: {linenum}: '{using_decl}' in global namespace"
-                        )
+                    print(
+                        f"warning: {filename}: {linenum}: '{using_decl}' in global namespace"
+                    )
 
         return lines, format_succeeded

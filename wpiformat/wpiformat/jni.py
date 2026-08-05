@@ -37,7 +37,7 @@ class Jni(PipelineTask):
     @staticmethod
     def map_jni_type(type_name: str) -> str:
         ret = ""
-        if type_name.endswith("*") or type_name.endswith("Array"):
+        if type_name.endswith(("*", "Array")):
             ret += "["
 
         if type_name.startswith("jboolean"):

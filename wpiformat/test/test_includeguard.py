@@ -9,7 +9,7 @@ from .test_tasktest import OpenTemporaryDirectory, run_and_check_file
 
 def test_includeguard():
     with OpenTemporaryDirectory():
-        subprocess.run(["git", "init", "-q"])
+        subprocess.check_call(["git", "init", "-q"])
         Path(".wpiformat").write_text(r"""includeGuardRoots {
   test/
 }
