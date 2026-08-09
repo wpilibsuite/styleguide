@@ -214,7 +214,7 @@ def proc_batch(filenames: list[Path]) -> bool:
     return all_success
 
 
-def run_pipeline(task_pipeline, args, filenames: list[Path]):
+def run_pipeline(task_pipeline, args, filenames: list[Path]) -> bool:
     """Spawns process pool for proc_pipeline().
 
     Keyword arguments:
@@ -222,7 +222,7 @@ def run_pipeline(task_pipeline, args, filenames: list[Path]):
     args -- command line arguments from argparse
     filenames -- list of filenames to process
 
-    Calls sys.exit(1) if any task fails.
+    Returns true if all tasks succeeded.
     """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
@@ -240,11 +240,10 @@ def run_pipeline(task_pipeline, args, filenames: list[Path]):
         # Start worker processes for task pipeline
         results = pool.map(proc_pipeline, filenames)
 
-        if not all(results):
-            sys.exit(1)
+    return all(results)
 
 
-def run_batch(task_pipeline, args, filename_batches: list[list[Path]]):
+def run_batch(task_pipeline, args, filename_batches: list[list[Path]]) -> bool:
     """Spawns process pool for proc_batch().
 
     Keyword arguments:
@@ -252,7 +251,7 @@ def run_batch(task_pipeline, args, filename_batches: list[list[Path]]):
     args -- command line arguments from argparse
     filename_batches -- list of batches of filenames to process
 
-    Calls sys.exit(1) if any task fails.
+    Returns true if all tasks succeeded.
     """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
@@ -270,11 +269,10 @@ def run_batch(task_pipeline, args, filename_batches: list[list[Path]]):
         # Start worker processes for batch tasks
         results = pool.map(proc_batch, filename_batches)
 
-        if not all(results):
-            sys.exit(1)
+    return all(results)
 
 
-def run_standalone(task_pipeline, args, filenames: list[Path]):
+def run_standalone(task_pipeline, args, filenames: list[Path]) -> bool:
     """Spawns process pool for proc_standalone().
 
     Keyword arguments:
@@ -282,7 +280,7 @@ def run_standalone(task_pipeline, args, filenames: list[Path]):
     args -- command line arguments from argparse
     filenames -- list of filenames to process
 
-    Calls sys.exit(1) if any task fails.
+    Returns true if all tasks succeeded.
     """
     init_args = (task_pipeline, args.verbose1, args.verbose2)
 
@@ -300,8 +298,7 @@ def run_standalone(task_pipeline, args, filenames: list[Path]):
         # Start worker processes for standalone tasks
         results = pool.map(proc_standalone, filenames)
 
-        if not all(results):
-            sys.exit(1)
+    return all(results)
 
 
 def main():
@@ -561,10 +558,11 @@ def main():
         filenames[i : i + chunksize] for i in range(0, len(filenames), chunksize)
     ]
 
+    all_success = True
     if args.no_format:
         # Only run Lint
         task_pipeline = [Lint()]
-        run_batch(task_pipeline, args, file_batches)
+        all_success &= run_batch(task_pipeline, args, file_batches)
     else:
         # ClangFormat is run after the other tasks so it can clean up their
         # formatting.
@@ -581,12 +579,12 @@ def main():
             ClangFormat(),
             Jni(),  # Fixes clang-format formatting
         ]
-        run_pipeline(task_pipeline, args, filenames)
+        all_success &= run_pipeline(task_pipeline, args, filenames)
 
         # Lint is run last since previous tasks can affect its output.
         task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
 
-        run_batch(task_pipeline, args, file_batches)
+        all_success &= run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
     if args.tidy_all or args.tidy_changed:
@@ -598,7 +596,10 @@ def main():
                 args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )
         ]
-        run_standalone(task_pipeline, args, filenames)
+        all_success &= run_standalone(task_pipeline, args, filenames)
+
+    if not all_success:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
