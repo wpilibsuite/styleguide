@@ -37,7 +37,7 @@ def test_main_continues_after_non_utf8_file(monkeypatch, tmp_path, capsys):
     SynchronousPool.callbacks = []
     monkeypatch.setattr(wpiformat.mp, "Pool", SynchronousPool)
     monkeypatch.setattr(wpiformat.Task, "get_repo_root", lambda: tmp_path)
-    monkeypatch.setattr(wpiformat, "filter_for_unignored_files", lambda files: files)
+    monkeypatch.setattr(wpiformat, "_filter_for_unignored_files", lambda files: files)
     monkeypatch.setattr(
         wpiformat.subprocess, "check_output", lambda *args, **kwargs: ""
     )
