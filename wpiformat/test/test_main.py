@@ -65,4 +65,4 @@ def test_main_continues_after_non_utf8_file(monkeypatch, tmp_path, capsys):
     invalid_file_error = f"error: {invalid_filename} contains characters not in UTF-8"
     warning = f'warning: {warning_filename}: 1: avoid "using namespace std;"'
     assert output.index(invalid_file_error) < output.index(warning)
-    assert SynchronousPool.callbacks == ["proc_pipeline", "proc_batch"]
+    assert SynchronousPool.callbacks == ["_proc_pipeline", "_proc_batch"]
