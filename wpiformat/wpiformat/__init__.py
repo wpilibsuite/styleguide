@@ -25,7 +25,7 @@ from wpiformat.usingnamespacestd import UsingNamespaceStd
 from wpiformat.whitespace import Whitespace
 
 
-def filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
+def _filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
     """Returns list of files not in .gitignore.
 
     Keyword arguments:
@@ -441,7 +441,7 @@ def main():
 
     # Skip ignored files before resolving symlinks in case resolved filepath is
     # outside Git repo
-    filenames: list[Path] = filter_for_unignored_files(filenames)
+    filenames: list[Path] = _filter_for_unignored_files(filenames)
 
     # Convert relative filepaths to absolute and resolve symlinks
     filenames: list[Path] = [f.resolve() for f in filenames]
