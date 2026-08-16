@@ -63,7 +63,7 @@ def filter_for_unignored_files(filenames: list[Path]) -> list[Path]:
     ]
 
 
-def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
+def _proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
     """Common initialization for process pool worker.
 
     Keyword arguments:
@@ -82,7 +82,7 @@ def proc_init(task_pipeline_copy, verbose1_copy, verbose2_copy):
     print_lock = mp.Lock()
 
 
-def proc_pipeline(filename: Path) -> bool:
+def _proc_pipeline(filename: Path) -> bool:
     """Runs the contents of each file through the task pipeline.
 
     If the contents were modified at any point, the result is written back out
@@ -128,7 +128,7 @@ def proc_pipeline(filename: Path) -> bool:
     return all_success
 
 
-def proc_standalone(filename: Path) -> bool:
+def _proc_standalone(filename: Path) -> bool:
     """Runs each task on each file.
 
     Keyword arguments:
@@ -157,7 +157,7 @@ def proc_standalone(filename: Path) -> bool:
     return all_success
 
 
-def chunks(iterable: list[Path], max_len: int) -> Generator[list[Path], None, None]:
+def _chunks(iterable: list[Path], max_len: int) -> Generator[list[Path], None, None]:
     """
     Yield successive chunks from iterable whose content lengths sum to less than
     max_len.
@@ -173,7 +173,7 @@ def chunks(iterable: list[Path], max_len: int) -> Generator[list[Path], None, No
             size = 0
 
 
-def proc_batch(filenames: list[Path]) -> bool:
+def _proc_batch(filenames: list[Path]) -> bool:
     """Runs each task in the pipeline on batches of files.
 
     These tasks read and write to the files directly. They are given a list of
@@ -203,7 +203,7 @@ def proc_batch(filenames: list[Path]) -> bool:
             # than that in practice.
             MAX_WIN32_ARGS_LEN = int(32767 * 7 / 8)
 
-            for subwork in chunks(work, MAX_WIN32_ARGS_LEN):
+            for subwork in _chunks(work, MAX_WIN32_ARGS_LEN):
                 if verbose1 or verbose2:
                     print("Running", type(subtask).__name__)
                     if verbose2:
@@ -214,8 +214,8 @@ def proc_batch(filenames: list[Path]) -> bool:
     return all_success
 
 
-def run_pipeline(task_pipeline, args, filenames: list[Path]) -> bool:
-    """Spawns process pool for proc_pipeline().
+def _run_pipeline(task_pipeline, args, filenames: list[Path]) -> bool:
+    """Spawns process pool for _proc_pipeline().
 
     Keyword arguments:
     task_pipeline -- task pipeline
@@ -236,15 +236,15 @@ def run_pipeline(task_pipeline, args, filenames: list[Path]) -> bool:
         print(f"error: the following pipeline tasks are invalid: {invalid_tasks}")
         sys.exit(1)
 
-    with mp.Pool(args.jobs, proc_init, init_args) as pool:
+    with mp.Pool(args.jobs, _proc_init, init_args) as pool:
         # Start worker processes for task pipeline
-        results = pool.map(proc_pipeline, filenames)
+        results = pool.map(_proc_pipeline, filenames)
 
     return all(results)
 
 
-def run_batch(task_pipeline, args, filename_batches: list[list[Path]]) -> bool:
-    """Spawns process pool for proc_batch().
+def _run_batch(task_pipeline, args, filename_batches: list[list[Path]]) -> bool:
+    """Spawns process pool for _proc_batch().
 
     Keyword arguments:
     task_pipeline -- task pipeline
@@ -265,15 +265,15 @@ def run_batch(task_pipeline, args, filename_batches: list[list[Path]]) -> bool:
         print(f"error: the following batch tasks are invalid: {invalid_tasks}")
         sys.exit(1)
 
-    with mp.Pool(args.jobs, proc_init, init_args) as pool:
+    with mp.Pool(args.jobs, _proc_init, init_args) as pool:
         # Start worker processes for batch tasks
-        results = pool.map(proc_batch, filename_batches)
+        results = pool.map(_proc_batch, filename_batches)
 
     return all(results)
 
 
-def run_standalone(task_pipeline, args, filenames: list[Path]) -> bool:
-    """Spawns process pool for proc_standalone().
+def _run_standalone(task_pipeline, args, filenames: list[Path]) -> bool:
+    """Spawns process pool for _proc_standalone().
 
     Keyword arguments:
     task_pipeline -- task pipeline
@@ -294,9 +294,9 @@ def run_standalone(task_pipeline, args, filenames: list[Path]) -> bool:
         print(f"error: the following standalone tasks are invalid: {invalid_tasks}")
         sys.exit(1)
 
-    with mp.Pool(args.jobs, proc_init, init_args) as pool:
+    with mp.Pool(args.jobs, _proc_init, init_args) as pool:
         # Start worker processes for standalone tasks
-        results = pool.map(proc_standalone, filenames)
+        results = pool.map(_proc_standalone, filenames)
 
     return all(results)
 
@@ -562,7 +562,7 @@ def main():
     if args.no_format:
         # Only run Lint
         task_pipeline = [Lint()]
-        all_success &= run_batch(task_pipeline, args, file_batches)
+        all_success &= _run_batch(task_pipeline, args, file_batches)
     else:
         # ClangFormat is run after the other tasks so it can clean up their
         # formatting.
@@ -579,12 +579,12 @@ def main():
             ClangFormat(),
             Jni(),  # Fixes clang-format formatting
         ]
-        all_success &= run_pipeline(task_pipeline, args, filenames)
+        all_success &= _run_pipeline(task_pipeline, args, filenames)
 
         # Lint is run last since previous tasks can affect its output.
         task_pipeline = [CMakeFormat(), PyFormat(), Lint()]
 
-        all_success &= run_batch(task_pipeline, args, file_batches)
+        all_success &= _run_batch(task_pipeline, args, file_batches)
 
     # ClangTidy is run last of all; it needs the actual files
     if args.tidy_all or args.tidy_changed:
@@ -596,7 +596,7 @@ def main():
                 args.tidy_extra_args.split(",") if args.tidy_extra_args else [],
             )
         ]
-        all_success &= run_standalone(task_pipeline, args, filenames)
+        all_success &= _run_standalone(task_pipeline, args, filenames)
 
     if not all_success:
         sys.exit(1)
