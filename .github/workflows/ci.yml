@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - uses: actions/checkout@v5
       with:
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, windows-2022, ubuntu-24.04]
+        os: [macos-26, windows-2025, ubuntu-26.04]
         python-version: ['3.11', '3.12', '3.13', '3.14']
     needs: [build]
     name: Test - ${{ matrix.os }}, ${{ matrix.python-version }}
