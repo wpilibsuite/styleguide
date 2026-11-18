@@ -6,8 +6,8 @@ readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.11"
 dependencies = [
-  "clang-format==22.1.8",
-  "clang-tidy==22.1.8",
+  "clang-format==23.1.5",
+  "clang-tidy==23.1.4",
   "cpplint==2.0.2",
   "gersemi==0.28.0",
   "ruff==0.16.1"
