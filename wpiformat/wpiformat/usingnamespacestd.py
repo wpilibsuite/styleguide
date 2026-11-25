@@ -24,7 +24,25 @@ class UsingNamespaceStd(PipelineTask):
         # Find instances of "using namespace std;" or subnamespaces of "std",
         # but not namespaces for literals or placeholders.
         using_regex = re.compile(
-            r"using\s+namespace\s+std(;|::(?!(chrono_|string_|string_view_)?literals|placeholders))"
+            r"""
+            using\s+namespace\s+     # "using namespace"
+            (::\s*)?                 # Optional global scope qualifier
+            std\s*                   # "std"
+            (
+              ;                      # Followed by ";"
+            |
+              ::                     # Or followed by a subnamespace that isn't
+              (?!
+                \s*
+                (\w+\s*::\s*)*       # Zero or more nested namespaces (e.g.,
+                                     # "literals::" or "chrono::")
+                \w*literals\b        # Then "literals" or "*_literals"
+              |
+                \s*placeholders\b    # Or "placeholders"
+              )
+            )
+            """,
+            re.VERBOSE,
         )
 
         for match in using_regex.finditer(lines):

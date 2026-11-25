@@ -57,6 +57,42 @@ int main() {
             True,
         )
 
+        # Whitespace before semicolon
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std ;\n",
+            f"warning: {main_cpp}: 1: " + warning_str,
+            True,
+        )
+
+        # Global scope qualifier
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace ::std;\n",
+            f"warning: {main_cpp}: 1: " + warning_str,
+            True,
+        )
+
+        # Global scope qualifier with whitespace
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace :: std ;\n",
+            f"warning: {main_cpp}: 1: " + warning_str,
+            True,
+        )
+
+        # Whitespace around subnamespace scope operator
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std :: chrono;\n",
+            f"warning: {main_cpp}: 1: " + warning_str,
+            True,
+        )
+
         # Ignore std::literals
         run_and_check_stdout(
             UsingNamespaceStd(), main_cpp, "using namespace std::literals;\n", "", True
@@ -85,6 +121,60 @@ int main() {
             UsingNamespaceStd(),
             main_cpp,
             "using namespace std::string_view_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore std::complex_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std::complex_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore std::literals::chrono_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std::literals::chrono_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore std::chrono::chrono_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std::chrono::chrono_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore ::std::chrono_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace ::std::chrono_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore std :: literals :: chrono_literals
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std :: literals :: chrono_literals;\n",
+            "",
+            True,
+        )
+
+        # Ignore std :: placeholders
+        run_and_check_stdout(
+            UsingNamespaceStd(),
+            main_cpp,
+            "using namespace std :: placeholders;\n",
             "",
             True,
         )
